@@ -229,56 +229,69 @@ function loadFeed() {
   if (!feed || feedStarted || !currentEventId) return;
 
   feedStarted = true;
+
+  // 🔥 pokaži skeleton
   renderFeedSkeleton();
 
-const firstQuery = query(
-  collection(db, "events", currentEventId, "photos"),
-  orderBy("likes", "desc"),
-  orderBy("created", "desc"),
-  limit(FEED_PAGE_SIZE)
-);
+  const firstQuery = query(
+    collection(db, "events", currentEventId, "photos"),
+    orderBy("likes", "desc"),
+    orderBy("created", "desc"),
+    limit(FEED_PAGE_SIZE)
+  );
 
   onSnapshot(
-  firstQuery,
-  (snapshot) => {
+    firstQuery,
 
-    // 🔥 ukloni skeleton
-    if (feed.dataset.loaded !== "true") {
-      feed.innerHTML = "";
-      feed.dataset.loaded = "true";
-    }
+    // ✅ SUCCESS
+    (snapshot) => {
 
-    // 🔥 AKO NEMA SLIKA
-    if (snapshot.empty) {
+      // 🔥 makni skeleton samo prvi put
+      if (feed.dataset.loaded !== "true") {
+        feed.innerHTML = "";
+        feed.dataset.loaded = "true";
+      }
+
+      // 🔥 AKO NEMA SLIKA
+      if (snapshot.empty) {
+        feed.innerHTML = `
+          <p style="grid-column:1/-1; text-align:center; opacity:0.6;">
+            Još nema fotografija 📸
+          </p>
+        `;
+        return;
+      }
+
+      // 🔥 pagination pointer
+      lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
+
+      // 🔥 render promjena
+      snapshot.docChanges().forEach((change) => {
+        renderFeedChange(change, feed, true);
+      });
+
+      // 🔥 infinite scroll
+      createFeedObserver(feed);
+    },
+
+    // ❌ ERROR HANDLER (NAJBITNIJE)
+    (error) => {
+      console.error("🔥 Feed error:", error);
+
       feed.innerHTML = `
-        <p style="grid-column:1/-1; opacity:0.6; text-align:center;">
-          Još nema fotografija 📸
+        <p style="
+          grid-column:1/-1;
+          text-align:center;
+          color:#ff6b6b;
+          padding:20px;
+        ">
+          Greška pri učitavanju 😕<br>
+          Provjeri internet ili pokušaj kasnije
         </p>
       `;
-      return;
     }
-
-    lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
-
-    snapshot.docChanges().forEach((change) => {
-      renderFeedChange(change, feed, true);
-    });
-
-    createFeedObserver(feed);
-  },
-
-  // 🔥 KLJUČNO — ERROR HANDLER
-  (error) => {
-    console.error("Feed error:", error);
-
-    feed.innerHTML = `
-      <p style="grid-column:1/-1; color:#ff6b6b; text-align:center;">
-        Greška pri učitavanju 😕<br>
-        Provjeri internet ili pravila
-      </p>
-    `;
-  }
-);
+  );
+}
 
 function renderFeedChange(change, feed, isLiveTop = false) {
   const docSnap = change.doc;
