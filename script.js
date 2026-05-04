@@ -69,12 +69,17 @@ function getTitleWithEmoji(title, type) {
     default: return "✨ " + title + " ✨";
   }
 }
-
 function applyEvent(event) {
   if (!event) return;
-
+window.eventData = event;
+  // ==============================
+  // 🎨 THEME
+  // ==============================
   setTheme(event.type);
 
+  // ==============================
+  // 🌐 TITLE
+  // ==============================
   document.title = event.title + " | PhotoDump";
 
   const eventTitle = document.getElementById("eventTitle");
@@ -82,7 +87,67 @@ function applyEvent(event) {
     eventTitle.innerText = getTitleWithEmoji(event.title, event.type);
   }
 
+  // ==============================
+  // 🧠 DEFAULT TEXTS (fallback)
+  // ==============================
+  const defaults = {
+    home_title: "Galerija uspomena 🤍",
+    home_subtitle: "Svaka fotografija postaje dio uspomena",
+
+    upload_title: "Podijeli trenutak 📸",
+    upload_subtitle: "Dodaj fotografiju i ostavi uspomenu",
+
+    profile_title: "Tvoje uspomene",
+    profile_subtitle: "Ovdje su tvoje fotografije"
+  };
+
+  // ==============================
+  // 📥 TEXTS IZ BAZE
+  // ==============================
+  const homeTitle =
+    event.texts?.index?.title || defaults.home_title;
+
+  const homeSubtitle =
+    event.texts?.index?.subtitle || defaults.home_subtitle;
+
+  const uploadTitle =
+    event.texts?.upload?.title || defaults.upload_title;
+
+  const uploadSubtitle =
+    event.texts?.upload?.subtitle || defaults.upload_subtitle;
+
+  const profileSubtitle =
+    event.texts?.profile?.subtitle || defaults.profile_subtitle;
+
+  // ==============================
+  // 🖥️ UI UPDATE
+  // ==============================
+
+  // HOME
+  const homeTitleEl = document.getElementById("homeTitle");
+  const homeSubtitleEl = document.getElementById("homeSubtitle");
+
+  if (homeTitleEl) homeTitleEl.innerText = homeTitle;
+  if (homeSubtitleEl) homeSubtitleEl.innerText = homeSubtitle;
+
+  // UPLOAD
+  const uploadTitleEl = document.getElementById("uploadTitle");
+  const uploadSubtitleEl = document.getElementById("uploadSubtitle");
+
+  if (uploadTitleEl) uploadTitleEl.innerText = uploadTitle;
+  if (uploadSubtitleEl) uploadSubtitleEl.innerText = uploadSubtitle;
+
+  // PROFILE
+  const profileSubtitleEl = document.getElementById("profileSubtitle");
+
+  if (profileSubtitleEl) profileSubtitleEl.innerText = profileSubtitle;
+
+  // ==============================
+  // 💾 SAVE
+  // ==============================
   localStorage.setItem("eventId", currentEventId);
+
+  console.log("✅ App texts applied");
 }
 
 function bootEventFromCache() {
@@ -166,29 +231,54 @@ function loadFeed() {
   feedStarted = true;
   renderFeedSkeleton();
 
-  const firstQuery = query(
-    collection(db, "events", currentEventId, "photos"),
-    orderBy("created", "desc"),
-    limit(FEED_PAGE_SIZE)
-  );
+const firstQuery = query(
+  collection(db, "events", currentEventId, "photos"),
+  orderBy("likes", "desc"),
+  orderBy("created", "desc"),
+  limit(FEED_PAGE_SIZE)
+);
 
-  onSnapshot(firstQuery, (snapshot) => {
+  onSnapshot(
+  firstQuery,
+  (snapshot) => {
+
+    // 🔥 ukloni skeleton
     if (feed.dataset.loaded !== "true") {
       feed.innerHTML = "";
       feed.dataset.loaded = "true";
     }
 
-    if (!snapshot.empty) {
-      lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
+    // 🔥 AKO NEMA SLIKA
+    if (snapshot.empty) {
+      feed.innerHTML = `
+        <p style="grid-column:1/-1; opacity:0.6; text-align:center;">
+          Još nema fotografija 📸
+        </p>
+      `;
+      return;
     }
+
+    lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
 
     snapshot.docChanges().forEach((change) => {
       renderFeedChange(change, feed, true);
     });
 
     createFeedObserver(feed);
-  });
-}
+  },
+
+  // 🔥 KLJUČNO — ERROR HANDLER
+  (error) => {
+    console.error("Feed error:", error);
+
+    feed.innerHTML = `
+      <p style="grid-column:1/-1; color:#ff6b6b; text-align:center;">
+        Greška pri učitavanju 😕<br>
+        Provjeri internet ili pravila
+      </p>
+    `;
+  }
+);
 
 function renderFeedChange(change, feed, isLiveTop = false) {
   const docSnap = change.doc;
@@ -391,12 +481,13 @@ async function loadMoreFeedPhotos(feed) {
 
   isLoadingMore = true;
 
-  const nextQuery = query(
-    collection(db, "events", currentEventId, "photos"),
-    orderBy("created", "desc"),
-    startAfter(lastVisiblePhoto),
-    limit(FEED_PAGE_SIZE)
-  );
+const nextQuery = query(
+  collection(db, "events", currentEventId, "photos"),
+  orderBy("likes", "desc"),
+  orderBy("created", "desc"),
+  startAfter(lastVisiblePhoto),
+  limit(FEED_PAGE_SIZE)
+);
 
   const snapshot = await getDocs(nextQuery);
 
@@ -486,17 +577,19 @@ window.uploadToFirebase = function (file, user, onProgress) {
       const thumbFile = await resizeImage(file, 350, 0.65);
 
       const safeName = file.name.replace(/\s+/g, "-");
+      const timestamp = Date.now();
 
       const bigRef = ref(
         storage,
-        `events/${currentEventId}/photos/${Date.now()}_${safeName}`
+        `events/${currentEventId}/photos/${timestamp}_${safeName}`
       );
 
       const thumbRef = ref(
         storage,
-        `events/${currentEventId}/thumbs/${Date.now()}_${safeName}`
+        `events/${currentEventId}/thumbs/${timestamp}_${safeName}`
       );
 
+      // 🔥 upload glavne slike
       const uploadTask = uploadBytesResumable(bigRef, bigFile);
 
       uploadTask.on(
@@ -509,29 +602,48 @@ window.uploadToFirebase = function (file, user, onProgress) {
         },
         reject,
         async () => {
-          const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          try {
+            const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
-          await uploadBytesResumable(thumbRef, thumbFile);
+            // 🔥 upload thumbnail
+            await uploadBytesResumable(thumbRef, thumbFile);
+            const thumbUrl = await getDownloadURL(thumbRef);
 
-          const thumbUrl = await getDownloadURL(thumbRef);
+            // 🔥 ORIGINAL (samo ako je uključeno)
+            if (window.eventData?.allowOriginals) {
+              const originalRef = ref(
+                storage,
+                `events/${currentEventId}/originals/${timestamp}_${safeName}`
+              );
 
-          await addDoc(collection(db, "events", currentEventId, "photos"), {
-            imageUrl,
-            thumbUrl,
-            path: uploadTask.snapshot.ref.fullPath,
-            user,
-            userId: localStorage.getItem("userId"),
-            created: Date.now(),
-            likes: 0
-          });
+              await uploadBytesResumable(originalRef, file);
+            }
 
-          await updateDoc(doc(db, "stats", "main"), {
-            photos: increment(1)
-          });
+            // 🔥 zapis u bazu
+            await addDoc(collection(db, "events", currentEventId, "photos"), {
+              imageUrl,
+              thumbUrl,
+              path: uploadTask.snapshot.ref.fullPath,
+              user,
+              userId: localStorage.getItem("userId"),
+              created: Date.now(),
+              likes: 0,
+              visible: true
+            });
 
-          resolve(imageUrl);
+            // 🔥 stats
+            await updateDoc(doc(db, "stats", "main"), {
+              photos: increment(1)
+            });
+
+            resolve(imageUrl);
+
+          } catch (err) {
+            reject(err);
+          }
         }
       );
+
     } catch (err) {
       reject(err);
     }
@@ -559,12 +671,25 @@ window.uploadFile = async function (files) {
     wrapper.appendChild(progress);
     gallery.appendChild(wrapper);
 
-    const task = uploadToFirebase(file, user, (percent) => {
-      progress.style.width = percent + "%";
-    }).then((url) => {
-      img.src = url;
-      progress.remove();
-    });
+const task = uploadToFirebase(file, user, (percent) => {
+  progress.style.width = percent + "%";
+})
+.then((url) => {
+  img.src = url;
+  progress.remove();
+})
+.catch(() => {
+  let pending = JSON.parse(localStorage.getItem("pendingUploads") || "[]");
+
+  pending.push({
+    name: file.name,
+    time: Date.now()
+  });
+
+  localStorage.setItem("pendingUploads", JSON.stringify(pending));
+
+  showToast("Slika će se poslati kad se vrati internet 📡");
+});
 
     uploads.push(task);
   }
@@ -893,5 +1018,23 @@ async function initApp() {
     document.body.classList.add("loaded");
   });
 }
+
+let reloaded = false;
+
+window.addEventListener("online", () => {
+  if (reloaded) return;
+
+  const pending = JSON.parse(localStorage.getItem("pendingUploads") || "[]");
+
+  if (pending.length > 0) {
+    reloaded = true;
+
+    showToast("Internet vraćen — pokušavam upload 📡");
+
+    setTimeout(() => {
+      location.reload();
+    }, 1500);
+  }
+});
 
 initApp();

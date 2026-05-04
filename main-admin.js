@@ -38,6 +38,7 @@ const createBtn = document.getElementById("createBtn");
 const resultBox = document.getElementById("resultBox");
 const qrBox = document.getElementById("qrBox");
 const qrImage = document.getElementById("qrImage");
+const originalsInput = document.getElementById("allowOriginals");
 
 /* ================= DEFAULT TEXTS ================= */
 const defaults = {
@@ -450,19 +451,20 @@ window.createNewEvent = async function () {
 
     createBtn.innerText = "Spremam event...";
 
-    await setDoc(eventRef, {
-      title,
-      type,
-      bubbles: bubbleUrls,
-      texts,
-      active: true,
-      created: Date.now(),
-      stats: {
-        photos: 0,
-        dedications: 0,
-        likes: 0
-      }
-    });
+ await setDoc(eventRef, {
+  title,
+  type,
+  bubbles: bubbleUrls,
+  texts,
+  active: true,
+  allowOriginals: originalsInput.value === "true", // 🔥 OVO DODAJ
+  created: Date.now(),
+  stats: {
+    photos: 0,
+    dedications: 0,
+    likes: 0
+  }
+});
 
     const guestLink = `${location.origin}/index.html?event=${eventId}`;
     const appLink = `${location.origin}/app.html?event=${eventId}`;
