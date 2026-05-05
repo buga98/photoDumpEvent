@@ -7,26 +7,38 @@ import {
   orderBy,
   updateDoc,
   doc,
-  limit
+  limit,
+  getDoc,
+  startAfter   
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-/* ================= FIREBASE ================= */
+/* ================= FIREBASE (ISTI KAO APP) ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "photodumpkrstenje.firebaseapp.com",
-  projectId: "photodumpkrstenje",
+  apiKey: "AIzaSyBjETO...",
+  authDomain: "photodumpevent-4578c.firebaseapp.com",
+  projectId: "photodumpevent-4578c",
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ================= SETTINGS ================= */
-const IMAGE_LIMIT = 50;
-const DEDICATION_LIMIT = 50;
+/* ================= EVENT ID ================= */
+const currentEventId =
+  new URLSearchParams(window.location.search).get("event");
 
+if (!currentEventId) {
+  alert("Nema event ID-a");
+  throw new Error("Missing eventId");
+}
+
+/* ================= SETTINGS ================= */
+const IMAGE_LIMIT = 24;
+const DEDICATION_LIMIT = 24;
+let lastVisible = null;
+let loadingMore = false;
+let hasMore = true;
 /* ================= STATE ================= */
 let currentFilter = "all";
-
 let selectedPhotoId = null;
 let selectedWrapper = null;
 let selectedVisible = true;
@@ -39,6 +51,18 @@ let overlay = null;
 
 let showAuthor = localStorage.getItem("showAuthor") !== "false";
 let showDedications = localStorage.getItem("showDedications") === "true";
+let selectionMode = false;
+let selectedIds = new Set();
+
+/* ================= EVENT INFO ================= */
+async function loadEventInfo() {
+  const snap = await getDoc(doc(db, "events", currentEventId));
+
+  if (snap.exists()) {
+    document.getElementById("eventName").innerText =
+      snap.data().title;
+  }
+}
 
 /* ================= HELPERS ================= */
 function buildImageList(snapshot) {
@@ -50,18 +74,20 @@ function buildImageList(snapshot) {
     if (currentFilter === "visible" && data.visible === false) return;
     if (currentFilter === "hidden" && data.visible !== false) return;
 
-allImages.push({
-  id: docSnap.id,
-  url: data.imageUrl,
-  thumb: data.thumbUrl,
-  user: data.user || "Gost",
-  visible: data.visible !== false
-});
+    allImages.push({
+      id: docSnap.id,
+      url: data.imageUrl,
+      thumb: data.thumbUrl,
+      user: data.user || "Gost",
+      visible: data.visible !== false
+    });
   });
 }
 
 /* ================= FILTER ================= */
 window.filterPhotos = function (type) {
+  lastVisible = null;
+hasMore = true;
   currentFilter = type;
 
   document.querySelectorAll(".admin-filters button").forEach((btn) => {
@@ -81,9 +107,15 @@ async function loadAllImages() {
 
   gallery.innerHTML = "Učitavanje...";
 
-  const snapshot = await getDocs(
-    query(collection(db, "photos"), orderBy("created", "desc"), limit(IMAGE_LIMIT))
-  );
+const q = query(
+  collection(db, "events", currentEventId, "photos"),
+  orderBy("created", "desc"),
+  limit(IMAGE_LIMIT)
+);
+
+const snapshot = await getDocs(q);
+
+lastVisible = snapshot.docs[snapshot.docs.length - 1];
 
   gallery.innerHTML = "";
   buildImageList(snapshot);
@@ -95,6 +127,7 @@ async function loadAllImages() {
 
     const wrapper = document.createElement("div");
     wrapper.className = "photo-card";
+    wrapper.dataset.id = imgData.id;
 
     if (!imgData.visible) wrapper.classList.add("hidden-photo");
 
@@ -102,10 +135,6 @@ async function loadAllImages() {
     img.src = imgData.thumb || imgData.url;
     img.loading = "lazy";
     img.decoding = "async";
-    img.style.touchAction = "manipulation";
-    
-    img.style.userSelect = "none";
-img.style.webkitUserSelect = "none";
 
     wrapper.appendChild(img);
 
@@ -114,110 +143,139 @@ img.style.webkitUserSelect = "none";
     badge.innerText = imgData.visible ? "✔" : "🚫";
     wrapper.appendChild(badge);
 
-    /* LONG PRESS */
-let pressTimer;
-let isLongPress = false;
-let startX = 0;
-let startY = 0;
-let moved = false;
+    let pressTimer;
+    let moved = false;
 
-const start = (e) => {
-  isLongPress = false;
-  moved = false;
+    wrapper.addEventListener("touchstart", (e) => {
+  if (selectionMode) return;
+      moved = false;
 
-  const touch = e.touches[0];
-  startX = touch.clientX;
-  startY = touch.clientY;
+      pressTimer = setTimeout(() => {
+        if (!moved) {
+          openPhotoAction(imgData.id, wrapper);
+        }
+      }, 600);
+    });
 
-  pressTimer = setTimeout(() => {
-    if (!moved) {
-      isLongPress = true;
-      openPhotoAction(imgData.id, wrapper);
-    }
-  }, 600);
-};
+    wrapper.addEventListener("touchmove", () => {
+      moved = true;
+      clearTimeout(pressTimer);
+    });
+wrapper.addEventListener("click", () => {
+  if (!selectionMode) return;
 
-const move = (e) => {
-  const touch = e.touches[0];
-  const dx = Math.abs(touch.clientX - startX);
-  const dy = Math.abs(touch.clientY - startY);
+  const id = imgData.id;
 
- if (dx > 15 || dy > 15) {
-    moved = true;
-    clearTimeout(pressTimer);
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id);
+    wrapper.classList.remove("selected");
+  } else {
+    selectedIds.add(id);
+    wrapper.classList.add("selected");
   }
-};
-
-const end = () => {
-  clearTimeout(pressTimer);
-
-  if (!isLongPress && !moved) {
-    openFullscreenFromList(imgData.id);
-  }
-};
-
-wrapper.addEventListener("touchstart", start);
-wrapper.addEventListener("touchmove", move); // 🔥 OVO TI FALI
-wrapper.addEventListener("touchend", end);
-wrapper.addEventListener("touchcancel", () => clearTimeout(pressTimer));
+});
+    wrapper.addEventListener("touchend", () => {
+      clearTimeout(pressTimer);
+    });
 
     gallery.appendChild(wrapper);
   });
 
   document.getElementById("photoCount").innerText = count;
 }
+async function loadMoreImages() {
+  if (loadingMore || !hasMore || !lastVisible) return;
 
-/* ================= FULLSCREEN ================= */
-function openFullscreenFromList(photoId) {
-    if (document.querySelector(".admin-fullscreen")) return;
-  let index = allImages.findIndex(p => p.id === photoId);
-  if (index === -1) return;
+  loadingMore = true;
 
-  const full = document.createElement("div");
-  full.className = "admin-fullscreen";
+  const q = query(
+    collection(db, "events", currentEventId, "photos"),
+    orderBy("created", "desc"),
+    startAfter(lastVisible),
+    limit(IMAGE_LIMIT)
+  );
 
-  const img = document.createElement("img");
-  img.className = "admin-fullscreen-img";
+  const snapshot = await getDocs(q);
 
-  full.appendChild(img);
-  document.body.appendChild(full);
-
-  function render() {
-    img.src = allImages[index].url;
-  }
-
-  let startX = 0;
-  let isSwiping = false;
-
-  full.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-    isSwiping = false;
-  });
-
-  full.addEventListener("touchmove", () => {
-    isSwiping = true;
-  });
-
-full.addEventListener("touchend", e => {
-  const diff = startX - e.changedTouches[0].clientX;
-
-  if (Math.abs(diff) > 50) {
-    index = diff > 0
-      ? (index + 1) % allImages.length
-      : (index - 1 + allImages.length) % allImages.length;
-
-    render();
+  if (snapshot.empty) {
+    hasMore = false;
+    loadingMore = false;
     return;
   }
 
-  // 🔥 ako nije swipe → zatvori
-  full.remove();
+  lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+  const gallery = document.getElementById("gallery");
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    // 🔥 FILTER SUPPORT
+    if (currentFilter === "visible" && data.visible === false) return;
+    if (currentFilter === "hidden" && data.visible !== false) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "photo-card";
+    wrapper.dataset.id = docSnap.id;
+
+    if (data.visible === false) wrapper.classList.add("hidden-photo");
+
+    const img = document.createElement("img");
+    img.src = data.thumbUrl || data.imageUrl;
+    img.loading = "lazy";
+
+    wrapper.appendChild(img);
+
+    const badge = document.createElement("div");
+    badge.className = "admin-badge";
+    badge.innerText = data.visible === false ? "🚫" : "✔";
+    wrapper.appendChild(badge);
+
+    // 🔥 LONG PRESS
+    let pressTimer;
+    let moved = false;
+
+    wrapper.addEventListener("touchstart", (e) => {
+  if (selectionMode) return;
+      moved = false;
+
+      pressTimer = setTimeout(() => {
+        if (!moved) {
+          openPhotoAction(docSnap.id, wrapper);
+        }
+      }, 600);
+    });
+wrapper.addEventListener("click", () => {
+  if (!selectionMode) return;
+
+  const id = docSnap.id;
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id);
+    wrapper.classList.remove("selected");
+  } else {
+    selectedIds.add(id);
+    wrapper.classList.add("selected");
+  }
 });
+    wrapper.addEventListener("touchmove", () => {
+      moved = true;
+      clearTimeout(pressTimer);
+    });
 
-  render();
+    wrapper.addEventListener("touchend", () => {
+      clearTimeout(pressTimer);
+    });
+
+    gallery.appendChild(wrapper);
+  });
+
+  // 🔥 UPDATE COUNT
+  document.getElementById("photoCount").innerText =
+    document.querySelectorAll(".photo-card").length;
+
+  loadingMore = false;
 }
-
-/* ================= ACTION MODAL ================= */
+/* ================= ACTION ================= */
 function openPhotoAction(id, wrapper) {
   selectedPhotoId = id;
   selectedWrapper = wrapper;
@@ -235,17 +293,15 @@ window.confirmPhotoAction = async function (confirm) {
 
   const newState = !selectedVisible;
 
-  await updateDoc(doc(db, "photos", selectedPhotoId), {
-    visible: newState
-  });
+  await updateDoc(
+    doc(db, "events", currentEventId, "photos", selectedPhotoId),
+    { visible: newState }
+  );
 
   selectedWrapper.classList.toggle("hidden-photo", !newState);
 
   const badge = selectedWrapper.querySelector(".admin-badge");
   if (badge) badge.innerText = newState ? "✔" : "🚫";
-
-  const img = allImages.find(p => p.id === selectedPhotoId);
-  if (img) img.visible = newState;
 };
 
 /* ================= DEDICATIONS ================= */
@@ -254,7 +310,11 @@ async function loadDedications() {
   if (!list) return;
 
   const snapshot = await getDocs(
-    query(collection(db, "dedications"), orderBy("created", "desc"), limit(DEDICATION_LIMIT))
+    query(
+      collection(db, "events", currentEventId, "dedications"),
+      orderBy("created", "desc"),
+      limit(DEDICATION_LIMIT)
+    )
   );
 
   list.innerHTML = "";
@@ -287,36 +347,14 @@ window.closeDedicationModal = function () {
   document.getElementById("dedicationModal").style.display = "none";
 };
 
-/* ================= SETTINGS ================= */
-window.openSettings = () =>
-  document.getElementById("settingsModal").style.display = "flex";
-
-window.closeSettings = function () {
-  showAuthor = document.getElementById("showAuthor").checked;
-  showDedications = document.getElementById("showDedications").checked;
-
-  localStorage.setItem("showAuthor", showAuthor);
-  localStorage.setItem("showDedications", showDedications);
-
-  document.getElementById("settingsModal").style.display = "none";
-};
-
-/* ================= DOWNLOAD ================= */
-window.downloadAllPhotos = function () {
-  alert("Download trenutno nije dostupan 🙂");
-};
-
 /* ================= SLIDESHOW ================= */
 window.startSlideshow = async function () {
-  if (overlay) return;
-
-  if (slideshowInterval) {
-    clearInterval(slideshowInterval);
-    slideshowInterval = null;
-  }
-
   const snapshot = await getDocs(
-    query(collection(db, "photos"), orderBy("created", "desc"), limit(IMAGE_LIMIT))
+    query(
+      collection(db, "events", currentEventId, "photos"),
+      orderBy("created", "desc"),
+      limit(IMAGE_LIMIT)
+    )
   );
 
   slideshowImages = [];
@@ -338,7 +376,6 @@ window.startSlideshow = async function () {
 
   const img = document.createElement("img");
   const caption = document.createElement("div");
-  caption.className = "slideshow-caption";
 
   overlay.append(img, caption);
   document.body.appendChild(overlay);
@@ -348,24 +385,15 @@ window.startSlideshow = async function () {
     const current = slideshowImages[i];
 
     img.src = current.url;
-
-    if (showAuthor) {
-      caption.innerText = "📸 " + current.user;
-      caption.style.display = "block";
-    } else {
-      caption.style.display = "none";
-    }
+    caption.innerText = showAuthor ? "📸 " + current.user : "";
   }
 
   next();
-
-  const speed = Number(document.getElementById("slideSpeed")?.value || 3000);
-  slideshowInterval = setInterval(next, speed);
+  slideshowInterval = setInterval(next, 3000);
 
   overlay.onclick = () => {
     clearInterval(slideshowInterval);
     overlay.remove();
-    overlay = null;
   };
 };
 
@@ -391,6 +419,62 @@ window.switchAdminScreen = function (screen) {
 };
 
 /* ================= INIT ================= */
+loadEventInfo();
 loadAllImages();
 loadDedications();
 switchAdminScreen("photos");
+window.addEventListener("scroll", () => {
+  if (
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 300
+  ) {
+    loadMoreImages();
+  }
+});
+window.toggleSelectionMode = function () {
+  selectionMode = !selectionMode;
+
+  selectedIds.clear();
+
+  document.body.classList.toggle("select-mode", selectionMode);
+
+  document.querySelectorAll(".photo-card").forEach(card => {
+    card.classList.remove("selected");
+  });
+};
+window.hideSelected = async function () {
+  for (let id of selectedIds) {
+    await updateDoc(
+      doc(db, "events", currentEventId, "photos", id),
+      { visible: false }
+    );
+  }
+
+  alert("Sakriveno ✔");
+  loadAllImages();
+selectedIds.clear();
+};
+
+window.showSelected = async function () {
+  for (let id of selectedIds) {
+    await updateDoc(
+      doc(db, "events", currentEventId, "photos", id),
+      { visible: true }
+    );
+  }
+
+  alert("Vraćeno ✔");
+  loadAllImages();
+selectedIds.clear();
+};
+window.selectAll = function () {
+  selectedIds.clear();
+
+  document.querySelectorAll(".photo-card").forEach(card => {
+    const id = card.dataset.id;
+
+    if (!id) return;
+
+    selectedIds.add(id);
+    card.classList.add("selected");
+  });
+};

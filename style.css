@@ -1402,3 +1402,11 @@ body.theme-pricest .glass {
     height: 72px;
   }
 }
+.select-mode .photo-card {
+  cursor: pointer;
+}
+
+.photo-card.selected {
+  outline: 4px solid #e91e63;
+  transform: scale(0.95);
+}

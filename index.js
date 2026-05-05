@@ -266,3 +266,52 @@ window.addEventListener("load", () => {
   document.body.classList.add("loaded");
   logTime("Page loaded");
 });
+let clickCount = 0;
+let clickTimer;
+
+titleEl.addEventListener("click", () => {
+  clickCount++;
+
+  clearTimeout(clickTimer);
+
+  clickTimer = setTimeout(() => {
+    clickCount = 0;
+  }, 800);
+
+  if (clickCount >= 3) {
+    openAdminModal();
+    clickCount = 0;
+  }
+});
+window.openAdminModal = function () {
+  document.getElementById("adminModal").style.display = "flex";
+};
+
+window.closeAdminModal = function () {
+  document.getElementById("adminModal").style.display = "none";
+};
+
+window.checkAdmin = function () {
+  const pass = document.getElementById("adminPass").value;
+
+  if (pass === "1234") { // 🔥 TU STAVI SVOJU LOZINKU
+    window.location.href = "/admin.html?event=" + eventId;
+  } else {
+    alert("Kriva lozinka");
+  }
+};
+window.addEventListener("click", (e) => {
+  const modal = document.getElementById("adminModal");
+
+  if (e.target === modal) {
+    closeAdminModal();
+  }
+});
+window.openAdminModal = function () {
+  const modal = document.getElementById("adminModal");
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    document.getElementById("adminPass").focus();
+  }, 50);
+};
