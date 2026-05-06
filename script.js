@@ -1030,72 +1030,28 @@ window.loadMyImages = async function () {
       "<p style='grid-column:1/-1;'>Greška pri učitavanju</p>";
   }
 };
-/* ===== SECRET ADMIN OPEN ===== */
+/* ===== SECRET ADMIN BUTTON ===== */
 
-const topbar =
-  document.getElementById("eventTitle");
+const secretBtn =
+  document.getElementById("secretAdminBtn");
 
-let holdTimer = null;
-let holdTriggered = false;
+if (secretBtn) {
 
-if (topbar) {
+  secretBtn.onclick = () => {
 
-  const startHold = () => {
+    const pass =
+      prompt("Admin šifra");
 
-    holdTriggered = false;
+    if (pass === "admin") {
 
-    holdTimer = setTimeout(() => {
+      window.location.href =
+        "/admin.html?event=" + currentEventId;
 
-      holdTriggered = true;
+    } else {
 
-      if (navigator.vibrate) {
-        navigator.vibrate(80);
-      }
-
-      const pass =
-        prompt("Admin šifra");
-
-      if (pass === "admin") {
-
-        window.location.href =
-          "/admin.html?event=" + currentEventId;
-      }
-
-    }, 1400);
-  };
-
-  const cancelHold = () => {
-
-    clearTimeout(holdTimer);
-  };
-
-  // MOBILE
-  topbar.addEventListener("touchstart", startHold, {
-    passive: true
-  });
-
-  topbar.addEventListener("touchend", cancelHold);
-
-  topbar.addEventListener("touchmove", cancelHold);
-
-  topbar.addEventListener("touchcancel", cancelHold);
-
-  // DESKTOP
-  topbar.addEventListener("mousedown", startHold);
-
-  topbar.addEventListener("mouseup", cancelHold);
-
-  topbar.addEventListener("mouseleave", cancelHold);
-
-  // BLOCK CLICK AFTER HOLD
-  topbar.addEventListener("click", (e) => {
-
-    if (holdTriggered) {
-
-      e.preventDefault();
-      e.stopPropagation();
+      alert("Kriva šifra");
     }
-  });
+  };
 }
 /* ===== LIVE COUNTERS ===== */
 function loadLiveCounters() {

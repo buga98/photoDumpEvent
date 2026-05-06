@@ -99,7 +99,14 @@ if (currentRole === "superadmin") {
       </div>
     `;
 
-    card.onclick = () => openEditor(docSnap.id);
+    if (currentRole === "superadmin") {
+
+  card.onclick = () => openEditor(docSnap.id);
+
+} else {
+
+  card.style.cursor = "default";
+}
 
     eventsList.appendChild(card);
   });
@@ -320,6 +327,10 @@ onAuthStateChanged(auth, async (user) => {
 
   currentRole =
     userData.role;
+    if (currentRole !== "superadmin") {
+
+  editor.remove();
+}
 const badge =
   document.getElementById("roleBadge");
 

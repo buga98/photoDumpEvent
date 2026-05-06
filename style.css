@@ -1414,3 +1414,42 @@ body.theme-pricest .glass {
   outline: 4px solid #e91e63;
   transform: scale(0.95);
 }
+.topbar-wrap{
+
+  position:relative;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#secretAdminBtn{
+
+  position:absolute;
+
+  right:14px;
+  top:50%;
+
+  transform:translateY(-50%);
+
+  width:34px;
+  height:34px;
+
+  border:none;
+  outline:none;
+
+  border-radius:50%;
+
+  background:transparent;
+
+  opacity:.08;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+#secretAdminBtn:hover{
+
+  opacity:.25;
+}
