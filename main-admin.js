@@ -407,7 +407,30 @@ function updatePreview() {
   setText("previewProfileTitle", profileTitle);
   setText("previewProfileText", profileText);
 }
+window.switchPreview = function(screen) {
 
+  document
+    .getElementById("previewIndex")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("previewApp")
+    ?.classList.remove("active");
+
+  if (screen === "index") {
+
+    document
+      .getElementById("previewIndex")
+      ?.classList.add("active");
+  }
+
+  if (screen === "app") {
+
+    document
+      .getElementById("previewApp")
+      ?.classList.add("active");
+  }
+};
 /* ================= LISTENERS ================= */
 typeInput.addEventListener("change", () => {
 

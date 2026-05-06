@@ -90,7 +90,7 @@ async function loadUsers() {
       </div>
 
       <div class="event-status">
-        ${data.approved ? "✅ Odobren" : "⏳ Čeka approval"}
+        ${data.approved ? "✅ Odobren" : "⏳ Čeka Odobrenje"}
       </div>
 
       ${
