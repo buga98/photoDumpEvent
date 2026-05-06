@@ -329,52 +329,76 @@ if (visibleDocs.length === 0) {
 }
 
 function renderFeedChange(change, feed, isLiveTop = false) {
+
   const docSnap = change.doc;
-  const data = docSnap.data();
   const photoId = docSnap.id;
 
-  if (change.type === "removed" || data.visible === false) {
-    const existing = renderedPhotos.get(photoId);
+  // 🔥 REMOVED
+  if (change.type === "removed") {
+
+    const existing =
+      renderedPhotos.get(photoId);
+
     if (existing) {
       existing.remove();
       renderedPhotos.delete(photoId);
     }
+
     return;
   }
 
-if (change.type === "modified") {
-  const existing = renderedPhotos.get(photoId);
+  const data = docSnap.data();
 
-  if (existing) {
+  // 🔥 HIDDEN
+  if (data.visible === false) {
 
-    const countEl =
-      existing.querySelector(".like-count");
+    const existing =
+      renderedPhotos.get(photoId);
 
-    if (countEl) {
-      countEl.innerText = data.likes || 0;
+    if (existing) {
+      existing.remove();
+      renderedPhotos.delete(photoId);
     }
 
-    const heart =
-      existing.querySelector(".heart");
-
-    if (likedCache.has(photoId)) {
-      heart?.classList.add("liked");
-    }
+    return;
   }
 
-  return;
-}
+  // 🔥 MODIFIED
+  if (change.type === "modified") {
 
+    const existing =
+      renderedPhotos.get(photoId);
+
+    if (existing) {
+
+      const countEl =
+        existing.querySelector(".like-count");
+
+      if (countEl) {
+        countEl.innerText = data.likes || 0;
+      }
+
+      const heart =
+        existing.querySelector(".heart");
+
+      if (likedCache.has(photoId)) {
+        heart?.classList.add("liked");
+      }
+    }
+
+    return;
+  }
+
+  // 🔥 ALREADY EXISTS
   if (renderedPhotos.has(photoId)) return;
 
-  const card = createFeedCard(photoId, data);
+  // 🔥 CREATE
+  const card =
+    createFeedCard(photoId, data);
+
   renderedPhotos.set(photoId, card);
 
-  if (isLiveTop) {
-    feed.prepend(card);
-  } else {
-    feed.appendChild(card);
-  }
+  feed.appendChild(card);
 }
 
 function createFeedCard(photoId, data) {
@@ -878,6 +902,13 @@ if (data) {
 }
 
   await deleteDoc(docRef);
+  const existing =
+  renderedPhotos.get(selectedPhotoId);
+
+if (existing) {
+  existing.remove();
+  renderedPhotos.delete(selectedPhotoId);
+}
 
 await updateDoc(doc(db, "events", currentEventId), {
   photoCount: increment(-1)
@@ -999,7 +1030,39 @@ window.loadMyImages = async function () {
       "<p style='grid-column:1/-1;'>Greška pri učitavanju</p>";
   }
 };
+let adminPressTimer;
 
+const title =
+  document.getElementById("eventTitle");
+
+if (title) {
+
+  title.addEventListener("touchstart", () => {
+
+    adminPressTimer = setTimeout(() => {
+
+      const pass =
+        prompt("Admin šifra");
+
+      if (pass === "admin") {
+
+        window.location.href =
+          "/admin.html?event=" + currentEventId;
+      }
+
+    }, 2000);
+
+  });
+
+  title.addEventListener("touchend", () => {
+    clearTimeout(adminPressTimer);
+  });
+
+  title.addEventListener("touchmove", () => {
+    clearTimeout(adminPressTimer);
+  });
+
+}
 /* ===== LIVE COUNTERS ===== */
 function loadLiveCounters() {
   const photoEl = document.getElementById("livePhotoCount");
