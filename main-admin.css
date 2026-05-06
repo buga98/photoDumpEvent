@@ -42,22 +42,18 @@ body{
   padding: 96px 18px 34px;
 }
 
-.glass-card{
-  width:100%;
-  max-width:520px;
-
-  padding:28px;
-
-  border-radius:34px;
-
-  background:
-    rgba(17,24,39,.92);
-
-  border:
-    1px solid rgba(255,255,255,.06);
-
+.glass-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 26px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.78);
+  backdrop-filter: blur(22px);
+  border: 1px solid rgba(255,255,255,.8);
   box-shadow:
-    0 30px 60px rgba(0,0,0,.35);
+    0 22px 55px rgba(0,0,0,.09),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  animation: enter .35s ease;
 }
 
 @keyframes enter {
@@ -529,15 +525,14 @@ textarea {
 }
 .admin-toolbar{
   width:100%;
-  max-width:1200px;
-
-  margin:110px auto 30px;
-
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:14px;
-
+  max-width:1400px;
+  margin:90px auto 0;
   padding:0 20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 }
 
 .toolbar-left,
@@ -561,43 +556,24 @@ textarea {
 }
 
 .toolbar-btn{
-  width:100%;
-  height:62px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
   border:none;
-  border-radius:22px;
-
-  background:#111827;
-  color:white;
-
-  font-weight:700;
-  font-size:16px;
-
-  cursor:pointer;
   text-decoration:none;
-
+  background:#101827;
+  color:white;
+  padding:14px 20px;
+  border-radius:18px;
+  font-weight:700;
+  cursor:pointer;
   transition:.2s ease;
-
-  box-shadow:
-    0 12px 24px rgba(0,0,0,.22);
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
 }
 
 .toolbar-btn:hover{
   transform:translateY(-2px);
-  background:#1b2435;
 }
 
 .primary-btn{
-  background:
-    linear-gradient(
-      135deg,
-      #ff2f7d,
-      #ff4f9a
-    );
+  background:linear-gradient(135deg,#d81b60,#ff4d8d);
 }
 
 .logout-btn{
@@ -606,64 +582,4 @@ textarea {
 
 .hidden-admin{
   display:none !important;
-}
-input,
-select,
-textarea{
-  background:#0f172a;
-  color:white;
-  border:1px solid rgba(255,255,255,.06);
-}
-h1{
-  color:white;
-}
-
-.subtitle{
-  color:#9ca3af;
-}
-.events-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  margin-bottom:26px;
-}
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-.back-btn{
-  width:90px;
-  height:64px;
-
-  border:none;
-  border-radius:22px;
-
-  background:#111827;
-  color:white;
-
-  font-weight:700;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  box-shadow:
-    0 12px 24px rgba(0,0,0,.25);
-
-  transition:.2s;
-}
-.role-badge{
-  padding:10px 18px;
-
-  border-radius:999px;
-
-  background:#60a5fa;
-  color:black;
-
-  font-size:12px;
-  font-weight:800;
-
-  letter-spacing:.5px;
 }
