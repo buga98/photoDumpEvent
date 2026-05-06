@@ -1,7 +1,7 @@
 {
   "name": "Event PhotoDump",
   "short_name": "Event PhotoDump",
-  "start_url": "/index.html",
+  "start_url": "/app.html",
   "display": "standalone",
   "background_color": "#ffe6f0",
   "theme_color": "#e91e63",

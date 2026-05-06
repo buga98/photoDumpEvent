@@ -14,9 +14,12 @@ import {
 
 /* ================= FIREBASE (ISTI KAO APP) ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBjETO...",
+  apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
   projectId: "photodumpevent-4578c",
+  storageBucket: "photodumpevent-4578c.firebasestorage.app",
+  messagingSenderId: "617407847422",
+  appId: "1:617407847422:web:2c4a13242a0fa1ba50feaf"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -477,4 +480,21 @@ window.selectAll = function () {
     selectedIds.add(id);
     card.classList.add("selected");
   });
+};
+window.openSettings = function () {
+  document.getElementById("settingsModal").style.display = "flex";
+};
+
+window.closeSettings = function () {
+  showAuthor = document.getElementById("showAuthor").checked;
+  showDedications = document.getElementById("showDedications").checked;
+
+  localStorage.setItem("showAuthor", showAuthor);
+  localStorage.setItem("showDedications", showDedications);
+
+  document.getElementById("settingsModal").style.display = "none";
+};
+
+window.downloadAllPhotos = function () {
+  alert("Download ZIP ćemo dodati kasnije 🙂");
 };

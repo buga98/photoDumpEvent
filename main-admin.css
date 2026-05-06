@@ -499,3 +499,25 @@ textarea {
   box-shadow: 0 12px 30px rgba(0,0,0,0.08);
   margin-bottom: 20px;
 }
+.top-actions{
+  display:flex;
+  justify-content:flex-end;
+  margin:82px auto 0;
+  max-width:1400px;
+  padding:0 20px;
+}
+
+.events-btn{
+  background:#111827;
+  color:white;
+  text-decoration:none;
+  padding:14px 20px;
+  border-radius:14px;
+  font-weight:600;
+  transition:.2s;
+}
+
+.events-btn:hover{
+  transform:translateY(-2px);
+  background:#1c2535;
+}

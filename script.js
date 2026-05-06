@@ -156,6 +156,19 @@ function bootEventFromCache() {
 
   try {
     const event = JSON.parse(cached);
+    // 🔥 EXPIRED EVENT
+if (
+  event.expiresAt &&
+  Date.now() > event.expiresAt
+) {
+  localStorage.removeItem(
+    "eventData_" + currentEventId
+  );
+
+  alert("Event je istekao ⏳");
+
+  return false;
+}
     applyEvent(event);
     console.log("⚡ App boot from cached event");
     return true;
@@ -179,7 +192,14 @@ async function loadEventDataFallback() {
   }
 
   const event = snap.data();
-
+// 🔥 EXPIRED EVENT
+if (
+  event.expiresAt &&
+  Date.now() > event.expiresAt
+) {
+  alert("Event je istekao ⏳");
+  return false;
+}
   localStorage.setItem("eventId", currentEventId);
   localStorage.setItem("eventData_" + currentEventId, JSON.stringify(event));
 
@@ -585,6 +605,35 @@ async function resizeImage(file, maxWidth, quality) {
 /* ===== UPLOAD ===== */
 window.uploadToFirebase = function (file, user, onProgress) {
   return new Promise(async (resolve, reject) => {
+    // 🔥 PROVJERA LIMITA
+const eventSnap = await getDoc(
+  doc(db, "events", currentEventId)
+);
+
+if (!eventSnap.exists()) {
+  reject("EVENT_NOT_FOUND");
+  return;
+}
+
+const eventData = eventSnap.data();
+// 🔥 EXPIRED EVENT
+if (
+  eventData.expiresAt &&
+  Date.now() > eventData.expiresAt
+) {
+  reject("EVENT_EXPIRED");
+  return;
+}
+
+if (
+  (eventData.photoCount || 0) >=
+  (eventData.uploadLimit || 1000)
+) {
+  showToast("Dosegnut je limit fotografija 📸");
+
+  reject("UPLOAD_LIMIT");
+  return;
+}
     try {
       const bigFile = await resizeImage(file, 1450, 0.8);
       const thumbFile = await resizeImage(file, 350, 0.65);
@@ -633,16 +682,26 @@ window.uploadToFirebase = function (file, user, onProgress) {
             }
 
             // 🔥 zapis u bazu
-            await addDoc(collection(db, "events", currentEventId, "photos"), {
-              imageUrl,
-              thumbUrl,
-              path: uploadTask.snapshot.ref.fullPath,
-              user,
-              userId: localStorage.getItem("userId"),
-              created: Date.now(),
-              likes: 0,
-              visible: true
-            });
+await addDoc(collection(db, "events", currentEventId, "photos"), {
+  imageUrl,
+  thumbUrl,
+
+  // 🔥 STORAGE PATHS
+  path: uploadTask.snapshot.ref.fullPath,
+  thumbPath: thumbRef.fullPath,
+
+  originalPath:
+    window.eventData?.allowOriginals
+      ? `events/${currentEventId}/originals/${timestamp}_${safeName}`
+      : null,
+
+  user,
+  userId: localStorage.getItem("userId"),
+
+  created: Date.now(),
+  likes: 0,
+  visible: true
+});
 
             // 🔥 stats
 await updateDoc(doc(db, "events", currentEventId), {
@@ -691,20 +750,53 @@ const task = uploadToFirebase(file, user, (percent) => {
   img.src = url;
   progress.remove();
 })
-.catch(() => {
-  let pending = JSON.parse(localStorage.getItem("pendingUploads") || "[]");
+.catch((err) => {
+
+  // 🔥 EVENT EXPIRED
+  if (err === "EVENT_EXPIRED") {
+    progress.remove();
+    wrapper.remove();
+
+    showToast("Event je istekao ⏳");
+    return;
+  }
+
+  // 🔥 LIMIT
+  if (err === "UPLOAD_LIMIT") {
+    progress.remove();
+    wrapper.remove();
+
+    showToast("Dosegnut je limit fotografija 📸");
+    return;
+  }
+
+  // 🔥 EVENT NOT FOUND
+  if (err === "EVENT_NOT_FOUND") {
+    progress.remove();
+    wrapper.remove();
+
+    showToast("Event nije pronađen 😕");
+    return;
+  }
+
+  // 🔥 OFFLINE / NETWORK
+  let pending = JSON.parse(
+    localStorage.getItem("pendingUploads") || "[]"
+  );
 
   pending.push({
     name: file.name,
     time: Date.now()
   });
 
-  localStorage.setItem("pendingUploads", JSON.stringify(pending));
+  localStorage.setItem(
+    "pendingUploads",
+    JSON.stringify(pending)
+  );
 
   showToast("Slika će se poslati kad se vrati internet 📡");
 });
-
-    uploads.push(task);
+uploads.push(task);
   }
 
   await Promise.all(uploads);
@@ -723,16 +815,38 @@ window.confirmDelete = async function () {
 
   const docRef = doc(db, "events", currentEventId, "photos", selectedPhotoId);
   const snap = await getDoc(docRef);
-  const imageUrl = snap.exists() ? snap.data().imageUrl : null;
+const data = snap.exists()
+  ? snap.data()
+  : null;
 
-  if (imageUrl) {
-    try {
-      const imageRef = ref(storage, imageUrl);
-      await deleteObject(imageRef);
-    } catch (e) {
-      console.log("Storage delete fail:", e);
+if (data) {
+  try {
+
+    // 🔥 MAIN IMAGE
+    if (data.path) {
+      await deleteObject(
+        ref(storage, data.path)
+      );
     }
+
+    // 🔥 THUMB
+    if (data.thumbPath) {
+      await deleteObject(
+        ref(storage, data.thumbPath)
+      );
+    }
+
+    // 🔥 ORIGINAL
+    if (data.originalPath) {
+      await deleteObject(
+        ref(storage, data.originalPath)
+      );
+    }
+
+  } catch (e) {
+    console.log("Storage delete fail:", e);
   }
+}
 
   await deleteDoc(docRef);
 
@@ -1015,7 +1129,13 @@ function showToast(message) {
 
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
-
+/* ===== USER ID FIX ===== */
+if (!localStorage.getItem("userId")) {
+  localStorage.setItem(
+    "userId",
+    crypto.randomUUID()
+  );
+}
 /* ===== USER ===== */
 const user = localStorage.getItem("name");
 const welcomeEl = document.getElementById("welcome");
@@ -1033,7 +1153,12 @@ async function initApp() {
   const booted = bootEventFromCache();
 
   if (!booted) {
-    await loadEventDataFallback();
+    const loaded = await loadEventDataFallback();
+
+    if (!loaded) {
+      document.body.classList.add("loaded");
+      return;
+    }
   }
 
   loadFeed();
@@ -1051,15 +1176,17 @@ window.addEventListener("online", () => {
 
   const pending = JSON.parse(localStorage.getItem("pendingUploads") || "[]");
 
-  if (pending.length > 0) {
-    reloaded = true;
+if (pending.length > 0) {
+  reloaded = true;
 
-    showToast("Internet vraćen — pokušavam upload 📡");
+  localStorage.removeItem("pendingUploads");
 
-    setTimeout(() => {
-      location.reload();
-    }, 1500);
-  }
+  showToast("Internet vraćen — pokušavam upload 📡");
+
+  setTimeout(() => {
+    location.reload();
+  }, 1500);
+}
 });
 
 initApp();

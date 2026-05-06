@@ -15,10 +15,12 @@ import {
 
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
   projectId: "photodumpevent-4578c",
-  storageBucket: "photodumpevent-4578c.firebasestorage.app"
+  storageBucket: "photodumpevent-4578c.firebasestorage.app",
+  messagingSenderId: "617407847422",
+  appId: "1:617407847422:web:2c4a13242a0fa1ba50feaf"
 };
 
 const app = initializeApp(firebaseConfig);
