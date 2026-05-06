@@ -10,14 +10,33 @@
 <body>
 
 <div class="topbar">⚙️ PhotoDump Main Admin</div>
-<div class="top-actions">
-  <a href="/pregled_event.html" class="events-btn">
-    📸 Pregled svih eventova
-  </a>
+<div class="admin-toolbar">
+
+  <div class="toolbar-left" id="superAdminActions">
+
+    <a href="/users.html" class="toolbar-btn">
+      👥 Korisnici
+    </a>
+
+  </div>
+
+  <div class="toolbar-center">
+
+    <a href="/pregled_event.html" class="toolbar-btn primary-btn">
+      📸 Pregled eventova
+    </a>
+
+  </div>
+
+  <div class="toolbar-right">
+
+    <button onclick="logout()" class="toolbar-btn logout-btn">
+      🚪 Logout
+    </button>
+
+  </div>
+
 </div>
-<button onclick="logout()" class="events-btn">
-  🚪 Logout
-</button>
 
 <main class="admin-page">
 

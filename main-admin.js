@@ -63,7 +63,15 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const data = snap.data();
+if (data.role !== "superadmin") {
 
+  const adminActions =
+    document.getElementById("superAdminActions");
+
+  if (adminActions) {
+    adminActions.classList.add("hidden-admin");
+  }
+}
     if (!data.approved) {
       alert("Račun još nije odobren");
       window.location.href = "/login.html";

@@ -521,3 +521,63 @@ textarea {
   transform:translateY(-2px);
   background:#1c2535;
 }
+.admin-toolbar{
+  width:100%;
+  max-width:1400px;
+  margin:90px auto 0;
+  padding:0 20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right{
+  flex:1;
+  display:flex;
+  align-items:center;
+}
+
+.toolbar-left{
+  justify-content:flex-start;
+}
+
+.toolbar-center{
+  justify-content:center;
+}
+
+.toolbar-right{
+  justify-content:flex-end;
+}
+
+.toolbar-btn{
+  border:none;
+  text-decoration:none;
+  background:#101827;
+  color:white;
+  padding:14px 20px;
+  border-radius:18px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+
+.toolbar-btn:hover{
+  transform:translateY(-2px);
+}
+
+.primary-btn{
+  background:linear-gradient(135deg,#d81b60,#ff4d8d);
+}
+
+.logout-btn{
+  background:#1f2937;
+}
+
+.hidden-admin{
+  display:none !important;
+}
