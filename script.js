@@ -396,9 +396,9 @@ function createFeedCard(photoId, data) {
       likes: increment(1)
     });
 
-    await updateDoc(doc(db, "stats", "main"), {
-      likes: increment(1)
-    });
+await updateDoc(doc(db, "events", currentEventId), {
+  likeCount: increment(1)
+ });
   }
 
   likeBox.onclick = (e) => {
@@ -645,9 +645,9 @@ window.uploadToFirebase = function (file, user, onProgress) {
             });
 
             // 🔥 stats
-            await updateDoc(doc(db, "stats", "main"), {
-              photos: increment(1)
-            });
+await updateDoc(doc(db, "events", currentEventId), {
+  photoCount: increment(1)
+});
 
             resolve(imageUrl);
 
@@ -736,9 +736,9 @@ window.confirmDelete = async function () {
 
   await deleteDoc(docRef);
 
-  await updateDoc(doc(db, "stats", "main"), {
-    photos: increment(-1)
-  });
+await updateDoc(doc(db, "events", currentEventId), {
+  photoCount: increment(-1)
+});
 
   loadMyImages();
 };
@@ -785,9 +785,9 @@ window.saveDedication = async function () {
     created: Date.now()
   });
 
-  await updateDoc(doc(db, "stats", "main"), {
-    dedications: increment(1)
-  });
+await updateDoc(doc(db, "events", currentEventId), {
+  dedicationCount: increment(1)
+});
 
   document.getElementById("dedicationText").value = "";
   showToast("🤍 Hvala na lijepim riječima");
@@ -863,22 +863,34 @@ function loadLiveCounters() {
   const dedicationEl = document.getElementById("liveDedicationCount");
   const likesEl = document.getElementById("liveLikesCount");
 
-  if (!photoEl || !dedicationEl) return;
+  if (!photoEl || !dedicationEl || !currentEventId) return;
 
-  const statsRef = doc(db, "stats", "main");
+  // 🔥 EVENT STATS
+  const statsRef = doc(db, "events", currentEventId);
 
-  onSnapshot(statsRef, (snap) => {
-    if (!snap.exists()) return;
+  onSnapshot(
+    statsRef,
 
-    const data = snap.data();
+    // ✅ SUCCESS
+    (snap) => {
+      if (!snap.exists()) return;
 
-    photoEl.innerText = data.photos || 0;
-    dedicationEl.innerText = data.dedications || 0;
+      const data = snap.data();
 
-    if (likesEl) {
-      likesEl.innerText = data.likes || 0;
+      // 🔥 EVENT COUNTERS
+      photoEl.innerText = data.photoCount || 0;
+      dedicationEl.innerText = data.dedicationCount || 0;
+
+      if (likesEl) {
+        likesEl.innerText = data.likeCount || 0;
+      }
+    },
+
+    // ❌ ERROR
+    (err) => {
+      console.error("Live counter error:", err);
     }
-  });
+  );
 }
 
 /* ===== FULLSCREEN ===== */

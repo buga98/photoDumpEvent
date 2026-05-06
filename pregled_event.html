@@ -1,0 +1,136 @@
+<!-- pregled_event.html -->
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Pregled eventova</title>
+
+  <link rel="stylesheet" href="pregled_event.css" />
+</head>
+<body>
+
+  <div class="page">
+
+    <div class="topbar">
+      <h1>📸 Pregled eventova</h1>
+      <a href="/main-admin.html" class="back-btn">← Nazad</a>
+    </div>
+
+    <!-- LISTA -->
+    <div id="eventsList" class="events-list">
+      <div class="loading">Učitavanje eventova...</div>
+    </div>
+
+    <!-- EDIT PANEL -->
+    <div id="editor" class="editor hidden">
+
+      <div class="editor-header">
+        <h2>✏️ Uredi event</h2>
+      </div>
+
+      <div class="editor-grid">
+
+        <label>
+          Naziv eventa
+          <input type="text" id="edit_title">
+        </label>
+
+        <label>
+          Tip eventa
+          <select id="edit_type">
+            <option value="svadba">Svadba</option>
+            <option value="rodendan">Rođendan</option>
+            <option value="krstenje">Krštenje</option>
+            <option value="pricest">Pričest</option>
+            <option value="party">Party</option>
+          </select>
+        </label>
+
+        <label>
+          Plan
+          <select id="edit_plan">
+            <option value="basic">Basic</option>
+            <option value="standard">Standard</option>
+            <option value="premium">Premium</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+          <select id="edit_status">
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </label>
+
+        <label>
+          Upload limit
+          <input type="number" id="edit_limit">
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" id="edit_originals">
+          Allow originals
+        </label>
+
+      </div>
+
+      <!-- COUNTERS -->
+      <div class="stats-box">
+
+        <div class="stat">
+          <span>📸 Slike</span>
+          <b id="stat_photos">0</b>
+        </div>
+
+        <div class="stat">
+          <span>❤️ Lajkovi</span>
+          <b id="stat_likes">0</b>
+        </div>
+
+        <div class="stat">
+          <span>💌 Posvete</span>
+          <b id="stat_dedications">0</b>
+        </div>
+
+      </div>
+
+      <!-- LINKOVI -->
+      <div class="links-box">
+
+        <a id="guest_link" target="_blank">Guest link</a>
+        <a id="app_link" target="_blank">App link</a>
+        <a id="admin_link" target="_blank">Admin link</a>
+
+      </div>
+
+      <!-- TEXTOVI -->
+      <div class="texts">
+
+        <h3>📝 Textovi</h3>
+
+        <textarea id="edit_index_title" placeholder="Index title"></textarea>
+        <textarea id="edit_index_subtitle" placeholder="Index subtitle"></textarea>
+
+        <textarea id="edit_upload_title" placeholder="Upload title"></textarea>
+        <textarea id="edit_upload_subtitle" placeholder="Upload subtitle"></textarea>
+
+        <textarea id="edit_profile_title" placeholder="Profile title"></textarea>
+        <textarea id="edit_profile_subtitle" placeholder="Profile subtitle"></textarea>
+
+      </div>
+
+      <button id="saveBtn" class="save-btn">
+        💾 Spremi promjene
+      </button>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="pregled_event.js"></script>
+</body>
+</html>

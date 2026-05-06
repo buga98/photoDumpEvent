@@ -38,7 +38,7 @@ const createBtn = document.getElementById("createBtn");
 const resultBox = document.getElementById("resultBox");
 const qrBox = document.getElementById("qrBox");
 const qrImage = document.getElementById("qrImage");
-const originalsInput = document.getElementById("allowOriginals");
+const planInput = document.getElementById("eventPlan");
 
 /* ================= DEFAULT TEXTS ================= */
 const defaults = {
@@ -451,19 +451,45 @@ window.createNewEvent = async function () {
 
     createBtn.innerText = "Spremam event...";
 
- await setDoc(eventRef, {
+const plan = planInput.value || "basic";
+
+let allowOriginals = false;
+let uploadLimit = 1000;
+
+if (plan === "standard") {
+  allowOriginals = true;
+  uploadLimit = 1200;
+}
+
+if (plan === "premium") {
+  allowOriginals = true;
+  uploadLimit = 1500;
+}
+
+const expiresAt =
+  Date.now() + (1000 * 60 * 60 * 24 * 30); // 30 dana
+
+await setDoc(eventRef, {
   title,
   type,
+  plan,
+
   bubbles: bubbleUrls,
   texts,
+
   active: true,
-  allowOriginals: originalsInput.value === "true", // 🔥 OVO DODAJ
-  created: Date.now(),
-  stats: {
-    photos: 0,
-    dedications: 0,
-    likes: 0
-  }
+  status: "active",
+
+  allowOriginals,
+  uploadLimit,
+
+  photoCount: 0,
+  dedicationCount: 0,
+  likeCount: 0,
+
+  expiresAt,
+
+  created: Date.now()
 });
 
     const guestLink = `${location.origin}/index.html?event=${eventId}`;

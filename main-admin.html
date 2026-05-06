@@ -10,6 +10,11 @@
 <body>
 
 <div class="topbar">⚙️ PhotoDump Main Admin</div>
+<div class="top-actions">
+  <a href="/pregled_event.html" class="events-btn">
+    📸 Pregled svih eventova
+  </a>
+</div>
 
 <main class="admin-page">
 
@@ -19,11 +24,6 @@
 
     <label>Naslov eventa</label>
     <input id="eventTitle" type="text" placeholder="npr. Rođendan Ivan/Sveto krštenje Lucija/Mirko & Marica">
-<label>Original slike (full kvaliteta)</label>
-<select id="allowOriginals">
-  <option value="false" selected>Isključeno (manji storage)</option>
-  <option value="true">Uključeno (spremi original slike)</option>
-</select>
     <label>Tip eventa</label>
     <select id="eventType">
       <option value="svadba">Vjenčanje</option>
@@ -33,6 +33,13 @@
       <option value="party">Party</option>
       <option value="default">Default</option>
     </select>
+    <label>Plan eventa</label>
+
+<select id="eventPlan">
+  <option value="basic">Basic — 1000 slika</option>
+  <option value="standard">Standard — 1200 + originals</option>
+  <option value="premium">Premium — 1500 + originals</option>
+</select>
         <label class="file-box">
       <span id="fileLabel">Dodaj 6 slika za bubble</span>
       <input type="file" id="bubbleImages" multiple accept="image/*">
