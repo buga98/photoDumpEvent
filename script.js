@@ -273,14 +273,29 @@ function loadFeed() {
       }
 
       // 🔥 AKO NEMA SLIKA
-      if (snapshot.empty) {
-        feed.innerHTML = `
-          <p style="grid-column:1/-1; text-align:center; opacity:0.6;">
-            Još nema fotografija 📸
-          </p>
-        `;
-        return;
-      }
+const visibleDocs = snapshot.docs.filter(
+  d => d.data().visible !== false
+);
+
+if (visibleDocs.length === 0) {
+
+  // 🔥 SAMO ako još ništa nije renderirano
+  if (renderedPhotos.size === 0) {
+
+    feed.innerHTML = `
+      <p style="
+        grid-column:1/-1;
+        text-align:center;
+        opacity:0.6;
+        padding:30px 10px;
+      ">
+        Još nema fotografija 📸
+      </p>
+    `;
+  }
+
+  return;
+}
 
       // 🔥 pagination pointer
       lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
@@ -327,14 +342,28 @@ function renderFeedChange(change, feed, isLiveTop = false) {
     return;
   }
 
-  if (change.type === "modified") {
-    const existing = renderedPhotos.get(photoId);
-    if (existing) {
-      const countEl = existing.querySelector(".like-count");
-      if (countEl) countEl.innerText = data.likes || 0;
+if (change.type === "modified") {
+  const existing = renderedPhotos.get(photoId);
+
+  if (existing) {
+
+    const countEl =
+      existing.querySelector(".like-count");
+
+    if (countEl) {
+      countEl.innerText = data.likes || 0;
     }
-    return;
+
+    const heart =
+      existing.querySelector(".heart");
+
+    if (likedCache.has(photoId)) {
+      heart?.classList.add("liked");
+    }
   }
+
+  return;
+}
 
   if (renderedPhotos.has(photoId)) return;
 
