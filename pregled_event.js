@@ -249,7 +249,7 @@ if (isSuperAdmin) {
 
   alert("Spremljeno ✅");
 
- 
+ loadEvents();
 };
 
 /* ================= HELPERS ================= */
