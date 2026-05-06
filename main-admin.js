@@ -224,9 +224,9 @@ function fillAllDefaults() {
     const value = defaults[typeInput.value]?.[field];
     const input = getInput("text_" + field);
 
-    if (input && !input.value.trim()) {
-      input.value = value || "";
-    }
+if (input) {
+  input.value = value || "";
+}
   });
 
   updatePreview();
