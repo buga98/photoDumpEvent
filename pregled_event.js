@@ -10,9 +10,14 @@ import {
   getDoc,
   updateDoc,
   orderBy,
-  query
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
+import {
+  getAuth,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
@@ -28,6 +33,8 @@ const db = getFirestore(app);
 
 /* ================= STATE ================= */
 let currentEventId = null;
+let currentUser = null;
+let currentRole = null;
 
 /* ================= ELEMENTS ================= */
 const eventsList = document.getElementById("eventsList");
@@ -38,10 +45,23 @@ async function loadEvents() {
 
   eventsList.innerHTML = "Učitavanje...";
 
-  const q = query(
+let q;
+
+if (currentRole === "superadmin") {
+
+  q = query(
     collection(db, "events"),
     orderBy("created", "desc")
   );
+
+} else {
+
+  q = query(
+    collection(db, "events"),
+    where("ownerId", "==", currentUser.uid),
+    orderBy("created", "desc")
+  );
+}
 
   const snapshot = await getDocs(q);
 
@@ -60,6 +80,9 @@ async function loadEvents() {
     card.className = "event-card";
 
     card.innerHTML = `
+      <div class="owner">
+  👤 ${data.ownerName || "Nepoznato"}
+</div>
       <div class="event-top">
         <h3>${data.title || "Bez naziva"}</h3>
         <span class="badge">${data.plan || "basic"}</span>
@@ -97,6 +120,8 @@ async function openEditor(eventId) {
   const data = snap.data();
 
   editor.classList.remove("hidden");
+  const isSuperAdmin =
+  currentRole === "superadmin";
 
   /* INFO */
   setValue("edit_title", data.title);
@@ -105,7 +130,14 @@ async function openEditor(eventId) {
   setValue("edit_status", data.status);
 
   setValue("edit_limit", data.uploadLimit || 0);
+document.getElementById("edit_plan").disabled =
+  !isSuperAdmin;
 
+document.getElementById("edit_limit").disabled =
+  !isSuperAdmin;
+
+document.getElementById("edit_originals").disabled =
+  !isSuperAdmin;
   document.getElementById("edit_originals").checked =
     data.allowOriginals || false;
 
@@ -171,38 +203,44 @@ async function openEditor(eventId) {
 
 /* ================= SAVE ================= */
 document.getElementById("saveBtn").onclick = async () => {
-
+const isSuperAdmin =
+  currentRole === "superadmin";
   if (!currentEventId) return;
 
-  const payload = {
+const payload = {
 
-    title: getValue("edit_title"),
-    type: getValue("edit_type"),
-    plan: getValue("edit_plan"),
-    status: getValue("edit_status"),
+  title: getValue("edit_title"),
+  type: getValue("edit_type"),
+  status: getValue("edit_status"),
 
-    uploadLimit: Number(getValue("edit_limit")) || 0,
+  texts: {
+    index: {
+      title: getValue("edit_index_title"),
+      subtitle: getValue("edit_index_subtitle")
+    },
 
-    allowOriginals:
-      document.getElementById("edit_originals").checked,
+    upload: {
+      title: getValue("edit_upload_title"),
+      subtitle: getValue("edit_upload_subtitle")
+    },
 
-    texts: {
-      index: {
-        title: getValue("edit_index_title"),
-        subtitle: getValue("edit_index_subtitle")
-      },
-
-      upload: {
-        title: getValue("edit_upload_title"),
-        subtitle: getValue("edit_upload_subtitle")
-      },
-
-      profile: {
-        title: getValue("edit_profile_title"),
-        subtitle: getValue("edit_profile_subtitle")
-      }
+    profile: {
+      title: getValue("edit_profile_title"),
+      subtitle: getValue("edit_profile_subtitle")
     }
-  };
+  }
+};
+if (isSuperAdmin) {
+
+  payload.plan =
+    getValue("edit_plan");
+
+  payload.uploadLimit =
+    Number(getValue("edit_limit")) || 0;
+
+  payload.allowOriginals =
+    document.getElementById("edit_originals").checked;
+}
 
   await updateDoc(
     doc(db, "events", currentEventId),
@@ -211,7 +249,7 @@ document.getElementById("saveBtn").onclick = async () => {
 
   alert("Spremljeno ✅");
 
-  loadEvents();
+ 
 };
 
 /* ================= HELPERS ================= */
@@ -239,4 +277,58 @@ function setLink(id, url) {
 }
 
 /* ================= INIT ================= */
-loadEvents();
+//loadEvents();
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+
+    window.location.href =
+      "/login.html";
+
+    return;
+  }
+
+  currentUser = user;
+
+  const userSnap =
+    await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+  if (!userSnap.exists()) {
+
+    window.location.href =
+      "/login.html";
+
+    return;
+  }
+
+  const userData =
+    userSnap.data();
+
+  if (!userData.approved) {
+
+    alert("Račun nije odobren");
+
+    window.location.href =
+      "/login.html";
+
+    return;
+  }
+
+  currentRole =
+    userData.role;
+const badge =
+  document.getElementById("roleBadge");
+
+if (badge) {
+
+  badge.innerText =
+    currentRole === "superadmin"
+      ? "SUPERADMIN"
+      : "ORGANIZER";
+}
+  loadEvents();
+});

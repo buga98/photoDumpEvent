@@ -1,19 +1,32 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 import {
   getFirestore,
   collection,
   doc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  setDoc,
+  getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
-
+}
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+import {
+  signOut
+}
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
@@ -25,8 +38,45 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+/* ================= AUTH PROTECTION ================= */
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  try {
+
+    const snap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    if (!snap.exists()) {
+      window.location.href = "/login.html";
+      return;
+    }
+
+    const data = snap.data();
+
+    if (!data.approved) {
+      alert("Račun još nije odobren");
+      window.location.href = "/login.html";
+      return;
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    window.location.href = "/login.html";
+  }
+});
 
 /* ================= ELEMENTS ================= */
 const titleInput = document.getElementById("eventTitle");
@@ -42,8 +92,10 @@ const planInput = document.getElementById("eventPlan");
 
 /* ================= DEFAULT TEXTS ================= */
 const defaults = {
+
   krstenje: {
     index_title: "Dobrodošli na poseban dan naše male zvijezde ✨",
+
     index_subtitle: `Dragi naši,
 
 hvala što ste danas s nama na ovom posebnom i blagoslovljenom danu 🤍
@@ -61,6 +113,7 @@ Hvala vam na ljubavi, dolasku i podršci 💫`,
 
   svadba: {
     index_title: "Dobrodošli na našu ljubavnu priču 💍",
+
     index_subtitle: `Dragi naši,
 
 hvala što ste dio našeg najposebnijeg dana 🤍
@@ -78,6 +131,7 @@ Zajedno stvaramo uspomene koje traju zauvijek ✨`,
 
   rodendan: {
     index_title: "Dobrodošli na slavlje života 🎂",
+
     index_subtitle: `Hej ekipa! 🎉
 
 vrijeme je za smijeh, zabavu i nezaboravne trenutke 🔥
@@ -95,6 +149,7 @@ Ajmo ovo pretvoriti u nešto što ćemo dugo pamtiti 💜`,
 
   pricest: {
     index_title: "Dobrodošli na ovaj sveti i poseban dan ✝️",
+
     index_subtitle: `Dragi naši,
 
 hvala što ste danas s nama u ovom važnom i duhovnom trenutku 🤍
@@ -112,6 +167,7 @@ Neka nas prate mir, ljubav i blagoslov ✨`,
 
   party: {
     index_title: "Dobrodošli na party 🔥",
+
     index_subtitle: `Okej ekipa 😎
 
 znate pravila — što se dogodi na partyju… završi ovdje 📸
@@ -129,6 +185,7 @@ Ajmo napraviti uspomene koje ne blijede 💥`,
 
   default: {
     index_title: "Dobrodošli u PhotoDump 📸",
+
     index_subtitle: `Drago nam je da si ovdje 👋
 
 Ova aplikacija služi za jednostavno dijeljenje fotografija i uspomena s eventa u realnom vremenu 📸
@@ -149,7 +206,7 @@ Kreni i postani dio ove priče 🤍`,
   }
 };
 
-/* ================= TEXT HELPERS ================= */
+/* ================= HELPERS ================= */
 function getInput(id) {
   return document.getElementById(id);
 }
@@ -158,13 +215,51 @@ function getTextValue(id) {
   return getInput(id)?.value.trim() || "";
 }
 
+function setText(id, value) {
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerText = value;
+  }
+}
+
+function setHTML(id, value) {
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerHTML = value;
+  }
+}
+
+function formatText(text) {
+
+  if (!text) return "";
+
+  return text
+    .split("\n")
+    .map(line => line.trim())
+    .map(line => line ? `<p>${line}</p>` : `<br>`)
+    .join("");
+}
+window.logout = async function () {
+
+  await signOut(auth);
+
+  localStorage.clear();
+
+  window.location.href =
+    "/login.html";
+};
 function cleanTexts(obj) {
+
   const result = {};
 
   for (const section in obj) {
+
     result[section] = {};
 
     for (const key in obj[section]) {
+
       const value = obj[section][key];
 
       if (value && value.trim()) {
@@ -181,15 +276,19 @@ function cleanTexts(obj) {
 }
 
 function getTextsFromInputs() {
+
   return cleanTexts({
+
     index: {
       title: getTextValue("text_index_title"),
       subtitle: getTextValue("text_index_subtitle")
     },
+
     upload: {
       title: getTextValue("text_upload_title"),
       subtitle: getTextValue("text_upload_subtitle")
     },
+
     profile: {
       title: getTextValue("text_profile_title"),
       subtitle: getTextValue("text_profile_subtitle")
@@ -197,22 +296,9 @@ function getTextsFromInputs() {
   });
 }
 
-window.fillDefault = function (field) {
-  const type = typeInput.value;
-  const value = defaults[type]?.[field];
-
-  if (!value) {
-    alert("Nema default teksta za ovaj tip eventa");
-    return;
-  }
-
-  const input = getInput("text_" + field);
-  if (input) input.value = value;
-
-  updatePreview();
-};
-
+/* ================= DEFAULT FILL ================= */
 function fillAllDefaults() {
+
   [
     "index_title",
     "index_subtitle",
@@ -221,65 +307,88 @@ function fillAllDefaults() {
     "profile_title",
     "profile_subtitle"
   ].forEach((field) => {
-    const value = defaults[typeInput.value]?.[field];
-    const input = getInput("text_" + field);
 
-if (input) {
-  input.value = value || "";
-}
+    const value =
+      defaults[typeInput.value]?.[field];
+
+    const input =
+      getInput("text_" + field);
+
+    if (input) {
+      input.value = value || "";
+    }
   });
 
   updatePreview();
 }
 
 /* ================= PREVIEW ================= */
-window.switchPreview = function (screen) {
-  document.getElementById("previewIndex")?.classList.remove("active");
-  document.getElementById("previewApp")?.classList.remove("active");
-
-  if (screen === "index") {
-    document.getElementById("previewIndex")?.classList.add("active");
-  }
-
-  if (screen === "app") {
-    document.getElementById("previewApp")?.classList.add("active");
-  }
-};
-
 function getPreviewTitleWithEmoji(title, type) {
+
   switch (type) {
-    case "rodendan": return "🎂 " + title + " 🎂";
-    case "svadba": return "💍 " + title + " 💍";
-    case "krstenje": return "✨ " + title + " ✨";
-    case "pricest": return "✝️ " + title + " ✝️";
-    case "party": return "🎉 " + title + " 🎉";
-    default: return "✨ " + title + " ✨";
+
+    case "rodendan":
+      return "🎂 " + title + " 🎂";
+
+    case "svadba":
+      return "💍 " + title + " 💍";
+
+    case "krstenje":
+      return "✨ " + title + " ✨";
+
+    case "pricest":
+      return "✝️ " + title + " ✝️";
+
+    case "party":
+      return "🎉 " + title + " 🎉";
+
+    default:
+      return "✨ " + title + " ✨";
   }
 }
 
 function updatePreview() {
-  const title = titleInput.value.trim() || "Naziv eventa";
-  const type = typeInput.value || "default";
-  const d = defaults[type] || defaults.default;
 
-  const indexTitle = getTextValue("text_index_title") || d.index_title;
-  const indexText = getTextValue("text_index_subtitle") || d.index_subtitle;
+  const title =
+    titleInput.value.trim() || "Naziv eventa";
 
-  const uploadTitle = getTextValue("text_upload_title") || d.upload_title;
-  const uploadText = getTextValue("text_upload_subtitle") || d.upload_subtitle;
+  const type =
+    typeInput.value || "default";
 
-  const profileTitle = getTextValue("text_profile_title") || d.profile_title;
-  const profileText = getTextValue("text_profile_subtitle") || d.profile_subtitle;
+  const d =
+    defaults[type] || defaults.default;
 
-  const phone = document.querySelector(".preview-phone");
+  const indexTitle =
+    getTextValue("text_index_title") || d.index_title;
+
+  const indexText =
+    getTextValue("text_index_subtitle") || d.index_subtitle;
+
+  const uploadTitle =
+    getTextValue("text_upload_title") || d.upload_title;
+
+  const uploadText =
+    getTextValue("text_upload_subtitle") || d.upload_subtitle;
+
+  const profileTitle =
+    getTextValue("text_profile_title") || d.profile_title;
+
+  const profileText =
+    getTextValue("text_profile_subtitle") || d.profile_subtitle;
+
+  const phone =
+    document.querySelector(".preview-phone");
+
   if (phone) {
-    phone.className = "preview-phone theme-" + type;
+    phone.className =
+      "preview-phone theme-" + type;
   }
 
-  const topbarText = getPreviewTitleWithEmoji(title, type);
+  const topbar =
+    getPreviewTitleWithEmoji(title, type);
 
-  setText("previewIndexTopbar", topbarText);
-  setText("previewAppTopbar", topbarText);
+  setText("previewIndexTopbar", topbar);
+  setText("previewAppTopbar", topbar);
 
   setText("previewIndexTitle", indexTitle);
   setHTML("previewIndexText", formatText(indexText));
@@ -290,58 +399,51 @@ function updatePreview() {
   setText("previewProfileTitle", profileTitle);
   setText("previewProfileText", profileText);
 }
-function setHTML(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = value;
-}
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = value;
-}
 
 /* ================= LISTENERS ================= */
 typeInput.addEventListener("change", () => {
+
   fillAllDefaults();
   updatePreview();
 });
 
 titleInput.addEventListener("input", updatePreview);
 
-[
-  "text_index_title",
-  "text_index_subtitle",
-  "text_upload_title",
-  "text_upload_subtitle",
-  "text_profile_title",
-  "text_profile_subtitle"
-].forEach((id) => {
-  const input = getInput(id);
-  if (input) input.addEventListener("input", updatePreview);
-});
-
 /* ================= FILE PREVIEW ================= */
 fileInput.addEventListener("change", () => {
+
   const files = [...fileInput.files];
 
   previewGrid.innerHTML = "";
 
   if (!files.length) {
-    fileLabel.innerText = "Dodaj 6 slika za bubble";
+
+    fileLabel.innerText =
+      "Dodaj 6 slika za bubble";
+
     return;
   }
 
-  fileLabel.innerText = `Odabrano slika: ${files.length}/6`;
+  fileLabel.innerText =
+    `Odabrano slika: ${files.length}/6`;
 
   files.slice(0, 6).forEach((file) => {
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      URL.createObjectURL(file);
+
     previewGrid.appendChild(img);
   });
 });
 
 /* ================= IMAGE RESIZE ================= */
 async function resizeImage(file, maxWidth = 900, quality = 0.82) {
+
   return new Promise((resolve, reject) => {
+
     const reader = new FileReader();
     const img = new Image();
 
@@ -353,39 +455,46 @@ async function resizeImage(file, maxWidth = 900, quality = 0.82) {
     };
 
     img.onload = () => {
+
       let width = img.width;
       let height = img.height;
 
       if (width > maxWidth) {
-        height = Math.round(height * (maxWidth / width));
+
+        height =
+          Math.round(height * (maxWidth / width));
+
         width = maxWidth;
       }
 
-      const canvas = document.createElement("canvas");
+      const canvas =
+        document.createElement("canvas");
+
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext("2d");
+      const ctx =
+        canvas.getContext("2d");
+
       ctx.drawImage(img, 0, 0, width, height);
 
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error("Resize nije uspio"));
-            return;
-          }
+      canvas.toBlob((blob) => {
 
-          const resizedFile = new File(
+        if (!blob) {
+          reject(new Error("Resize fail"));
+          return;
+        }
+
+        const resized =
+          new File(
             [blob],
             file.name.replace(/\.[^/.]+$/, "") + ".jpg",
             { type: "image/jpeg" }
           );
 
-          resolve(resizedFile);
-        },
-        "image/jpeg",
-        quality
-      );
+        resolve(resized);
+
+      }, "image/jpeg", quality);
     };
 
     reader.readAsDataURL(file);
@@ -394,123 +503,166 @@ async function resizeImage(file, maxWidth = 900, quality = 0.82) {
 
 /* ================= CREATE EVENT ================= */
 window.createNewEvent = async function () {
-  const title = titleInput.value.trim();
-  const type = typeInput.value;
-  const files = [...fileInput.files];
+
+  const title =
+    titleInput.value.trim();
+
+  const type =
+    typeInput.value;
+
+  const files =
+    [...fileInput.files];
 
   if (!title) {
     alert("Upiši naslov eventa");
     return;
   }
 
-  const texts = getTextsFromInputs();
-
-  if (!texts.index?.title) {
-    alert("Dodaj barem naslov za index");
-    return;
-  }
-
   if (files.length !== 6) {
-    alert("Moraš dodati točno 6 slika za bubble prikaz");
+    alert("Dodaj točno 6 bubble slika");
     return;
   }
+
+  const currentUser =
+    auth.currentUser;
+
+  if (!currentUser) {
+    alert("Nisi prijavljen");
+    return;
+  }
+
+  const userSnap =
+    await getDoc(
+      doc(db, "users", currentUser.uid)
+    );
+
+  const userData =
+    userSnap.data();
 
   createBtn.disabled = true;
-  createBtn.style.opacity = "0.7";
   createBtn.innerText = "Kreiram event...";
 
-  resultBox.classList.remove("show");
-  qrBox.classList.remove("show");
-
   try {
-    const eventRef = doc(collection(db, "events"));
-    const eventId = eventRef.id;
+
+    const eventRef =
+      doc(collection(db, "events"));
+
+    const eventId =
+      eventRef.id;
 
     const bubbleUrls = [];
 
     for (let i = 0; i < files.length; i++) {
-      createBtn.innerText = `Upload slika ${i + 1}/6...`;
 
-      const bubbleThumb = await resizeImage(files[i], 300, 0.6);
+      createBtn.innerText =
+        `Upload ${i + 1}/6`;
 
-      const cleanName = files[i].name
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9.-]/g, "");
+      const resized =
+        await resizeImage(files[i], 300, 0.6);
 
-      const fileRef = ref(
-        storage,
-        `events/${eventId}/bubbles/${Date.now()}_${i + 1}_${cleanName || "bubble.jpg"}`
-      );
+      const cleanName =
+        files[i].name
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9.-]/g, "");
 
-      await uploadBytes(fileRef, bubbleThumb);
-      const url = await getDownloadURL(fileRef);
+      const fileRef =
+        ref(
+          storage,
+          `events/${eventId}/bubbles/${Date.now()}_${i}_${cleanName}`
+        );
+
+      await uploadBytes(fileRef, resized);
+
+      const url =
+        await getDownloadURL(fileRef);
 
       bubbleUrls.push(url);
     }
 
-    createBtn.innerText = "Spremam event...";
+    const plan =
+      planInput.value || "basic";
 
-const plan = planInput.value || "basic";
+    let allowOriginals = false;
+    let uploadLimit = 1000;
 
-let allowOriginals = false;
-let uploadLimit = 1000;
+    if (plan === "standard") {
+      allowOriginals = true;
+      uploadLimit = 1200;
+    }
 
-if (plan === "standard") {
-  allowOriginals = true;
-  uploadLimit = 1200;
-}
+    if (plan === "premium") {
+      allowOriginals = true;
+      uploadLimit = 1500;
+    }
 
-if (plan === "premium") {
-  allowOriginals = true;
-  uploadLimit = 1500;
-}
+    const expiresAt =
+      Date.now() + (1000 * 60 * 60 * 24 * 30);
 
-const expiresAt =
-  Date.now() + (1000 * 60 * 60 * 24 * 30); // 30 dana
+    await setDoc(eventRef, {
 
-await setDoc(eventRef, {
-  title,
-  type,
-  plan,
+      title,
+      type,
+      plan,
 
-  bubbles: bubbleUrls,
-  texts,
+      ownerId: currentUser.uid,
+      ownerEmail: currentUser.email,
+      ownerName: userData?.name || "",
 
-  active: true,
-  status: "active",
+      bubbles: bubbleUrls,
 
-  allowOriginals,
-  uploadLimit,
+      texts: getTextsFromInputs(),
 
-  photoCount: 0,
-  dedicationCount: 0,
-  likeCount: 0,
+      active: true,
+      status: "active",
 
-  expiresAt,
+      allowOriginals,
+      uploadLimit,
 
-  created: Date.now()
-});
+      photoCount: 0,
+      dedicationCount: 0,
+      likeCount: 0,
 
-    const guestLink = `${location.origin}/index.html?event=${eventId}`;
-    const appLink = `${location.origin}/app.html?event=${eventId}`;
-    const adminLink = `${location.origin}/admin.html?event=${eventId}`;
+      expiresAt,
+
+      created: Date.now()
+    });
+
+    const guestLink =
+      `${location.origin}/index.html?event=${eventId}`;
+
+    const appLink =
+      `${location.origin}/app.html?event=${eventId}`;
+
+    const adminLink =
+      `${location.origin}/admin.html?event=${eventId}`;
 
     resultBox.innerHTML = `
       <p><b>Event kreiran ✅</b></p>
-      <br>
-      <p><b>Link za goste / QR:</b></p>
-      <a href="${guestLink}" target="_blank">${guestLink}</a>
-      <br><br>
-      <p><b>Direktni app link:</b></p>
-      <a href="${appLink}" target="_blank">${appLink}</a>
-      <br><br>
-      <p><b>Admin event link:</b></p>
-      <a href="${adminLink}" target="_blank">${adminLink}</a>
 
-      <button class="copy-btn" onclick="copyEventLink('${guestLink}')">
-        Kopiraj link za goste
-      </button>
+      <br>
+
+      <p><b>Guest link:</b></p>
+
+      <a href="${guestLink}" target="_blank">
+        ${guestLink}
+      </a>
+
+      <br><br>
+
+      <p><b>App link:</b></p>
+
+      <a href="${appLink}" target="_blank">
+        ${appLink}
+      </a>
+
+      <br><br>
+
+      <p><b>Admin link:</b></p>
+
+      <a href="${adminLink}" target="_blank">
+        ${adminLink}
+      </a>
     `;
 
     resultBox.classList.add("show");
@@ -522,33 +674,18 @@ await setDoc(eventRef, {
     qrBox.classList.add("show");
 
     createBtn.innerText = "Gotovo ✅";
+
   } catch (err) {
+
     console.error(err);
-    alert("Greška pri kreiranju eventa. Pogledaj console.");
+
+    alert("Greška kod kreiranja eventa");
+
     createBtn.disabled = false;
-    createBtn.style.opacity = "1";
     createBtn.innerText = "Kreiraj event 🚀";
   }
 };
 
-/* ================= COPY LINK ================= */
-window.copyEventLink = async function (link) {
-  try {
-    await navigator.clipboard.writeText(link);
-    alert("Link kopiran ✅");
-  } catch {
-    prompt("Kopiraj link:", link);
-  }
-};
-function formatText(text) {
-  if (!text) return "";
-
-  return text
-    .split("\n")                // svaki enter
-    .map(line => line.trim())
-    .map(line => line ? `<p>${line}</p>` : `<br>`) // prazni red = razmak
-    .join("");
-}
 /* ================= INIT ================= */
 fillAllDefaults();
 updatePreview();

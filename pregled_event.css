@@ -189,3 +189,17 @@ textarea{
 .loading{
   opacity:.6;
 }
+.owner{
+  opacity:.6;
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.role-badge{
+  background:#6ea8fe;
+  color:black;
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:13px;
+}
