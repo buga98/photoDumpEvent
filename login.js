@@ -5,7 +5,8 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
@@ -16,6 +17,8 @@ import {
   getDoc
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+/* ================= FIREBASE ================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
@@ -31,47 +34,178 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const emailEl =
-  document.getElementById("email");
+/* ================= ELEMENTS ================= */
 
-const passwordEl =
-  document.getElementById("password");
+const formLogo =
+  document.getElementById("formLogo");
+
+const formTitle =
+  document.getElementById("formTitle");
+
+const formSubtitle =
+  document.getElementById("formSubtitle");
+
+const loginForm =
+  document.getElementById("loginForm");
+
+const registerForm =
+  document.getElementById("registerForm");
+
+const loginEmailEl =
+  document.getElementById("loginEmail");
+
+const loginPasswordEl =
+  document.getElementById("loginPassword");
+
+const registerEmailEl =
+  document.getElementById("registerEmail");
+
+const registerPasswordEl =
+  document.getElementById("registerPassword");
+
+const firstNameEl =
+  document.getElementById("firstName");
+
+const lastNameEl =
+  document.getElementById("lastName");
 
 const errorText =
   document.getElementById("errorText");
 
-document
-  .getElementById("loginBtn")
-  .onclick = login;
+const loginBtn =
+  document.getElementById("loginBtn");
 
-document
-  .getElementById("registerBtn")
-  .onclick = register;
+const registerBtn =
+  document.getElementById("registerBtn");
 
-// ==============================
-// LOGIN
-// ==============================
+const showRegisterBtn =
+  document.getElementById("showRegisterBtn");
+
+const showLoginBtn =
+  document.getElementById("showLoginBtn");
+
+/* ================= UI ================= */
+
+showRegisterBtn.onclick = () => {
+  showRegister();
+};
+
+showLoginBtn.onclick = () => {
+  showLogin();
+};
+
+loginBtn.onclick = login;
+registerBtn.onclick = register;
+
+function showRegister() {
+  clearMessage();
+
+  loginForm.classList.add("hidden");
+  registerForm.classList.remove("hidden");
+
+  formLogo.innerText = "✨";
+  formTitle.innerText = "Registracija";
+  formSubtitle.innerText =
+    "Kreiraj račun organizatora. Pristup mora odobriti administrator.";
+}
+
+function showLogin() {
+  clearMessage();
+
+  registerForm.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+
+  formLogo.innerText = "🔒";
+  formTitle.innerText = "PhotoDump Admin";
+  formSubtitle.innerText =
+    "Prijava za organizatore i administratore";
+}
+
+function setLoading(button, loading, text) {
+  if (!button) return;
+
+  button.disabled = loading;
+  button.innerText = loading
+    ? "Molim pričekaj..."
+    : text;
+}
+
+function showError(message) {
+  errorText.style.color = "#ff7b7b";
+  errorText.innerText = message;
+}
+
+function showSuccess(message) {
+  errorText.style.color = "#7dffae";
+  errorText.innerText = message;
+}
+
+function clearMessage() {
+  errorText.innerText = "";
+  errorText.style.color = "#ff7b7b";
+}
+
+function normalizeEmail(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function validatePassword(password) {
+  return String(password || "").length >= 6;
+}
+
+function getFirebaseErrorMessage(code) {
+  switch (code) {
+    case "auth/invalid-email":
+      return "Email adresa nije ispravna.";
+
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+    case "auth/invalid-credential":
+      return "Pogrešan email ili lozinka.";
+
+    case "auth/email-already-in-use":
+      return "Račun s ovim emailom već postoji.";
+
+    case "auth/weak-password":
+      return "Lozinka mora imati minimalno 6 znakova.";
+
+    case "auth/too-many-requests":
+      return "Previše pokušaja. Probaj ponovno kasnije.";
+
+    case "auth/network-request-failed":
+      return "Problem s internet vezom.";
+
+    default:
+      return "Dogodila se greška. Pokušaj ponovno.";
+  }
+}
+
+/* ================= LOGIN ================= */
 
 async function login() {
-
-  errorText.innerText = "";
+  clearMessage();
 
   const email =
-    emailEl.value.trim();
+    normalizeEmail(loginEmailEl.value);
 
   const password =
-    passwordEl.value.trim();
+    loginPasswordEl.value.trim();
 
   if (!email || !password) {
-
-    errorText.innerText =
-      "Unesi email i lozinku";
-
+    showError("Unesi email i lozinku.");
     return;
   }
 
-  try {
+  if (!validatePassword(password)) {
+    showError("Lozinka mora imati minimalno 6 znakova.");
+    return;
+  }
 
+  setLoading(loginBtn, true, "Prijavi se 🚀");
+
+  try {
     const cred =
       await signInWithEmailAndPassword(
         auth,
@@ -88,78 +222,76 @@ async function login() {
       );
 
     if (!userSnap.exists()) {
-
-      errorText.innerText =
-        "Korisnik nije pronađen";
-
+      await signOut(auth);
+      showError("Korisnički profil nije pronađen.");
       return;
     }
 
     const userData =
       userSnap.data();
 
-    // 🔥 APPROVED CHECK
-    if (!userData.approved) {
-
-      errorText.innerText =
-        "Račun čeka odobrenje administratora";
-
+    if (userData.disabled === true) {
+      await signOut(auth);
+      showError("Račun je deaktiviran. Obrati se administratoru.");
       return;
     }
 
-    // 🔥 SAVE ROLE
-    localStorage.setItem(
-      "role",
-      userData.role
-    );
+    if (userData.approved !== true) {
+      await signOut(auth);
+      showError("Račun čeka odobrenje administratora.");
+      return;
+    }
 
-    localStorage.setItem(
-      "uid",
-      uid
-    );
+    localStorage.setItem("role", userData.role || "organizer");
+    localStorage.setItem("uid", uid);
+    localStorage.setItem("userName", userData.name || "");
 
-    localStorage.setItem(
-      "userName",
-      userData.name
-    );
-
-    // 🔥 REDIRECT
     window.location.href =
       "/main-admin.html";
 
   } catch (err) {
-
     console.error(err);
-
-    errorText.innerText =
-      "Pogrešan email ili lozinka";
+    showError(getFirebaseErrorMessage(err.code));
+  } finally {
+    setLoading(loginBtn, false, "Prijavi se 🚀");
   }
 }
 
-// ==============================
-// REGISTER
-// ==============================
+/* ================= REGISTER ================= */
 
 async function register() {
+  clearMessage();
 
-  errorText.innerText = "";
+  const firstName =
+    firstNameEl.value.trim();
+
+  const lastName =
+    lastNameEl.value.trim();
 
   const email =
-    emailEl.value.trim();
+    normalizeEmail(registerEmailEl.value);
 
   const password =
-    passwordEl.value.trim();
+    registerPasswordEl.value.trim();
 
-  if (!email || !password) {
-
-    errorText.innerText =
-      "Unesi email i lozinku";
-
+  if (!firstName || !lastName) {
+    showError("Unesi ime i prezime.");
     return;
   }
 
-  try {
+  if (!email || !password) {
+    showError("Unesi email i lozinku.");
+    return;
+  }
 
+  if (!validatePassword(password)) {
+    showError("Lozinka mora imati minimalno 6 znakova.");
+    return;
+  }
+
+  setLoading(registerBtn, true, "Kreiraj račun ✨");
+
+  try {
     const cred =
       await createUserWithEmailAndPassword(
         auth,
@@ -167,59 +299,92 @@ async function register() {
         password
       );
 
-    // 🔥 USERS COLLECTION
+    const uid =
+      cred.user.uid;
+
+    const fullName =
+      `${firstName} ${lastName}`.trim();
+
     await setDoc(
-      doc(db, "users", cred.user.uid),
+      doc(db, "users", uid),
       {
-
+        firstName,
+        lastName,
+        name: fullName,
         email,
-
-        name:
-          email.split("@")[0],
 
         role: "organizer",
 
         approved: false,
+        disabled: false,
 
         created: Date.now()
       }
     );
 
-    errorText.style.color =
-      "#7dffae";
+    await signOut(auth);
 
-    errorText.innerText =
-      "Račun kreiran — čeka odobrenje administratora";
+    firstNameEl.value = "";
+    lastNameEl.value = "";
+    registerEmailEl.value = "";
+    registerPasswordEl.value = "";
+
+    showLogin();
+
+    showSuccess(
+      "Račun je kreiran i čeka odobrenje administratora."
+    );
 
   } catch (err) {
-
     console.error(err);
-
-    errorText.innerText =
-      "Greška kod registracije";
+    showError(getFirebaseErrorMessage(err.code));
+  } finally {
+    setLoading(registerBtn, false, "Kreiraj račun ✨");
   }
 }
 
-// ==============================
-// AUTO LOGIN
-// ==============================
+/* ================= ENTER KEY ================= */
+
+loginPasswordEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    login();
+  }
+});
+
+registerPasswordEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    register();
+  }
+});
+
+/* ================= AUTO LOGIN ================= */
 
 onAuthStateChanged(auth, async (user) => {
-
   if (!user) return;
 
-  const snap =
-    await getDoc(
-      doc(db, "users", user.uid)
-    );
+  try {
+    const snap =
+      await getDoc(
+        doc(db, "users", user.uid)
+      );
 
-  if (!snap.exists()) return;
+    if (!snap.exists()) {
+      await signOut(auth);
+      return;
+    }
 
-  const data =
-    snap.data();
+    const data =
+      snap.data();
 
-  if (!data.approved) return;
+    if (
+      data.approved === true &&
+      data.disabled !== true
+    ) {
+      window.location.href =
+        "/main-admin.html";
+    }
 
-  window.location.href =
-    "/main-admin.html";
+  } catch (err) {
+    console.error("Auto login error:", err);
+  }
 });
