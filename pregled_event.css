@@ -966,3 +966,94 @@ textarea{
     grid-column:span 1;
   }
 }
+/* =====================================================
+   PREGLED EVENTOVA — COMPACT TOOLBAR FIX
+===================================================== */
+
+.events-toolbar{
+  width:100%;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+
+  margin:0 0 18px !important;
+  padding:12px !important;
+
+  background:#181c24 !important;
+  border:1px solid rgba(255,255,255,.06) !important;
+  border-radius:20px !important;
+
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+
+.analytics-open-btn{
+  flex:1;
+  min-width:0;
+
+  height:50px;
+  border:none;
+  border-radius:16px;
+
+  background:linear-gradient(135deg,#6ea8fe,#8fc7ff);
+  color:#06111f;
+
+  font-weight:900;
+  font-size:15px;
+
+  cursor:pointer;
+}
+
+.events-info{
+  flex:0 0 auto !important;
+
+  width:auto !important;
+  min-width:118px !important;
+  max-width:145px !important;
+
+  height:50px;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+
+  margin:0 !important;
+  padding:0 12px !important;
+
+  background:#111722 !important;
+  border:1px solid rgba(255,255,255,.06) !important;
+  border-radius:16px !important;
+
+  box-sizing:border-box !important;
+}
+
+.events-info b{
+  font-size:22px !important;
+  color:#8fc7ff !important;
+  line-height:1 !important;
+}
+
+.events-info span{
+  font-size:12px !important;
+  color:rgba(255,255,255,.72) !important;
+  white-space:nowrap !important;
+}
+
+.events-hint{
+  display:none !important;
+}
+
+@media(max-width:560px){
+  .events-toolbar{
+    flex-direction:column !important;
+    align-items:stretch !important;
+  }
+
+  .analytics-open-btn,
+  .events-info{
+    width:100% !important;
+    max-width:none !important;
+  }
+}
