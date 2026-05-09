@@ -1143,3 +1143,78 @@ textarea{
     border-radius:26px 26px 0 0;
   }
 }
+/* =====================================================
+   EVENT CARD — COMPACT STATS
+===================================================== */
+
+.event-stats-grid{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:8px !important;
+
+  margin:14px 0 !important;
+  padding:10px !important;
+
+  background:#0f1115 !important;
+  border:1px solid rgba(255,255,255,.04) !important;
+  border-radius:18px !important;
+}
+
+.event-stats-grid div{
+  flex:1 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+
+  min-height:42px !important;
+  padding:8px 6px !important;
+
+  background:transparent !important;
+  border:none !important;
+  border-radius:12px !important;
+
+  text-align:center !important;
+}
+
+.event-stats-grid div:not(:last-child){
+  border-right:1px solid rgba(255,255,255,.07) !important;
+}
+
+.event-stats-grid span{
+  display:inline !important;
+  margin:0 !important;
+  opacity:.85 !important;
+  font-size:15px !important;
+  line-height:1 !important;
+}
+
+.event-stats-grid b{
+  display:inline !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  color:white !important;
+}
+
+@media(max-width:420px){
+  .event-stats-grid{
+    gap:4px !important;
+    padding:8px !important;
+  }
+
+  .event-stats-grid div{
+    min-height:38px !important;
+    padding:6px 4px !important;
+  }
+
+  .event-stats-grid span{
+    font-size:14px !important;
+  }
+
+  .event-stats-grid b{
+    font-size:16px !important;
+  }
+}
