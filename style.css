@@ -1453,3 +1453,47 @@ body.theme-pricest .glass {
 
   opacity:.25;
 }
+.topbar-wrap{
+  position:sticky;
+  top:0;
+  z-index:9999;
+}
+
+.topbar{
+  position:relative;
+  z-index:1;
+}
+
+#secretAdminBtn{
+  position:absolute;
+
+  top:50%;
+  right:14px;
+
+  transform:translateY(-50%);
+
+  width:34px;
+  height:34px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,0.03);
+
+  color:white;
+
+  opacity:0.08;
+
+  z-index:99999;
+
+  cursor:pointer;
+
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+
+  transition:.2s;
+}
+
+#secretAdminBtn:active{
+  transform:translateY(-50%) scale(.92);
+}
