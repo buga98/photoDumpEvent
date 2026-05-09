@@ -97,7 +97,19 @@ onAuthStateChanged(auth, async (user) => {
 
   loadEvents();
 });
+document.getElementById("openAnalyticsBtn")?.addEventListener("click", () => {
+  document.getElementById("analyticsModal")?.classList.remove("hidden");
+});
 
+document.getElementById("closeAnalyticsBtn")?.addEventListener("click", () => {
+  document.getElementById("analyticsModal")?.classList.add("hidden");
+});
+
+document.getElementById("analyticsModal")?.addEventListener("click", (e) => {
+  if (e.target.id === "analyticsModal") {
+    document.getElementById("analyticsModal")?.classList.add("hidden");
+  }
+});
 /* ================= LOAD EVENTS ================= */
 
 async function loadEvents() {

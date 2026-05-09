@@ -31,55 +31,18 @@
 
     </div>
 
-    <!-- ANALYTICS -->
-    <section id="analyticsPanel" class="analytics-panel">
+    <section class="events-toolbar">
 
-      <div class="analytics-card">
-        <span>Ukupno eventova</span>
-        <b id="analyticsTotalEvents">0</b>
-      </div>
+  <button id="openAnalyticsBtn" class="analytics-open-btn">
+    📊 Analitika
+  </button>
 
-      <div class="analytics-card">
-        <span>Aktivni</span>
-        <b id="analyticsActiveEvents">0</b>
-      </div>
+  <div class="events-info">
+    <b id="eventsVisibleCount">0</b>
+    <span>eventova u prikazu</span>
+  </div>
 
-      <div class="analytics-card">
-        <span>Istekli / disabled</span>
-        <b id="analyticsExpiredEvents">0</b>
-      </div>
-
-      <div class="analytics-card">
-        <span>Ukupno slika</span>
-        <b id="analyticsPhotos">0</b>
-      </div>
-
-      <div class="analytics-card">
-        <span>Ukupno lajkova</span>
-        <b id="analyticsLikes">0</b>
-      </div>
-
-      <div class="analytics-card">
-        <span>Ukupno posveta</span>
-        <b id="analyticsDedications">0</b>
-      </div>
-
-      <div class="analytics-card wide">
-        <span>Iskorištenost limita</span>
-
-        <b id="analyticsUsage">0%</b>
-
-        <div class="usage-bar">
-          <div id="analyticsUsageBar"></div>
-        </div>
-      </div>
-
-      <div class="analytics-card wide">
-        <span>Najaktivniji organizator</span>
-        <b id="analyticsTopOwner">-</b>
-      </div>
-
-    </section>
+</section>
 
     <!-- FILTER / INFO -->
     <section class="events-toolbar">
@@ -255,7 +218,73 @@
     </div>
 
   </div>
+<div id="analyticsModal" class="modal-overlay hidden">
 
+  <div class="analytics-modal">
+
+    <div class="modal-head">
+      <div>
+        <h2>📊 Analitika</h2>
+        <p>Pregled svih eventova i iskorištenosti</p>
+      </div>
+
+      <button id="closeAnalyticsBtn" class="modal-close">
+        ×
+      </button>
+    </div>
+
+    <section id="analyticsPanel" class="analytics-panel modal-analytics">
+
+      <div class="analytics-card">
+        <span>Ukupno eventova</span>
+        <b id="analyticsTotalEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Aktivni</span>
+        <b id="analyticsActiveEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Istekli / disabled</span>
+        <b id="analyticsExpiredEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno slika</span>
+        <b id="analyticsPhotos">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno lajkova</span>
+        <b id="analyticsLikes">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno posveta</span>
+        <b id="analyticsDedications">0</b>
+      </div>
+
+      <div class="analytics-card wide">
+        <span>Iskorištenost limita</span>
+
+        <b id="analyticsUsage">0%</b>
+
+        <div class="usage-bar">
+          <div id="analyticsUsageBar"></div>
+        </div>
+      </div>
+
+      <div class="analytics-card wide">
+        <span>Najaktivniji organizator</span>
+        <b id="analyticsTopOwner">-</b>
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
   <script type="module" src="pregled_event.js"></script>
 </body>
 </html>
