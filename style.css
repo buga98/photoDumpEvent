@@ -1497,3 +1497,62 @@ body.theme-pricest .glass {
 #secretAdminBtn:active{
   transform:translateY(-50%) scale(.92);
 }
+#slideshowImage{
+  opacity:0;
+  transition:opacity .45s ease;
+}
+
+#slideshowImage.show{
+  opacity:1;
+}
+
+.slideshow-close{
+  position:absolute;
+  top:18px;
+  right:18px;
+  z-index:10;
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:none;
+  background:rgba(0,0,0,.45);
+  color:white;
+  font-size:32px;
+  cursor:pointer;
+}
+
+#slideshowCaption{
+  position:absolute;
+  left:50%;
+  bottom:34px;
+  transform:translateX(-50%);
+  padding:12px 20px;
+  border-radius:999px;
+  background:rgba(0,0,0,.45);
+  color:white;
+  font-weight:700;
+  backdrop-filter:blur(12px);
+}
+
+#slideshowCounter{
+  position:absolute;
+  left:18px;
+  top:18px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:rgba(0,0,0,.45);
+  color:white;
+  font-size:14px;
+  font-weight:700;
+}
+
+#slideshowLoading{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:20px;
+  font-weight:800;
+}
