@@ -80,6 +80,7 @@
 <script type="module" src="index.js"></script>
 
 <script>
+<script>
 window.enterApp = function () {
   const name = document.getElementById("name").value.trim();
 
@@ -88,6 +89,18 @@ window.enterApp = function () {
     return;
   }
 
+  const eventId =
+    new URLSearchParams(location.search).get("event") ||
+    localStorage.getItem("eventId");
+
+  if (!eventId) {
+    alert("Event nije pronađen. Otvori aplikaciju putem QR koda.");
+    return;
+  }
+
+  localStorage.setItem("eventId", eventId);
+  localStorage.setItem("name", name);
+
   let userId = localStorage.getItem("userId");
 
   if (!userId) {
@@ -95,17 +108,25 @@ window.enterApp = function () {
     localStorage.setItem("userId", userId);
   }
 
-  localStorage.setItem("name", name);
-
-  const eventId = localStorage.getItem("eventId");
-
-  // 🔥 SAFE CALL
   if (typeof createUser === "function") {
     createUser(userId, name, eventId);
   }
 
   window.location.href = "/app.html?event=" + eventId;
 };
+
+/* 🔥 EVENT HANDLING */
+const params = new URLSearchParams(location.search);
+const eventIdFromUrl = params.get("event");
+
+if (eventIdFromUrl) {
+  localStorage.setItem("eventId", eventIdFromUrl);
+}
+
+window.addEventListener("load", () => {
+  document.body.classList.add("loaded");
+});
+</script>
 /* 🔥 EVENT HANDLING */
 const params = new URLSearchParams(location.search);
 const eventIdFromUrl = params.get("event");
@@ -119,6 +140,12 @@ window.addEventListener("load", () => {
   document.body.classList.add("loaded");
 });
 </script>
-
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(console.error);
+  });
+}
+</script>
 </body>
 </html>

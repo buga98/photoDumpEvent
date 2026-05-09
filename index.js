@@ -10,7 +10,16 @@ function logTime(label) {
 // ==============================
 // 🔗 EVENT ID
 // ==============================
-const eventId = new URLSearchParams(location.search).get("event");
+const eventIdFromUrl =
+  new URLSearchParams(location.search).get("event");
+
+const eventId =
+  eventIdFromUrl ||
+  localStorage.getItem("eventId");
+
+if (eventIdFromUrl) {
+  localStorage.setItem("eventId", eventIdFromUrl);
+}
 
 // ==============================
 // 🌍 GLOBAL STATE
@@ -240,24 +249,42 @@ async function fetchEvent() {
 // 🥇 FALLBACK
 // ==============================
 function renderFallback() {
-  titleEl.innerText = "Dobrodošli";
-  headingEl.innerText = "PhotoDump";
-  subtitleEl.innerText = "Učitavanje...";
+  titleEl.innerText = "PhotoDump";
+  headingEl.innerText = "Nema aktivnog eventa";
+  subtitleEl.innerText =
+    "Otvori aplikaciju putem QR koda ili linka eventa.";
+
+  const nameInput =
+    document.getElementById("name");
+
+  const enterBtn =
+    document.querySelector(".glass-card button");
+
+  if (nameInput) {
+    nameInput.style.display = "none";
+  }
+
+  if (enterBtn) {
+    enterBtn.style.display = "none";
+  }
 }
 
 // ==============================
 // 🚀 START
 // ==============================
-const booted = bootFromCache();
-
-if (!booted) {
+if (!eventId) {
   renderFallback();
+} else {
+  const booted = bootFromCache();
+
+  if (!booted) {
+    renderFallback();
+  }
+
+  tryAutoLogin();
+
+  setTimeout(fetchEvent, 100);
 }
-
-tryAutoLogin();
-
-// 🔥 uvijek sync u pozadini
-setTimeout(fetchEvent, 100);
 
 // ==============================
 // ✅ FINAL

@@ -139,6 +139,13 @@
 </div>
 
 <script type="module" src="script.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(console.error);
+  });
+}
+</script>
 <div id="toast"></div>
 
 </body>

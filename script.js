@@ -1,6 +1,10 @@
 let currentEventId =
   new URLSearchParams(window.location.search).get("event") ||
   localStorage.getItem("eventId");
+  if (!currentEventId) {
+  alert("Event nije pronađen. Otvori aplikaciju putem QR koda.");
+  window.location.href = "/index.html";
+}
 
 /* ===== FIREBASE ===== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
