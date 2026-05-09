@@ -1556,3 +1556,210 @@ body.theme-pricest .glass {
   font-size:20px;
   font-weight:800;
 }
+/* =====================================================
+   ADMIN SLIDESHOW — FINAL POLISH
+===================================================== */
+
+body.slideshow-open{
+  overflow:hidden !important;
+}
+
+#slideshowOverlay{
+  position:fixed !important;
+  inset:0 !important;
+
+  width:100vw !important;
+  height:100vh !important;
+
+  z-index:999999 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,.04), transparent 42%),
+    #020204 !important;
+
+  overflow:hidden !important;
+}
+
+/* drži sliku pod kontrolom */
+.slideshow-image-wrap{
+  width:100vw;
+  height:100vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:42px 42px 74px;
+
+  pointer-events:none;
+}
+
+/* najbitniji dio — slika se NE rasteže agresivno */
+#slideshowImage{
+  display:block;
+
+  width:auto !important;
+  height:auto !important;
+
+  max-width:min(92vw, 1600px) !important;
+  max-height:82vh !important;
+
+  object-fit:contain !important;
+
+  border-radius:18px;
+
+  opacity:0;
+  transition:
+    opacity .45s ease,
+    transform .45s ease;
+
+  transform:scale(.985);
+
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.72);
+
+  background:#000;
+}
+
+/* kad se slika učita */
+#slideshowImage.show{
+  opacity:1;
+  transform:scale(1);
+}
+
+/* X gumb — neutralan, ne zlatan */
+.slideshow-close{
+  position:absolute !important;
+  top:18px !important;
+  right:18px !important;
+
+  width:44px !important;
+  height:44px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  z-index:20 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:50% !important;
+
+  border:1px solid rgba(255,255,255,.08) !important;
+
+  background:rgba(255,255,255,.06) !important;
+  color:rgba(255,255,255,.62) !important;
+
+  font-family:Arial,sans-serif !important;
+  font-size:30px !important;
+  line-height:1 !important;
+  font-weight:300 !important;
+
+  box-shadow:none !important;
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  cursor:pointer;
+  opacity:.78;
+
+  transition:.18s ease;
+}
+
+.slideshow-close:hover{
+  background:rgba(255,255,255,.10) !important;
+  color:rgba(255,255,255,.88) !important;
+  opacity:1;
+  transform:none !important;
+}
+
+.slideshow-close:active{
+  transform:scale(.94) !important;
+}
+
+/* brojač sakriven — nepotreban */
+#slideshowCounter{
+  display:none !important;
+}
+
+/* autor slike — diskretno */
+#slideshowCaption{
+  position:absolute !important;
+  left:50% !important;
+  bottom:26px !important;
+
+  transform:translateX(-50%) !important;
+
+  max-width:86vw;
+
+  padding:10px 16px !important;
+
+  border-radius:999px !important;
+
+  background:rgba(0,0,0,.34) !important;
+  color:rgba(255,255,255,.82) !important;
+
+  font-size:14px !important;
+  font-weight:500 !important;
+
+  border:1px solid rgba(255,255,255,.06);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+
+  box-shadow:none !important;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* loading poruka */
+#slideshowLoading{
+  position:absolute !important;
+  inset:0 !important;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:rgba(255,255,255,.78) !important;
+
+  font-size:18px !important;
+  font-weight:600 !important;
+
+  pointer-events:none;
+}
+
+/* mobiteli */
+@media(max-width:700px){
+  .slideshow-image-wrap{
+    padding:54px 14px 76px;
+  }
+
+  #slideshowImage{
+    max-width:96vw !important;
+    max-height:78vh !important;
+    border-radius:14px;
+  }
+
+  .slideshow-close{
+    top:14px !important;
+    right:14px !important;
+    width:40px !important;
+    height:40px !important;
+    font-size:27px !important;
+  }
+
+  #slideshowCaption{
+    bottom:22px !important;
+    font-size:13px !important;
+    max-width:90vw;
+  }
+}
