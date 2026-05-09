@@ -450,3 +450,71 @@ textarea{
     width:100%;
   }
 }
+/* =====================================================
+   USERS PANEL — FIX CARD OVERFLOW
+===================================================== */
+
+.users-list{
+  grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+}
+
+.user-card{
+  overflow:hidden;
+}
+
+.user-meta{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px;
+}
+
+.user-meta div{
+  min-width:0;
+  overflow:hidden;
+}
+
+.user-meta b,
+.user-meta span{
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+
+.user-meta b{
+  display:block;
+  line-height:1.25;
+}
+
+.user-actions{
+  align-items:center;
+}
+
+.mini-btn{
+  max-width:100%;
+  white-space:normal;
+  line-height:1.2;
+}
+
+/* malo bolji layout za srednje ekrane */
+@media(max-width:1050px){
+  .users-list{
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  }
+
+  .user-meta{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* mobitel */
+@media(max-width:620px){
+  .users-list{
+    grid-template-columns:1fr;
+  }
+
+  .users-summary{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .user-meta{
+    grid-template-columns:1fr !important;
+  }
+}
