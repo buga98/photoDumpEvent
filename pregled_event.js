@@ -426,7 +426,11 @@ async function openEditor(eventId) {
   const data =
     currentEventData;
 
-  editor.classList.remove("hidden");
+document
+  .getElementById("editorModal")
+  ?.classList.remove("hidden");
+
+editor.classList.remove("hidden");
 
   const subtitle =
     document.getElementById("editorSubtitle");
@@ -518,11 +522,6 @@ async function openEditor(eventId) {
     "edit_profile_subtitle",
     data.texts?.profile?.subtitle || ""
   );
-
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth"
-  });
 }
 
 function renderEventUsage(data) {
@@ -622,10 +621,33 @@ document.getElementById("saveBtn").onclick = async () => {
 
 /* ================= QUICK ACTIONS ================= */
 
-document.getElementById("closeEditorBtn")?.addEventListener("click", () => {
+function closeEditorModal() {
+  document
+    .getElementById("editorModal")
+    ?.classList.add("hidden");
+
   editor.classList.add("hidden");
+
   currentEventId = null;
   currentEventData = null;
+}
+
+document
+  .getElementById("closeEditorBtn")
+  ?.addEventListener("click", closeEditorModal);
+
+document
+  .getElementById("editorModal")
+  ?.addEventListener("click", (e) => {
+    if (e.target.id === "editorModal") {
+      closeEditorModal();
+    }
+  });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeEditorModal();
+  }
 });
 
 document.getElementById("copyEventIdBtn")?.addEventListener("click", async () => {

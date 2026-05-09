@@ -1057,3 +1057,89 @@ textarea{
     max-width:none !important;
   }
 }
+/* =====================================================
+   EVENT EDITOR MODAL
+===================================================== */
+
+#editorModal.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+
+  background:rgba(0,0,0,.72);
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+#editorModal.hidden{
+  display:none !important;
+}
+
+.editor-modal{
+  width:100%;
+  max-width:980px;
+  max-height:88vh;
+
+  overflow:auto;
+
+  margin:0 !important;
+
+  background:#111722;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:28px;
+
+  padding:24px;
+
+  box-shadow:0 28px 90px rgba(0,0,0,.55);
+}
+
+.editor-modal.hidden{
+  display:block !important;
+}
+
+.editor-modal .editor-header{
+  position:sticky;
+  top:-24px;
+  z-index:10;
+
+  margin:-24px -24px 22px;
+  padding:22px 24px;
+
+  background:rgba(17,23,34,.94);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  border-bottom:1px solid rgba(255,255,255,.07);
+  border-radius:28px 28px 0 0;
+}
+
+#closeEditorBtn{
+  white-space:nowrap;
+}
+
+@media(max-width:760px){
+  #editorModal.modal-overlay{
+    align-items:flex-end;
+    padding:0;
+  }
+
+  .editor-modal{
+    max-height:92vh;
+    border-radius:26px 26px 0 0;
+    padding:20px;
+  }
+
+  .editor-modal .editor-header{
+    top:-20px;
+    margin:-20px -20px 20px;
+    padding:18px 20px;
+    border-radius:26px 26px 0 0;
+  }
+}
