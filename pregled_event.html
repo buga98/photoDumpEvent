@@ -9,14 +9,91 @@
 
   <link rel="stylesheet" href="pregled_event.css" />
 </head>
+
 <body>
 
   <div class="page">
 
-    <div class="topbar">
-      <h1>📸 Pregled eventova</h1>
-      <a href="/main-admin.html" class="back-btn">← Nazad</a>
+    <div class="topbar pregled-topbar">
+
+      <div>
+        <h1>📸 Pregled eventova</h1>
+
+        <div class="topbar-subtitle">
+          Analitika, linkovi i upravljanje eventovima
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <span id="roleBadge" class="role-badge">...</span>
+        <a href="/main-admin.html" class="back-btn">← Nazad</a>
+      </div>
+
     </div>
+
+    <!-- ANALYTICS -->
+    <section id="analyticsPanel" class="analytics-panel">
+
+      <div class="analytics-card">
+        <span>Ukupno eventova</span>
+        <b id="analyticsTotalEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Aktivni</span>
+        <b id="analyticsActiveEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Istekli / disabled</span>
+        <b id="analyticsExpiredEvents">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno slika</span>
+        <b id="analyticsPhotos">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno lajkova</span>
+        <b id="analyticsLikes">0</b>
+      </div>
+
+      <div class="analytics-card">
+        <span>Ukupno posveta</span>
+        <b id="analyticsDedications">0</b>
+      </div>
+
+      <div class="analytics-card wide">
+        <span>Iskorištenost limita</span>
+
+        <b id="analyticsUsage">0%</b>
+
+        <div class="usage-bar">
+          <div id="analyticsUsageBar"></div>
+        </div>
+      </div>
+
+      <div class="analytics-card wide">
+        <span>Najaktivniji organizator</span>
+        <b id="analyticsTopOwner">-</b>
+      </div>
+
+    </section>
+
+    <!-- FILTER / INFO -->
+    <section class="events-toolbar">
+
+      <div class="events-info">
+        <b id="eventsVisibleCount">0</b>
+        <span>eventova u prikazu</span>
+      </div>
+
+      <div class="events-hint">
+        Superadmin može otvoriti event i uređivati. Organizator vidi samo svoje eventove.
+      </div>
+
+    </section>
 
     <!-- LISTA -->
     <div id="eventsList" class="events-list">
@@ -27,7 +104,36 @@
     <div id="editor" class="editor hidden">
 
       <div class="editor-header">
-        <h2>✏️ Uredi event</h2>
+
+        <div>
+          <h2>✏️ Uredi event</h2>
+          <p id="editorSubtitle">Detalji eventa</p>
+        </div>
+
+        <button id="closeEditorBtn" class="mini-btn ghost">
+          Zatvori
+        </button>
+
+      </div>
+
+      <div class="editor-actions superadmin-only">
+
+        <button id="copyEventIdBtn" class="mini-btn ghost">
+          📋 Kopiraj event ID
+        </button>
+
+        <button id="extendEventBtn" class="mini-btn primary">
+          ➕ Produži 30 dana
+        </button>
+
+        <button id="expireEventBtn" class="mini-btn danger">
+          ⏳ Označi expired
+        </button>
+
+        <button id="cleanedEventBtn" class="mini-btn ghost">
+          🧹 Označi očišćen
+        </button>
+
       </div>
 
       <div class="editor-grid">
@@ -45,6 +151,7 @@
             <option value="krstenje">Krštenje</option>
             <option value="pricest">Pričest</option>
             <option value="party">Party</option>
+            <option value="default">Default</option>
           </select>
         </label>
 
@@ -71,6 +178,11 @@
           <input type="number" id="edit_limit">
         </label>
 
+        <label>
+          Ističe
+          <input type="text" id="edit_expires_display" disabled>
+        </label>
+
         <label class="checkbox">
           <input type="checkbox" id="edit_originals">
           Allow originals
@@ -94,6 +206,19 @@
         <div class="stat">
           <span>💌 Posvete</span>
           <b id="stat_dedications">0</b>
+        </div>
+
+      </div>
+
+      <div class="event-usage-box">
+
+        <div class="event-usage-head">
+          <span>Iskorištenost eventa</span>
+          <b id="eventUsageText">0%</b>
+        </div>
+
+        <div class="usage-bar">
+          <div id="eventUsageBar"></div>
         </div>
 
       </div>
