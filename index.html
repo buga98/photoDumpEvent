@@ -8,24 +8,58 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>PhotoDump Event</title>
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#07111f">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- BASIC SEO -->
+  <title>PhotoDump Event — QR galerija za vjenčanja i evente</title>
+
   <meta
     name="description"
-    content="PhotoDump Event je jednostavna aplikacija za dijeljenje fotografija, posveta i uspomena s vjenčanja, rođendana, krštenja, pričesti i partyja."
+    content="PhotoDump Event je QR galerija za vjenčanja, krštenja, rođendane i partyje. Gosti bez instalacije dodaju fotografije, lajkaju trenutke i ostavljaju posvete."
   >
-<link rel="icon" type="image/png" href="/icon.png">
-<link rel="apple-touch-icon" href="/icon.png">
-<meta name="theme-color" content="#07111f">
-  <link rel="stylesheet" href="index.css">
 
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="PhotoDump Event">
+  <link rel="canonical" href="https://photodumpeventi.com/">
+
+  <!-- MOBILE / THEME -->
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+
+  <!-- OPEN GRAPH / FACEBOOK / WHATSAPP -->
+  <meta property="og:title" content="PhotoDump Event — QR galerija za evente">
+  <meta
+    property="og:description"
+    content="Gosti skeniraju QR kod, dodaju fotografije i ostavljaju posvete. Sve uspomene s eventa na jednom mjestu."
+  >
+  <meta property="og:image" content="https://photodumpeventi.com/og-image.png">
+  <meta property="og:url" content="https://photodumpeventi.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PhotoDump Event">
+  <meta property="og:locale" content="hr_HR">
+
+  <!-- TWITTER / X PREVIEW -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PhotoDump Event — QR galerija za evente">
+  <meta
+    name="twitter:description"
+    content="QR galerija za vjenčanja, krštenja, rođendane i partyje. Bez instalacije aplikacije."
+  >
+  <meta name="twitter:image" content="https://photodumpeventi.com/og-image.png">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/index.css">
+
+  <!-- FONTS -->
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
+  <!-- EVENT ROUTING - NE MICATI -->
   <script>
     const params = new URLSearchParams(window.location.search);
     const eventParam = params.get("event");
