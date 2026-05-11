@@ -1763,3 +1763,413 @@ body.slideshow-open{
     max-width:90vw;
   }
 }
+/* =====================================================
+   ADMIN PANEL — GLASS POLISH FINAL
+===================================================== */
+
+/* admin page spacing */
+body:has(#adminTopbar) .container{
+  position:relative;
+  z-index:2;
+
+  width:100%;
+  max-width:920px;
+
+  margin:0 auto;
+  padding:76px 12px 92px;
+}
+
+/* header */
+body:has(#adminTopbar) .admin-header{
+  margin:10px 0 14px !important;
+  padding:22px 18px !important;
+
+  border-radius:28px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.84),
+      rgba(255,255,255,.56)
+    ) !important;
+
+  border:1px solid rgba(255,255,255,.7) !important;
+
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.07),
+    0 0 32px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+
+body:has(#adminTopbar) .admin-header h2{
+  font-size:26px;
+  margin-bottom:4px;
+}
+
+body:has(#adminTopbar) .admin-header p{
+  font-size:13px;
+}
+
+/* stats compact glass pills */
+body:has(#adminTopbar) .admin-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  margin:0 0 14px !important;
+  padding:0 !important;
+}
+
+body:has(#adminTopbar) .admin-stats > div{
+  min-height:48px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,.62);
+  border:1px solid var(--accent-soft);
+
+  color:var(--title);
+  font-weight:800;
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.045),
+    0 0 20px var(--accent-soft);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+body:has(#adminTopbar) .admin-stats span{
+  font-size:18px;
+}
+
+/* actions main layout */
+body:has(#adminTopbar) .admin-actions-grid{
+  display:grid !important;
+  grid-template-columns:1.15fr .85fr .85fr;
+  gap:12px;
+
+  margin:0 0 14px !important;
+  padding:0 !important;
+}
+
+/* the inline div with 4 buttons */
+body:has(#adminTopbar) .admin-actions-grid > div:first-child{
+  display:grid !important;
+  grid-template-columns:1fr;
+  gap:10px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+}
+
+/* action buttons */
+body:has(#adminTopbar) .admin-actions-grid > div:first-child button{
+  height:48px;
+
+  margin:0 !important;
+  padding:0 14px !important;
+
+  border-radius:18px !important;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  font-size:14px !important;
+  font-weight:800 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.72),
+      rgba(255,255,255,.46)
+    ) !important;
+
+  color:var(--title) !important;
+
+  border:1px solid var(--accent-soft) !important;
+
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.055),
+    0 0 18px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.65) !important;
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+body:has(#adminTopbar) .admin-actions-grid > div:first-child button:active{
+  transform:scale(.97);
+}
+
+/* slideshow/settings cards */
+body:has(#adminTopbar) .admin-card{
+  min-height:222px;
+
+  margin:0 !important;
+  padding:20px 12px !important;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  border-radius:28px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.80),
+      rgba(255,255,255,.48)
+    ) !important;
+
+  border:1px solid rgba(255,255,255,.68) !important;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.07),
+    0 0 26px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.7) !important;
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  color:var(--text-main) !important;
+}
+
+body:has(#adminTopbar) .admin-card:hover{
+  transform:translateY(-1px);
+}
+
+body:has(#adminTopbar) .admin-card:active{
+  transform:scale(.97);
+}
+
+body:has(#adminTopbar) .admin-card{
+  font-size:24px;
+}
+
+body:has(#adminTopbar) .admin-card span{
+  margin:0 !important;
+  font-size:13px !important;
+  font-weight:700;
+  color:var(--text-main);
+}
+
+/* filters */
+body:has(#adminTopbar) .admin-filters{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+
+  padding:0 !important;
+  margin:0 0 14px !important;
+}
+
+body:has(#adminTopbar) .admin-filters button{
+  height:44px;
+
+  margin:0 !important;
+  padding:0 10px !important;
+
+  border-radius:18px !important;
+
+  font-size:13px !important;
+  font-weight:800 !important;
+
+  background:rgba(255,255,255,.58) !important;
+  color:var(--title) !important;
+
+  border:1px solid var(--accent-soft) !important;
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.045),
+    inset 0 1px 0 rgba(255,255,255,.62) !important;
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+body:has(#adminTopbar) .admin-filters button.active{
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent-2),
+      var(--accent)
+    ) !important;
+
+  color:#fff !important;
+
+  box-shadow:
+    0 12px 28px var(--accent-glow),
+    0 0 22px var(--accent-soft) !important;
+}
+
+/* gallery spacing */
+body:has(#adminTopbar) #gallery{
+  padding:0 0 12px !important;
+  gap:7px !important;
+}
+
+body:has(#adminTopbar) .photo-card{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+body:has(#adminTopbar) .photo-card img,
+body:has(#adminTopbar) #gallery img{
+  border-radius:16px !important;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.08),
+    0 0 16px var(--accent-soft) !important;
+}
+
+/* selected state cleaner */
+body:has(#adminTopbar) .photo-card.selected{
+  outline:none !important;
+  transform:scale(.96);
+
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 0 0 7px var(--accent-soft),
+    0 14px 28px rgba(0,0,0,.12);
+}
+
+/* hidden photo clearer */
+body:has(#adminTopbar) .hidden-photo{
+  position:relative;
+}
+
+body:has(#adminTopbar) .hidden-photo::after{
+  content:"Skriveno";
+  position:absolute;
+  left:6px;
+  bottom:6px;
+
+  padding:5px 8px;
+  border-radius:999px;
+
+  background:rgba(0,0,0,.55);
+  color:white;
+
+  font-size:11px;
+  font-weight:800;
+
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+/* bottom nav polish */
+body:has(#adminTopbar) .admin-navbar{
+  height:74px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.68),
+      rgba(255,255,255,.9)
+    ) !important;
+
+  border-top:1px solid var(--accent-soft) !important;
+
+  box-shadow:
+    0 -14px 34px rgba(0,0,0,.08),
+    0 0 24px var(--accent-soft) !important;
+
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+
+body:has(#adminTopbar) .admin-nav-item{
+  width:54px;
+  height:54px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:20px;
+}
+
+body:has(#adminTopbar) .admin-nav-item.active{
+  background:rgba(255,255,255,.62);
+  border:1px solid var(--accent-soft);
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.05),
+    0 0 18px var(--accent-soft);
+}
+
+body:has(#adminTopbar) .admin-nav-item.active::after{
+  bottom:-5px !important;
+}
+
+/* modal boxes also more glass */
+body:has(#adminTopbar) .modal-box,
+body:has(#adminTopbar) .settings-box{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.9),
+      rgba(255,255,255,.72)
+    ) !important;
+
+  border:1px solid rgba(255,255,255,.7) !important;
+
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.18),
+    0 0 28px var(--accent-soft) !important;
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* mobile optimization */
+@media(max-width:520px){
+  body:has(#adminTopbar) .container{
+    padding-left:7px;
+    padding-right:7px;
+  }
+
+  body:has(#adminTopbar) .admin-header{
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+
+  body:has(#adminTopbar) .admin-actions-grid{
+    grid-template-columns:1fr .62fr .62fr;
+    gap:10px;
+  }
+
+  body:has(#adminTopbar) .admin-actions-grid > div:first-child button{
+    height:48px;
+    font-size:14px !important;
+  }
+
+  body:has(#adminTopbar) .admin-card{
+    min-height:192px;
+    border-radius:24px !important;
+    padding:18px 8px !important;
+  }
+
+  body:has(#adminTopbar) .admin-card span{
+    font-size:12px !important;
+  }
+
+  body:has(#adminTopbar) .admin-filters button{
+    height:42px;
+    font-size:12px !important;
+  }
+
+  body:has(#adminTopbar) .admin-stats > div{
+    min-height:44px;
+  }
+}
