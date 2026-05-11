@@ -34,6 +34,41 @@ const headingEl = document.getElementById("eventHeading");
 const subtitleEl = document.getElementById("eventSubtitle");
 const container = document.querySelector(".floating-container");
 
+
+// ==============================
+// 🚪 ENTER APP
+// ==============================
+window.enterApp = function () {
+  const nameInput = document.getElementById("name");
+  const name = nameInput ? nameInput.value.trim() : "";
+
+  if (!name || name.length < 2) {
+    alert("Upiši ime i prezime");
+    return;
+  }
+
+  const activeEventId =
+    new URLSearchParams(location.search).get("event") ||
+    localStorage.getItem("eventId");
+
+  if (!activeEventId) {
+    alert("Event nije pronađen. Otvori aplikaciju putem QR koda.");
+    return;
+  }
+
+  localStorage.setItem("eventId", activeEventId);
+  localStorage.setItem("name", name);
+
+  let userId = localStorage.getItem("userId");
+
+  if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem("userId", userId);
+  }
+
+  window.location.href =
+    "/app.html?event=" + encodeURIComponent(activeEventId);
+};
 // ==============================
 // 🧠 SUBTITLE
 // ==============================
