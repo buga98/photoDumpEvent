@@ -29,14 +29,30 @@
   </div>
 
   <!-- 🔥 AKCIJE -->
-<div class="admin-actions-grid compact">
+  <div class="admin-actions-grid">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+
   <button onclick="toggleSelectionMode()">🟣 Odabir</button>
+
   <button onclick="selectAll()">✅ Označi sve</button>
+
   <button onclick="hideSelected()">🚫 Sakrij</button>
+
   <button onclick="showSelected()">👁 Vrati</button>
-  <button onclick="startSlideshow()">▶️ Slideshow</button>
-  <button onclick="openSettings()">⚙️ Postavke</button>
+
 </div>
+
+    <div class="admin-card" onclick="startSlideshow()">
+      ▶️
+      <span>Slideshow</span>
+    </div>
+
+    <div class="admin-card" onclick="openSettings()">
+      ⚙️
+      <span>Postavke</span>
+    </div>
+
+  </div>
 
   <!-- 🔥 FILTERI -->
   <div class="admin-filters">
