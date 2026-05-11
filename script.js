@@ -3,7 +3,7 @@ let currentEventId =
   localStorage.getItem("eventId");
   if (!currentEventId) {
   alert("Event nije pronađen. Otvori aplikaciju putem QR koda.");
-  window.location.href = "/index.html";
+  window.location.href = "/";
 }
 
 /* ===== FIREBASE ===== */
@@ -1199,7 +1199,8 @@ window.checkAdmin = function () {
   const pass = document.getElementById("adminPass")?.value;
 
   if (pass === "admin") {
-    window.location.href = "/admin";
+    window.location.href =
+      "/admin.html?event=" + encodeURIComponent(currentEventId);
   } else {
     alert("Kriva šifra");
   }
@@ -1227,7 +1228,8 @@ const user = localStorage.getItem("name");
 const welcomeEl = document.getElementById("welcome");
 
 if (!user) {
-  window.location.href = "/index.html?event=" + currentEventId;
+  window.location.href =
+    "/event.html?event=" + encodeURIComponent(currentEventId);
 }
 
 if (user && welcomeEl) {

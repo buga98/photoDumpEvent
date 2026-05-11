@@ -5,45 +5,34 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0"
   >
 
-  <title>PhotoDump</title>
+  <title>PhotoDump Event — Galerija uspomena za evente</title>
 
-  <link rel="stylesheet" href="style.css">
+  <meta
+    name="description"
+    content="PhotoDump Event je jednostavna aplikacija za dijeljenje fotografija, posveta i uspomena s vjenčanja, rođendana, krštenja, pričesti i partyja."
+  >
+
+  <link rel="stylesheet" href="index.css">
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#e91e63">
-
-  <link rel="apple-touch-icon" href="icon.png">
-
-  <!-- Brzi theme iz cachea prije nego index.js učita event -->
   <script>
-    const eventId =
-      new URLSearchParams(location.search).get("event") ||
-      localStorage.getItem("eventId");
+    const params = new URLSearchParams(window.location.search);
+    const eventParam = params.get("event");
 
-    if (eventId) {
-      const cached =
-        localStorage.getItem("eventData_" + eventId);
-
-      if (cached) {
-        try {
-          const event =
-            JSON.parse(cached);
-
-          if (event && event.type) {
-            document.documentElement.className =
-              "theme-" + event.type;
-          }
-        } catch (err) {
-          console.warn("Theme cache error:", err);
-        }
+    if (eventParam) {
+      if (eventParam.toLowerCase() === "demo") {
+        window.location.replace("/demo.html?event=demo");
+      } else {
+        window.location.replace(
+          "/event.html?event=" + encodeURIComponent(eventParam)
+        );
       }
     }
   </script>
@@ -51,89 +40,462 @@
 
 <body>
 
-  <!-- FLOATING SLIKE -->
-  <div class="floating-container"></div>
+  <!-- HEADER -->
+  <header class="site-header">
 
-  <!-- TOP BAR -->
-  <div class="topbar" id="eventTitle">
-    Učitavanje...
-  </div>
+    <a href="#" class="logo">
+      <span>📸</span>
+      <strong>PhotoDump Event</strong>
+    </a>
 
-  <!-- MAIN CARD -->
-  <div class="center-wrapper">
+<nav class="nav">
+  <a href="#kako-radi">Kako radi</a>
+  <a href="#paketi">Paketi</a>
+  <a href="#demo">Demo</a>
+  <a href="#kontakt">Kontakt</a>
+  <a href="/login.html">Organizatori</a>
+</nav>
 
-    <div class="glass-card">
+<div class="header-actions">
+  <a href="/login.html" class="header-login">
+    Prijavi se kao organizator
+  </a>
 
-      <h1 id="eventHeading">
-        Učitavanje...
-      </h1>
+  <a href="/demo.html" class="header-cta">
+    Isprobaj demo 📱
+  </a>
+</div>
 
-      <p class="subtitle" id="eventSubtitle">
-        Učitavanje...
-      </p>
+  </header>
 
-      <input
-        type="text"
-        id="name"
-        placeholder="Tvoje ime i prezime"
-        autocomplete="name"
-      >
+  <!-- HERO -->
+  <main>
 
-      <button onclick="enterApp()">
-        Uđi u galeriju 📸
-      </button>
+    <section class="hero">
 
-    </div>
+      <div class="hero-bg-glow one"></div>
+      <div class="hero-bg-glow two"></div>
 
-  </div>
+      <div class="hero-content">
 
-  <!-- ADMIN MODAL -->
-  <div id="adminModal" class="modal">
+        <div class="eyebrow">
+          ✨ Digitalna galerija uspomena za svaki event
+        </div>
 
-    <div class="admin-modal-box">
+        <h1>
+          Sve fotografije gostiju
+          <span>na jednom mjestu.</span>
+        </h1>
 
-      <div class="modal-header">
-        <span>Admin pristup</span>
+        <p class="hero-text">
+          PhotoDump Event omogućuje gostima da preko QR koda odmah dodaju fotografije,
+          lajkaju trenutke, ostave posvete i stvore zajedničku galeriju uspomena u realnom vremenu.
+        </p>
 
-        <span
-          class="close-btn"
-          onclick="closeAdminModal()"
-        >
-          ✖
-        </span>
+<div class="hero-actions">
+  <a href="/demo.html" class="btn primary">
+    Isprobaj demo 📱
+  </a>
+
+  <a href="#paketi" class="btn secondary">
+    Pogledaj pakete
+  </a>
+
+  <a href="/login.html" class="btn ghost">
+    Prijava organizatora
+  </a>
+</div>
+
+        <div class="event-jump" id="demo">
+          <label for="eventCode">
+            Već imaš event link ili ID?
+          </label>
+
+          <div class="event-jump-row">
+            <input
+              type="text"
+              id="eventCode"
+              placeholder="Upiši event ID ili zalijepi link"
+            >
+
+            <button onclick="openEventFromInput()">
+              Otvori event
+            </button>
+          </div>
+
+          <small>
+            Demo možeš otvoriti i upisom: <b>demo</b>
+          </small>
+        </div>
+
       </div>
 
-      <input
-        type="password"
-        id="adminPass"
-        placeholder="Unesi lozinku"
-        autocomplete="current-password"
-      >
+      <div class="hero-phone-wrap">
 
-      <button
-        class="btn-primary"
-        onclick="checkAdmin()"
-      >
-        Ulaz
-      </button>
+        <div class="phone-card main-phone">
 
+          <div class="phone-topbar">
+            💍 Ana & Marko 💍
+          </div>
+
+          <div class="phone-section">
+            <h3>Galerija uspomena 🤍</h3>
+            <p>Fotografije gostiju prikazuju se odmah.</p>
+
+            <div class="phone-stats">
+              <span>📸 127</span>
+              <span>💌 18</span>
+              <span>❤️ 342</span>
+            </div>
+          </div>
+
+          <div class="phone-grid">
+            <img src="assets/demo/1.png" alt="">
+            <img src="assets/demo/2.png" alt="">
+            <img src="assets/demo/3.png" alt="">
+            <img src="assets/demo/4.png" alt="">
+            <img src="assets/demo/5.png" alt="">
+            <img src="assets/demo/6.png" alt="">
+          </div>
+
+          <div class="phone-nav">
+            <span class="active">🖼️</span>
+            <span>➕</span>
+            <span>👤</span>
+          </div>
+
+        </div>
+
+        <div class="floating-card upload-card-preview">
+          <b>📸 Upload u sekundi</b>
+          <span>Kamera ili galerija</span>
+        </div>
+
+        <div class="floating-card qr-card-preview">
+          <b>🔗 QR pristup</b>
+          <span>Bez instalacije aplikacije</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TRUST / USE CASES -->
+    <section class="section use-cases">
+
+      <div class="section-head">
+        <span>Za koga je?</span>
+        <h2>Za evente gdje se stvaraju uspomene</h2>
+        <p>
+          Jednostavno rješenje za goste, organizatore, fotografe i mladence.
+        </p>
+      </div>
+
+      <div class="cards-grid four">
+
+        <div class="feature-card">
+          <div class="icon">💍</div>
+          <h3>Vjenčanja</h3>
+          <p>Gosti dijele spontane trenutke koje profesionalni fotograf često ne uhvati.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🎂</div>
+          <h3>Rođendani</h3>
+          <p>Jedna galerija za sve slike s proslave, bez slanja po WhatsApp grupama.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">✝️</div>
+          <h3>Krštenja i pričesti</h3>
+          <p>Elegantna galerija uspomena za obitelj i goste.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🎉</div>
+          <h3>Partyji i eventi</h3>
+          <p>Brz i moderan način za prikupljanje fotki s događaja.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section how" id="kako-radi">
+
+      <div class="section-head">
+        <span>Kako radi?</span>
+        <h2>Tri koraka i galerija je spremna</h2>
+      </div>
+
+      <div class="steps">
+
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Kreira se event</h3>
+          <p>Odabere se tip eventa, naziv, plan i osnovni tekstovi aplikacije.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Gosti skeniraju QR</h3>
+          <p>Bez instalacije. Otvore link, upišu ime i odmah ulaze u galeriju.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Fotke se pune uživo</h3>
+          <p>Fotografije, lajkovi i posvete stvaraju zajedničku digitalnu uspomenu.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- APP PREVIEW -->
+    <section class="section preview-section">
+
+      <div class="preview-text">
+        <span class="mini-label">Live preview</span>
+
+        <h2>Aplikacija izgleda moderno i jednostavno</h2>
+
+        <p>
+          Gostima je sve jasno odmah: galerija, dodavanje fotografija i vlastiti profil.
+          Moderator može sakriti neprimjerene fotografije, a organizator dobiva pregled eventa.
+        </p>
+
+        <ul class="check-list">
+          <li>✅ Upload iz kamere ili galerije</li>
+          <li>✅ Lajkovi i posvete</li>
+          <li>✅ Moderator za sakrivanje fotografija</li>
+          <li>✅ Slideshow za prikaz na ekranu</li>
+          <li>✅ Različite teme za tip eventa</li>
+        </ul>
+
+        <a href="/demo.html" class="btn primary">
+          Pokreni demo
+        </a>
+      </div>
+
+      <div class="preview-panels">
+
+        <div class="mini-phone">
+          <div class="mini-phone-top">Upload</div>
+          <div class="mini-upload-card">📸<br>Uhvati trenutak</div>
+          <div class="mini-upload-card">🖼️<br>Odaberi slike</div>
+          <div class="mini-textarea">Napiši posvetu...</div>
+        </div>
+
+        <div class="mini-phone second">
+          <div class="mini-phone-top">Profil</div>
+          <div class="mini-profile-head">Tvoje uspomene 🤍</div>
+          <div class="mini-grid">
+            <img src="assets/demo/2.png" alt="">
+            <img src="assets/demo/4.png" alt="">
+            <img src="assets/demo/6.png" alt="">
+            <img src="assets/demo/7.png" alt="">
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PACKAGES -->
+    <section class="section pricing" id="paketi">
+
+      <div class="section-head">
+        <span>Paketi</span>
+        <h2>Jednostavno za ponuditi i lako za razumjeti</h2>
+        <p>
+          Paketi su prilagođeni veličini eventa i potrebama klijenta.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <div class="price-card">
+          <div class="price-name">Basic</div>
+          <div class="price">59 €</div>
+          <p>Za manje evente i osnovno prikupljanje fotografija.</p>
+
+          <ul>
+            <li>1000 fotografija</li>
+            <li>Bez originala</li>
+            <li>QR link</li>
+            <li>Galerija + upload + profil</li>
+          </ul>
+        </div>
+
+        <div class="price-card featured">
+          <div class="popular">Najbolji izbor</div>
+          <div class="price-name">Standard</div>
+          <div class="price">99 €</div>
+          <p>Najbolji omjer cijene i mogućnosti.</p>
+
+          <ul>
+            <li>1200 fotografija</li>
+            <li>Originali uključeni</li>
+            <li>QR link</li>
+            <li>Moderator panel</li>
+          </ul>
+        </div>
+
+        <div class="price-card">
+          <div class="price-name">Premium</div>
+          <div class="price">139 €</div>
+          <p>Za veće evente i dodatni premium dojam.</p>
+
+          <ul>
+            <li>1500 fotografija</li>
+            <li>Originali uključeni</li>
+            <li>Custom QR kodovi</li>
+            <li>Slideshow prikaz</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- DEMO CTA -->
+    <section class="demo-cta">
+
+      <div>
+        <span>Interaktivni demo</span>
+        <h2>Isprobaj kako izgleda iz perspektive gosta</h2>
+        <p>
+          Demo ne sprema podatke i služi samo za prikaz. Možeš klikati kroz galeriju,
+          upload, profil i posvete.
+        </p>
+      </div>
+
+      <a href="/demo.html" class="btn light">
+        Isprobaj sad
+      </a>
+
+    </section>
+
+    <!-- FAQ -->
+    <section class="section faq">
+
+      <div class="section-head">
+        <span>Pitanja</span>
+        <h2>Često postavljena pitanja</h2>
+      </div>
+
+      <div class="faq-grid">
+
+        <div class="faq-item">
+          <h3>Treba li gost instalirati aplikaciju?</h3>
+          <p>Ne. Gost samo skenira QR kod i otvara aplikaciju u browseru.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Mogu li se sakriti neprimjerene fotografije?</h3>
+          <p>Da. Moderator može sakriti ili vratiti fotografije preko admin sučelja.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Može li se prikazivati slideshow?</h3>
+          <p>Da. Slideshow je namijenjen prikazu fotografija na ekranu tijekom eventa.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Radi li na mobitelima?</h3>
+          <p>Da. Aplikacija je rađena mobile-first i radi na Androidu i iPhoneu.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section contact" id="kontakt">
+
+      <div class="contact-card">
+
+        <div>
+          <span class="mini-label">Kontakt</span>
+          <h2>Želiš PhotoDump za svoj event?</h2>
+          <p>
+            Javi se za termin, demo prikaz ili ponudu za fotografe, sale i organizatore.
+          </p>
+        </div>
+
+<div class="contact-actions">
+  <a href="mailto:info@photodumpevent.com" class="btn primary">
+    Pošalji upit
+  </a>
+
+  <a href="/demo.html" class="btn secondary">
+    Prvo pogledaj demo
+  </a>
+
+  <a href="/login.html" class="btn ghost">
+    Prijava za organizatore
+  </a>
+</div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+
+    <div>
+      <strong>📸 PhotoDump Event</strong>
+      <p>Digitalna galerija uspomena za evente.</p>
     </div>
 
-  </div>
+<div class="footer-links">
+  <a href="#kako-radi">Kako radi</a>
+  <a href="#paketi">Paketi</a>
+  <a href="/demo.html">Demo</a>
+  <a href="/login.html">Organizatori</a>
+  <a href="#kontakt">Kontakt</a>
+</div>
 
-  <!-- SERVICE WORKER -->
+  </footer>
+
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .catch(console.error);
-      });
+    function openEventFromInput() {
+      const input = document.getElementById("eventCode");
+      const value = input.value.trim();
+
+      if (!value) {
+        alert("Upiši event ID ili zalijepi event link.");
+        return;
+      }
+
+      let eventId = value;
+
+      try {
+        if (value.includes("http")) {
+          const url = new URL(value);
+          eventId =
+            url.searchParams.get("event") ||
+            url.searchParams.get("code") ||
+            value;
+        }
+      } catch (err) {
+        eventId = value;
+      }
+
+      if (eventId.toLowerCase() === "demo") {
+        window.location.href = "/demo.html?event=demo";
+        return;
+      }
+
+      window.location.href =
+        "/?event=" + encodeURIComponent(eventId);
     }
   </script>
-
-  <!-- INDEX LOGIKA -->
-  <script type="module" src="index.js"></script>
 
 </body>
 </html>

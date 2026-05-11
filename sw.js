@@ -1,12 +1,21 @@
-const CACHE_NAME = "photodump-v1";
+const CACHE_NAME = "photodump-v2";
 
 const APP_SHELL = [
   "/",
   "/index.html",
+  "/event.html",
   "/app.html",
+  "/demo.html",
   "/style.css",
+  "/demo.css",
   "/manifest.json",
-  "/icon.png"
+  "/icon.png",
+  "/icon-512.png",
+  "/home.png",
+  "/add.png",
+  "/profile.png",
+  "/kamera.png",
+  "/galerija.png"
 ];
 
 self.addEventListener("install", (event) => {

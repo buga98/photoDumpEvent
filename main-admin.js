@@ -659,8 +659,8 @@ window.createNewEvent = async function () {
       created: Date.now()
     });
 
-    const guestLink =
-      `${location.origin}/index.html?event=${eventId}`;
+const guestLink =
+  `${location.origin}/?event=${eventId}`;
 
     const appLink =
       `${location.origin}/app.html?event=${eventId}`;

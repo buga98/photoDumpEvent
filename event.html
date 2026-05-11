@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <title>PhotoDump</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e91e63">
+
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <!-- Brzi theme iz cachea prije nego index.js učita event -->
+  <script>
+    const eventId =
+      new URLSearchParams(location.search).get("event") ||
+      localStorage.getItem("eventId");
+
+    if (eventId) {
+      const cached =
+        localStorage.getItem("eventData_" + eventId);
+
+      if (cached) {
+        try {
+          const event =
+            JSON.parse(cached);
+
+          if (event && event.type) {
+            document.documentElement.className =
+              "theme-" + event.type;
+          }
+        } catch (err) {
+          console.warn("Theme cache error:", err);
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- FLOATING SLIKE -->
+  <div class="floating-container"></div>
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="eventTitle">
+    Učitavanje...
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="center-wrapper">
+
+    <div class="glass-card">
+
+      <h1 id="eventHeading">
+        Učitavanje...
+      </h1>
+
+      <p class="subtitle" id="eventSubtitle">
+        Učitavanje...
+      </p>
+
+      <input
+        type="text"
+        id="name"
+        placeholder="Tvoje ime i prezime"
+        autocomplete="name"
+      >
+
+      <button onclick="enterApp()">
+        Uđi u galeriju 📸
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ADMIN MODAL -->
+  <div id="adminModal" class="modal">
+
+    <div class="admin-modal-box">
+
+      <div class="modal-header">
+        <span>Admin pristup</span>
+
+        <span
+          class="close-btn"
+          onclick="closeAdminModal()"
+        >
+          ✖
+        </span>
+      </div>
+
+      <input
+        type="password"
+        id="adminPass"
+        placeholder="Unesi lozinku"
+        autocomplete="current-password"
+      >
+
+      <button
+        class="btn-primary"
+        onclick="checkAdmin()"
+      >
+        Ulaz
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .catch(console.error);
+      });
+    }
+  </script>
+
+  <!-- INDEX LOGIKA -->
+  <script type="module" src="event.js"></script>
+
+</body>
+</html>

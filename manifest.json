@@ -3,7 +3,7 @@
   "name": "PhotoDump Event",
   "short_name": "PhotoDump",
   "description": "Galerija uspomena za evente",
-  "start_url": "/index.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
