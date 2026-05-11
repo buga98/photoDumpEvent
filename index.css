@@ -3060,3 +3060,72 @@ body.mock-theme-party{
     font-size:10px;
   }
 }
+/* =====================================================
+   MOBILE HERO CTA / PROOF CHIPS FIX
+   staviti SKROZ NA KRAJ index.css
+===================================================== */
+
+@media(max-width:860px){
+
+  .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    width:100%;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+    min-height:50px;
+  }
+
+  /* Ovo su ona 3: Bez instalacije / QR pristup / Custom dizajn */
+  .hero-proof-row{
+    display:flex !important;
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+    align-items:center;
+    justify-content:flex-start;
+
+    width:100%;
+    gap:8px;
+
+    margin-top:14px;
+  }
+
+  .hero-proof-row span{
+    width:auto !important;
+    flex:0 0 auto;
+
+    padding:7px 10px;
+    border-radius:999px;
+
+    font-size:11px;
+    line-height:1;
+    white-space:nowrap;
+
+    background:rgba(255,255,255,.075);
+    border:1px solid rgba(255,255,255,.11);
+    color:rgba(255,255,255,.76);
+  }
+
+  .hero-proof{
+    margin-top:10px;
+    max-width:100%;
+
+    font-size:12px;
+    line-height:1.55;
+    color:rgba(255,255,255,.56);
+  }
+}
+
+@media(max-width:420px){
+  .hero-proof-row{
+    gap:6px;
+  }
+
+  .hero-proof-row span{
+    padding:7px 9px;
+    font-size:10.5px;
+  }
+}
