@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v2";
+const CACHE_NAME = "photodump-v3";
 
 const APP_SHELL = [
   "/",
@@ -7,6 +7,7 @@ const APP_SHELL = [
   "/app.html",
   "/demo.html",
   "/style.css",
+   "/index.css",
   "/demo.css",
   "/manifest.json",
   "/icon.png",
