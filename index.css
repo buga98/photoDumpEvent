@@ -22,7 +22,14 @@
   --radius-sm:14px;
   --max:1240px;
 }
+html{
+  background:#07111f;
+  color-scheme:dark;
+}
 
+body{
+  background-color:#07111f;
+}
 *{
   margin:0;
   padding:0;
