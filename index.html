@@ -80,7 +80,6 @@
     <span></span>
   </button>
 
-</header>
 
 <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
 
@@ -152,10 +151,17 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
   <a href="#paketi" class="btn secondary">
     Pogledaj pakete
   </a>
-  <p class="hero-proof">
-  Custom dizajn za vjenčanja, krštenja, rođendane, pričesti i partyje.
-</p>
 </div>
+
+<div class="hero-proof-row">
+  <span>Bez instalacije</span>
+  <span>QR pristup</span>
+  <span>Custom dizajn</span>
+</div>
+
+<p class="hero-proof">
+  Prilagođeno za vjenčanja, krštenja, rođendane, pričesti, partyje i poslovne evente.
+</p>
 
         <div class="event-jump" id="demo">
           <label for="eventCode">
@@ -212,14 +218,14 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
             </div>
           </div>
 
-          <div class="phone-grid">
-            <img src="assets/demo/1.png" alt="">
-            <img src="assets/demo/2.png" alt="">
-            <img src="assets/demo/3.png" alt="">
-            <img src="assets/demo/4.png" alt="">
-            <img src="assets/demo/5.png" alt="">
-            <img src="assets/demo/6.png" alt="">
-          </div>
+<div class="phone-grid" id="mockGrid">
+  <img id="mockImg1" src="assets/demo/1.png" alt="Demo fotografija 1">
+  <img id="mockImg2" src="assets/demo/2.png" alt="Demo fotografija 2">
+  <img id="mockImg3" src="assets/demo/3.png" alt="Demo fotografija 3">
+  <img id="mockImg4" src="assets/demo/4.png" alt="Demo fotografija 4">
+  <img id="mockImg5" src="assets/demo/5.png" alt="Demo fotografija 5">
+  <img id="mockImg6" src="assets/demo/6.png" alt="Demo fotografija 6">
+</div>
 
           <div class="phone-nav">
             <span class="active">🖼️</span>
@@ -242,7 +248,27 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
       </div>
 
     </section>
+<section class="section value-strip">
+  <div class="value-card">
+    <strong>⚡ Bez aplikacije</strong>
+    <span>Gosti samo skeniraju QR kod i odmah ulaze.</span>
+  </div>
 
+  <div class="value-card">
+    <strong>📸 Sve fotke na jednom mjestu</strong>
+    <span>Nema više traženja slika po WhatsApp grupama.</span>
+  </div>
+
+  <div class="value-card">
+    <strong>🛡️ Kontrola sadržaja</strong>
+    <span>Moderator može sakriti neprimjerene fotografije.</span>
+  </div>
+
+  <div class="value-card">
+    <strong>🎨 Custom event dizajn</strong>
+    <span>Svaki događaj može imati svoj stil, tekstove i temu.</span>
+  </div>
+</section>
     <!-- TRUST / USE CASES -->
     <section class="section use-cases">
 
@@ -730,8 +756,10 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
     wedding: {
       topbar: "💍 Ana & Marko 💍",
       title: "Galerija uspomena 🤍",
-      subtitle: "Fotografije gostiju prikazuju se odmah.",
+      subtitle: "Elegantna galerija za fotografije, posvete i trenutke s vjenčanja.",
       className: "theme-wedding",
+      bodyClass: "mock-theme-wedding",
+      stats: ["📸 127", "💌 18", "❤️ 342"],
       images: [
         "assets/demo/1.png",
         "assets/demo/2.png",
@@ -744,24 +772,28 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
 
     baptism: {
       topbar: "✨ Lucija — Krštenje ✨",
-      title: "Poseban dan naše male zvijezde",
-      subtitle: "Obitelj i gosti dijele najljepše trenutke.",
+      title: "Nježne uspomene za obitelj",
+      subtitle: "Svaki osmijeh, zagrljaj i obiteljski trenutak ostaje spremljen.",
       className: "theme-baptism",
+      bodyClass: "mock-theme-baptism",
+      stats: ["📸 64", "💌 12", "❤️ 146"],
       images: [
-        "assets/demo/1.png",
         "assets/demo/3.png",
+        "assets/demo/1.png",
         "assets/demo/5.png",
+        "assets/demo/6.png",
         "assets/demo/2.png",
-        "assets/demo/4.png",
-        "assets/demo/6.png"
+        "assets/demo/4.png"
       ]
     },
 
     party: {
       topbar: "🎉 Birthday Party 🎉",
       title: "Party uspomene 🔥",
-      subtitle: "Svi trenuci, osmijesi i zabava na jednom mjestu.",
+      subtitle: "Brzi upload, lajkovi i najbolji trenuci zabave u jednom feedu.",
       className: "theme-party",
+      bodyClass: "mock-theme-party",
+      stats: ["📸 203", "💌 9", "❤️ 518"],
       images: [
         "assets/demo/6.png",
         "assets/demo/5.png",
@@ -777,10 +809,19 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
   const mockTopbar = document.getElementById("mockTopbar");
   const mockTitle = document.getElementById("mockTitle");
   const mockSubtitle = document.getElementById("mockSubtitle");
+  const mockStats = document.querySelectorAll(".phone-stats span");
 
   function setMockTheme(themeKey) {
     const theme = mockThemes[themeKey];
     if (!theme || !phoneCard) return;
+
+    document.body.classList.remove(
+      "mock-theme-wedding",
+      "mock-theme-baptism",
+      "mock-theme-party"
+    );
+
+    document.body.classList.add(theme.bodyClass);
 
     phoneCard.classList.remove(
       "theme-wedding",
@@ -794,19 +835,24 @@ Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen
     mockTitle.innerText = theme.title;
     mockSubtitle.innerText = theme.subtitle;
 
+    theme.stats.forEach((value, index) => {
+      if (mockStats[index]) {
+        mockStats[index].innerText = value;
+      }
+    });
+
     theme.images.forEach((src, index) => {
       const img = document.getElementById("mockImg" + (index + 1));
-
       if (!img) return;
 
-      img.style.opacity = "0";
-      img.style.transform = "scale(.96)";
+      img.classList.add("is-switching");
 
       setTimeout(() => {
         img.src = src;
-        img.style.opacity = "1";
-        img.style.transform = "scale(1)";
-      }, 120 + index * 35);
+        img.onload = () => {
+          img.classList.remove("is-switching");
+        };
+      }, 90 + index * 35);
     });
 
     document.querySelectorAll(".theme-pill").forEach((btn) => {

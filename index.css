@@ -1840,3 +1840,428 @@ body::after{
   font-size:13px;
   font-weight:700;
 }
+/* =====================================================
+   FINAL HERO / MOBILE / THEME POLISH
+   staviti NA KRAJ index.css
+===================================================== */
+
+/* theme-aware background */
+body.mock-theme-wedding{
+  background:
+    radial-gradient(circle at 16% 10%, rgba(116,192,252,.15), transparent 28%),
+    radial-gradient(circle at 86% 14%, rgba(139,92,246,.18), transparent 30%),
+    radial-gradient(circle at 52% 82%, rgba(34,211,238,.10), transparent 30%),
+    linear-gradient(140deg,#07111f 0%,#0b1728 45%,#0f2035 100%);
+}
+
+body.mock-theme-baptism{
+  background:
+    radial-gradient(circle at 14% 10%, rgba(165,243,252,.18), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(147,197,253,.16), transparent 30%),
+    radial-gradient(circle at 50% 84%, rgba(255,255,255,.08), transparent 30%),
+    linear-gradient(140deg,#06131c 0%,#0b1d2a 48%,#102d3b 100%);
+}
+
+body.mock-theme-party{
+  background:
+    radial-gradient(circle at 16% 10%, rgba(236,72,153,.18), transparent 28%),
+    radial-gradient(circle at 86% 14%, rgba(139,92,246,.20), transparent 30%),
+    radial-gradient(circle at 48% 82%, rgba(34,211,238,.10), transparent 30%),
+    linear-gradient(140deg,#0b0714 0%,#141126 45%,#21113b 100%);
+}
+
+/* logo fallback / alignment */
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* proof row under CTA */
+.hero-proof-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+}
+
+.hero-proof-row span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 11px;
+  border-radius:999px;
+
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.10);
+
+  color:rgba(255,255,255,.74);
+
+  font-size:12px;
+  font-weight:800;
+}
+
+.hero-proof{
+  margin-top:12px;
+  max-width:620px;
+
+  color:rgba(255,255,255,.58);
+  font-size:13px;
+  font-weight:700;
+  line-height:1.7;
+}
+
+/* theme switcher desktop */
+.theme-switcher{
+  top:10px;
+  width:max-content;
+  max-width:calc(100% - 20px);
+}
+
+.theme-pill{
+  white-space:nowrap;
+}
+
+/* phone theme colors */
+.phone-card.theme-wedding{
+  border-color:rgba(196,181,253,.22);
+}
+
+.phone-card.theme-wedding .phone-topbar,
+.phone-card.theme-wedding .phone-section,
+.phone-card.theme-wedding .phone-nav{
+  background:
+    linear-gradient(135deg, rgba(147,197,253,.10), rgba(196,181,253,.12));
+}
+
+.phone-card.theme-baptism{
+  border-color:rgba(165,243,252,.24);
+}
+
+.phone-card.theme-baptism .phone-topbar,
+.phone-card.theme-baptism .phone-section,
+.phone-card.theme-baptism .phone-nav{
+  background:
+    linear-gradient(135deg, rgba(165,243,252,.13), rgba(147,197,253,.10));
+}
+
+.phone-card.theme-party{
+  border-color:rgba(236,72,153,.26);
+}
+
+.phone-card.theme-party .phone-topbar,
+.phone-card.theme-party .phone-section,
+.phone-card.theme-party .phone-nav{
+  background:
+    linear-gradient(135deg, rgba(236,72,153,.15), rgba(139,92,246,.14));
+}
+
+.phone-grid img.is-switching{
+  opacity:0;
+  transform:scale(.94);
+}
+
+/* better event input card */
+.event-jump{
+  isolation:isolate;
+}
+
+.event-jump label{
+  white-space:normal;
+  line-height:1.4;
+}
+
+.event-jump button{
+  transition:.22s ease;
+}
+
+.event-jump button:hover{
+  transform:translateY(-1px);
+  filter:saturate(1.08);
+}
+
+/* more selling clarity */
+.feature-card,
+.step-card,
+.price-card,
+.faq-item{
+  min-height:100%;
+}
+
+/* fix mobile hero stacking */
+@media(max-width:860px){
+  body{
+    overflow-x:hidden;
+  }
+
+  .site-header{
+    position:sticky;
+    top:8px;
+    z-index:1300;
+  }
+
+  .hero{
+    width:calc(100% - 20px);
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:34px;
+
+    margin-top:16px;
+    padding:28px 0 54px;
+
+    text-align:left;
+    overflow:hidden;
+  }
+
+  .hero-content{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    text-align:left;
+  }
+
+  .eyebrow{
+    max-width:100%;
+    line-height:1.35;
+  }
+
+  .hero h1{
+    font-size:clamp(36px, 11vw, 48px);
+    line-height:1;
+    max-width:100%;
+  }
+
+  .hero-text{
+    max-width:100%;
+    font-size:15px;
+    line-height:1.75;
+  }
+
+  .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    width:100%;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+  }
+
+  .hero-proof-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    width:100%;
+  }
+
+  .hero-proof-row span{
+    width:100%;
+  }
+
+  .event-jump{
+    width:100%;
+    max-width:100%;
+    padding:16px;
+    border-radius:24px;
+    overflow:hidden;
+  }
+
+  .event-jump-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .event-jump input,
+  .event-jump button{
+    width:100%;
+    min-width:0;
+  }
+
+  .event-jump small{
+    text-align:left;
+    line-height:1.5;
+  }
+
+  .hero-phone-wrap{
+    width:100%;
+    max-width:100%;
+    min-height:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    overflow:visible;
+    padding-top:0;
+  }
+
+  .theme-switcher{
+    position:relative;
+    top:auto;
+    left:auto;
+    transform:none;
+
+    width:100%;
+    max-width:360px;
+    margin:0 auto 14px;
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+
+    padding:7px;
+    border-radius:999px;
+  }
+
+  .theme-pill{
+    width:100%;
+    padding:9px 6px;
+    font-size:11px;
+    text-align:center;
+  }
+
+  .phone-card{
+    width:100%;
+    max-width:360px;
+    min-height:auto;
+    padding:14px 12px 78px;
+    border-radius:34px;
+  }
+
+  .phone-topbar{
+    height:50px;
+    border-radius:22px;
+    font-size:13px;
+  }
+
+  .phone-section{
+    padding:14px 12px;
+    border-radius:22px;
+  }
+
+  .phone-section h3{
+    font-size:21px;
+  }
+
+  .phone-section p{
+    font-size:12px;
+  }
+
+  .phone-stats span{
+    font-size:11px;
+    padding:7px 9px;
+  }
+
+  .phone-grid{
+    gap:7px;
+  }
+
+  .phone-grid img{
+    border-radius:14px;
+  }
+
+  .phone-nav{
+    left:14px;
+    right:14px;
+    bottom:14px;
+    height:54px;
+    border-radius:20px;
+  }
+}
+
+/* very small phones */
+@media(max-width:420px){
+  .site-header{
+    width:calc(100% - 14px);
+    padding:10px 12px;
+    border-radius:20px;
+  }
+
+  .logo strong{
+    font-size:14px;
+  }
+
+  .logo-icon{
+    width:38px;
+    height:38px;
+    border-radius:14px;
+  }
+
+  .logo-icon img{
+    width:25px;
+    height:25px;
+  }
+
+  .menu-toggle{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+  }
+
+  .hero{
+    width:calc(100% - 14px);
+  }
+
+  .theme-switcher{
+    max-width:100%;
+  }
+
+  .theme-pill{
+    font-size:10.5px;
+  }
+
+  .phone-card{
+    max-width:100%;
+  }
+}
+.value-strip{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  padding-top:28px;
+}
+
+.value-card{
+  padding:18px;
+  border-radius:24px;
+
+  background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.11);
+
+  box-shadow:
+    0 18px 54px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.10);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+.value-card strong{
+  display:block;
+  color:#fff;
+  font-size:15px;
+  margin-bottom:7px;
+}
+
+.value-card span{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+@media(max-width:960px){
+  .value-strip{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:560px){
+  .value-strip{
+    grid-template-columns:1fr;
+  }
+}
