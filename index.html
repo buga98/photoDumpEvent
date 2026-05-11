@@ -43,27 +43,76 @@
   <!-- HEADER -->
   <header class="site-header">
 
-    <a href="#" class="logo">
-      <span>📸</span>
-      <strong>PhotoDump Event</strong>
+  <a href="#" class="logo">
+    <span>📸</span>
+    <strong>PhotoDump Event</strong>
+  </a>
+
+  <nav class="nav desktop-nav">
+    <a href="#kako-radi">Kako radi</a>
+    <a href="#paketi">Paketi</a>
+    <a href="#demo">Demo</a>
+    <a href="#kontakt">Kontakt</a>
+    <a href="/login.html">Organizatori</a>
+  </nav>
+
+  <div class="header-actions desktop-actions">
+    <a href="/login.html" class="header-login">
+      Prijavi se kao organizator
     </a>
 
-<nav class="nav">
-  <a href="#kako-radi">Kako radi</a>
-  <a href="#paketi">Paketi</a>
-  <a href="#demo">Demo</a>
-  <a href="#kontakt">Kontakt</a>
-  <a href="/login.html">Organizatori</a>
-</nav>
+    <a href="/demo.html" class="header-cta">
+      Isprobaj demo 📱
+    </a>
+  </div>
 
-<div class="header-actions">
-  <a href="/login.html" class="header-login">
-    Prijavi se kao organizator
-  </a>
+  <button
+    class="menu-toggle"
+    id="menuToggle"
+    aria-label="Otvori izbornik"
+    aria-expanded="false"
+    type="button"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 
-  <a href="/demo.html" class="header-cta">
-    Isprobaj demo 📱
-  </a>
+</header>
+
+<div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-top">
+    <div class="mobile-menu-title">Izbornik</div>
+
+    <button
+      class="mobile-menu-close"
+      id="mobileMenuClose"
+      type="button"
+      aria-label="Zatvori izbornik"
+    >
+      ✕
+    </button>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="#kako-radi">Kako radi</a>
+    <a href="#paketi">Paketi</a>
+    <a href="#demo">Demo</a>
+    <a href="#kontakt">Kontakt</a>
+    <a href="/login.html">Organizatori</a>
+  </nav>
+
+  <div class="mobile-menu-actions">
+    <a href="/login.html" class="btn ghost full">
+      Prijava organizatora
+    </a>
+
+    <a href="/demo.html" class="btn primary full">
+      Isprobaj demo 📱
+    </a>
+  </div>
 </div>
 
   </header>
@@ -99,10 +148,6 @@
 
   <a href="#paketi" class="btn secondary">
     Pogledaj pakete
-  </a>
-
-  <a href="/login.html" class="btn ghost">
-    Prijava organizatora
   </a>
 </div>
 
@@ -496,6 +541,33 @@
         "/?event=" + encodeURIComponent(eventId);
     }
   </script>
+<script>
+  const menuToggle = document.getElementById("menuToggle");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
+  const mobileMenuClose = document.getElementById("mobileMenuClose");
 
+  function openMobileMenu() {
+    mobileMenu.classList.add("open");
+    mobileMenuBackdrop.classList.add("show");
+    document.body.classList.add("menu-open");
+    menuToggle?.setAttribute("aria-expanded", "true");
+  }
+
+  function closeMobileMenu() {
+    mobileMenu.classList.remove("open");
+    mobileMenuBackdrop.classList.remove("show");
+    document.body.classList.remove("menu-open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+  }
+
+  menuToggle?.addEventListener("click", openMobileMenu);
+  mobileMenuClose?.addEventListener("click", closeMobileMenu);
+  mobileMenuBackdrop?.addEventListener("click", closeMobileMenu);
+
+  document.querySelectorAll(".mobile-nav a").forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+  });
+</script>
 </body>
 </html>
