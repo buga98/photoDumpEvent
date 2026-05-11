@@ -43,10 +43,12 @@
   <!-- HEADER -->
   <header class="site-header">
 
-  <a href="#" class="logo">
-    <span>📸</span>
-    <strong>PhotoDump Event</strong>
-  </a>
+<a href="/" class="logo">
+  <span class="logo-icon">
+    <img src="icon.png" alt="PhotoDump Event">
+  </span>
+  <strong>PhotoDump Event</strong>
+</a>
 
   <nav class="nav desktop-nav">
     <a href="#kako-radi">Kako radi</a>
@@ -137,8 +139,9 @@
         </h1>
 
         <p class="hero-text">
-          PhotoDump Event omogućuje gostima da preko QR koda odmah dodaju fotografije,
-          lajkaju trenutke, ostave posvete i stvore zajedničku galeriju uspomena u realnom vremenu.
+PhotoDump Event omogućuje gostima da preko QR koda odmah dodaju fotografije,
+lajkaju trenutke, ostave posvete i stvore zajedničku galeriju uspomena u realnom vremenu.
+Svaki event može imati vlastiti naziv, tekstove, fotografije i stil prilagođen događaju.
         </p>
 
 <div class="hero-actions">
@@ -149,6 +152,9 @@
   <a href="#paketi" class="btn secondary">
     Pogledaj pakete
   </a>
+  <p class="hero-proof">
+  Custom dizajn za vjenčanja, krštenja, rođendane, pričesti i partyje.
+</p>
 </div>
 
         <div class="event-jump" id="demo">
@@ -176,16 +182,28 @@
       </div>
 
       <div class="hero-phone-wrap">
+<div class="theme-switcher" aria-label="Primjeri custom dizajna">
+  <button class="theme-pill active" data-theme-demo="wedding">
+    💍 Vjenčanje
+  </button>
 
+  <button class="theme-pill" data-theme-demo="baptism">
+    ✨ Krštenje
+  </button>
+
+  <button class="theme-pill" data-theme-demo="party">
+    🎉 Party
+  </button>
+</div>
         <div class="phone-card main-phone">
 
-          <div class="phone-topbar">
-            💍 Ana & Marko 💍
-          </div>
+<div class="phone-topbar" id="mockTopbar">
+  💍 Ana & Marko 💍
+</div>
 
           <div class="phone-section">
-            <h3>Galerija uspomena 🤍</h3>
-            <p>Fotografije gostiju prikazuju se odmah.</p>
+<h3 id="mockTitle">Galerija uspomena 🤍</h3>
+<p id="mockSubtitle">Fotografije gostiju prikazuju se odmah.</p>
 
             <div class="phone-stats">
               <span>📸 127</span>
@@ -706,6 +724,106 @@
   document.querySelectorAll(".phone-stats").forEach((el) => {
     statsObserver.observe(el);
   });
+</script>
+<script>
+  const mockThemes = {
+    wedding: {
+      topbar: "💍 Ana & Marko 💍",
+      title: "Galerija uspomena 🤍",
+      subtitle: "Fotografije gostiju prikazuju se odmah.",
+      className: "theme-wedding",
+      images: [
+        "assets/demo/1.png",
+        "assets/demo/2.png",
+        "assets/demo/3.png",
+        "assets/demo/4.png",
+        "assets/demo/5.png",
+        "assets/demo/6.png"
+      ]
+    },
+
+    baptism: {
+      topbar: "✨ Lucija — Krštenje ✨",
+      title: "Poseban dan naše male zvijezde",
+      subtitle: "Obitelj i gosti dijele najljepše trenutke.",
+      className: "theme-baptism",
+      images: [
+        "assets/demo/1.png",
+        "assets/demo/3.png",
+        "assets/demo/5.png",
+        "assets/demo/2.png",
+        "assets/demo/4.png",
+        "assets/demo/6.png"
+      ]
+    },
+
+    party: {
+      topbar: "🎉 Birthday Party 🎉",
+      title: "Party uspomene 🔥",
+      subtitle: "Svi trenuci, osmijesi i zabava na jednom mjestu.",
+      className: "theme-party",
+      images: [
+        "assets/demo/6.png",
+        "assets/demo/5.png",
+        "assets/demo/4.png",
+        "assets/demo/3.png",
+        "assets/demo/2.png",
+        "assets/demo/1.png"
+      ]
+    }
+  };
+
+  const phoneCard = document.querySelector(".phone-card");
+  const mockTopbar = document.getElementById("mockTopbar");
+  const mockTitle = document.getElementById("mockTitle");
+  const mockSubtitle = document.getElementById("mockSubtitle");
+
+  function setMockTheme(themeKey) {
+    const theme = mockThemes[themeKey];
+    if (!theme || !phoneCard) return;
+
+    phoneCard.classList.remove(
+      "theme-wedding",
+      "theme-baptism",
+      "theme-party"
+    );
+
+    phoneCard.classList.add(theme.className);
+
+    mockTopbar.innerText = theme.topbar;
+    mockTitle.innerText = theme.title;
+    mockSubtitle.innerText = theme.subtitle;
+
+    theme.images.forEach((src, index) => {
+      const img = document.getElementById("mockImg" + (index + 1));
+
+      if (!img) return;
+
+      img.style.opacity = "0";
+      img.style.transform = "scale(.96)";
+
+      setTimeout(() => {
+        img.src = src;
+        img.style.opacity = "1";
+        img.style.transform = "scale(1)";
+      }, 120 + index * 35);
+    });
+
+    document.querySelectorAll(".theme-pill").forEach((btn) => {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.themeDemo === themeKey
+      );
+    });
+  }
+
+  document.querySelectorAll("[data-theme-demo]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setMockTheme(btn.dataset.themeDemo);
+    });
+  });
+
+  setMockTheme("wedding");
 </script>
 </body>
 </html>
