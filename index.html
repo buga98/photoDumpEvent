@@ -1,151 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="hr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
 
-<title>PhotoDump</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
 
-<link rel="stylesheet" href="style.css">
+  <title>PhotoDump</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#e91e63">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  >
 
-<link rel="apple-touch-icon" href="icon.png">
-<script>
-  const eventId = new URLSearchParams(location.search).get("event");
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e91e63">
 
-  if (eventId) {
-    const cached = localStorage.getItem("eventData_" + eventId);
+  <link rel="apple-touch-icon" href="icon.png">
 
-    if (cached) {
-      try {
-        const event = JSON.parse(cached);
-        document.documentElement.className = "theme-" + event.type;
-      } catch {}
+  <!-- Brzi theme iz cachea prije nego index.js učita event -->
+  <script>
+    const eventId =
+      new URLSearchParams(location.search).get("event") ||
+      localStorage.getItem("eventId");
+
+    if (eventId) {
+      const cached =
+        localStorage.getItem("eventData_" + eventId);
+
+      if (cached) {
+        try {
+          const event =
+            JSON.parse(cached);
+
+          if (event && event.type) {
+            document.documentElement.className =
+              "theme-" + event.type;
+          }
+        } catch (err) {
+          console.warn("Theme cache error:", err);
+        }
+      }
     }
-  }
-</script>
+  </script>
 </head>
 
 <body>
 
-<!-- floating slike -->
-<div class="floating-container"></div>
+  <!-- FLOATING SLIKE -->
+  <div class="floating-container"></div>
 
-<!-- top bar -->
-<div class="topbar" id="eventTitle">
+  <!-- TOP BAR -->
+  <div class="topbar" id="eventTitle">
     Učitavanje...
-</div>
+  </div>
 
-<!-- MAIN CARD -->
-<div class="center-wrapper">
+  <!-- MAIN CARD -->
+  <div class="center-wrapper">
 
     <div class="glass-card">
 
-<h1 id="eventHeading">
- Učitavanje...
-</h1>
+      <h1 id="eventHeading">
+        Učitavanje...
+      </h1>
 
       <p class="subtitle" id="eventSubtitle">
- Učitavanje...
-</p>
+        Učitavanje...
+      </p>
 
-        <input type="text" id="name" placeholder="Tvoje ime i prezime">
+      <input
+        type="text"
+        id="name"
+        placeholder="Tvoje ime i prezime"
+        autocomplete="name"
+      >
 
-        <button onclick="enterApp()">Uđi u galeriju 📸</button>
+      <button onclick="enterApp()">
+        Uđi u galeriju 📸
+      </button>
 
     </div>
-
-</div>
-
-<!-- ADMIN MODAL -->
-<div id="adminModal" class="modal">
-  <div class="admin-modal-box">
-
-    <div class="modal-header">
-      <span>Admin pristup</span>
-      <span class="close-btn" onclick="closeAdminModal()">✖</span>
-    </div>
-
-    <input type="password" id="adminPass" placeholder="Unesi lozinku">
-
-    <button class="btn-primary" onclick="checkAdmin()">Ulaz</button>
 
   </div>
-</div>
 
-<script type="module" src="index.js"></script>
+  <!-- ADMIN MODAL -->
+  <div id="adminModal" class="modal">
 
-<script>
-<script>
-window.enterApp = function () {
-  const name = document.getElementById("name").value.trim();
+    <div class="admin-modal-box">
 
-  if (!name || name.length < 2) {
-    alert("Upiši ime i prezime");
-    return;
-  }
+      <div class="modal-header">
+        <span>Admin pristup</span>
 
-  const eventId =
-    new URLSearchParams(location.search).get("event") ||
-    localStorage.getItem("eventId");
+        <span
+          class="close-btn"
+          onclick="closeAdminModal()"
+        >
+          ✖
+        </span>
+      </div>
 
-  if (!eventId) {
-    alert("Event nije pronađen. Otvori aplikaciju putem QR koda.");
-    return;
-  }
+      <input
+        type="password"
+        id="adminPass"
+        placeholder="Unesi lozinku"
+        autocomplete="current-password"
+      >
 
-  localStorage.setItem("eventId", eventId);
-  localStorage.setItem("name", name);
+      <button
+        class="btn-primary"
+        onclick="checkAdmin()"
+      >
+        Ulaz
+      </button>
 
-  let userId = localStorage.getItem("userId");
+    </div>
 
-  if (!userId) {
-    userId = crypto.randomUUID();
-    localStorage.setItem("userId", userId);
-  }
+  </div>
 
-  if (typeof createUser === "function") {
-    createUser(userId, name, eventId);
-  }
+  <!-- SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .catch(console.error);
+      });
+    }
+  </script>
 
-  window.location.href = "/app.html?event=" + eventId;
-};
+  <!-- INDEX LOGIKA -->
+  <script type="module" src="index.js"></script>
 
-/* 🔥 EVENT HANDLING */
-const params = new URLSearchParams(location.search);
-const eventIdFromUrl = params.get("event");
-
-if (eventIdFromUrl) {
-  localStorage.setItem("eventId", eventIdFromUrl);
-}
-
-window.addEventListener("load", () => {
-  document.body.classList.add("loaded");
-});
-</script>
-/* 🔥 EVENT HANDLING */
-const params = new URLSearchParams(location.search);
-const eventIdFromUrl = params.get("event");
-
-
-if (eventIdFromUrl) {
-  localStorage.setItem("eventId", eventIdFromUrl);
-}
-
-window.addEventListener("load", () => {
-  document.body.classList.add("loaded");
-});
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(console.error);
-  });
-}
-</script>
 </body>
 </html>
