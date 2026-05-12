@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v3";
+const CACHE_NAME = "photodump-v4";
 
 const APP_SHELL = [
   "/",
@@ -7,11 +7,9 @@ const APP_SHELL = [
   "/app.html",
   "/demo.html",
   "/style.css",
-   "/index.css",
-  "/demo.css",
+  "/index.css",
   "/manifest.json",
   "/icon.png",
-  "/icon-512.png",
   "/home.png",
   "/add.png",
   "/profile.png",
@@ -21,8 +19,24 @@ const APP_SHELL = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.all(
+        APP_SHELL.map(async (url) => {
+          try {
+            const response = await fetch(url, {
+              cache: "no-cache"
+            });
+
+            if (response.ok) {
+              await cache.put(url, response);
+            } else {
+              console.warn("SW skip cache:", url, response.status);
+            }
+          } catch (err) {
+            console.warn("SW cache failed:", url, err);
+          }
+        })
+      );
     })
   );
 
@@ -62,6 +76,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
+        if (!response || !response.ok) {
+          return response;
+        }
+
         const clone = response.clone();
 
         caches.open(CACHE_NAME).then((cache) => {

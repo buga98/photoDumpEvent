@@ -143,7 +143,21 @@ function applyEvent(event) {
   if (!event) return;
 
   eventData = event;
+const nameInput =
+  document.getElementById("name");
 
+const enterBtn =
+  document.querySelector(".glass-card button");
+
+if (nameInput) {
+  nameInput.style.display = "";
+  nameInput.disabled = false;
+}
+
+if (enterBtn) {
+  enterBtn.style.display = "";
+  enterBtn.disabled = false;
+}
   // ==============================
   // 🎨 THEME
   // ==============================
@@ -200,7 +214,26 @@ const defaultTexts = {
 
   console.log("✅ Event applied", event);
 }
+function renderNoEvent() {
+  titleEl.innerText = "PhotoDump";
+  headingEl.innerText = "Nema aktivnog eventa";
+  subtitleEl.innerText =
+    "Otvori aplikaciju putem QR koda ili linka eventa.";
 
+  const nameInput =
+    document.getElementById("name");
+
+  const enterBtn =
+    document.querySelector(".glass-card button");
+
+  if (nameInput) {
+    nameInput.style.display = "none";
+  }
+
+  if (enterBtn) {
+    enterBtn.style.display = "none";
+  }
+}
 // ==============================
 // ⚡ BOOT FROM CACHE
 // ==============================
@@ -261,7 +294,10 @@ async function fetchEvent() {
     const db = getFirestore(app);
     const snap = await getDoc(doc(db, "events", eventId));
 
-    if (!snap.exists()) return;
+if (!snap.exists()) {
+  renderNoEvent();
+  return;
+}
 
     const event = snap.data();
 
@@ -282,12 +318,11 @@ async function fetchEvent() {
 
 // ==============================
 // 🥇 FALLBACK
-// ==============================
 function renderFallback() {
   titleEl.innerText = "PhotoDump";
-  headingEl.innerText = "Nema aktivnog eventa";
+  headingEl.innerText = "Učitavanje eventa...";
   subtitleEl.innerText =
-    "Otvori aplikaciju putem QR koda ili linka eventa.";
+    "Molimo pričekaj trenutak.";
 
   const nameInput =
     document.getElementById("name");
@@ -296,11 +331,13 @@ function renderFallback() {
     document.querySelector(".glass-card button");
 
   if (nameInput) {
-    nameInput.style.display = "none";
+    nameInput.style.display = "";
+    nameInput.disabled = true;
   }
 
   if (enterBtn) {
-    enterBtn.style.display = "none";
+    enterBtn.style.display = "";
+    enterBtn.disabled = true;
   }
 }
 
