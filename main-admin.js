@@ -97,6 +97,7 @@ const resultBox = document.getElementById("resultBox");
 const qrBox = document.getElementById("qrBox");
 const qrImage = document.getElementById("qrImage");
 const planInput = document.getElementById("eventPlan");
+let createdEventPayload = null;
 
 /* ================= DEFAULT TEXTS ================= */
 const defaults = {
@@ -531,7 +532,302 @@ async function resizeImage(file, maxWidth = 900, quality = 0.82) {
     reader.readAsDataURL(file);
   });
 }
+function safeFileName(value) {
+  return String(value || "event")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9čćžšđ-]/gi, "")
+    .replace(/-+/g, "-")
+    .slice(0, 80);
+}
 
+function getEventTypeLabel(type) {
+  switch (type) {
+    case "svadba":
+      return "Vjenčanje";
+    case "krstenje":
+      return "Krštenje";
+    case "rodendan":
+      return "Rođendan";
+    case "pricest":
+      return "Prva pričest";
+    case "party":
+      return "Party";
+    default:
+      return "Event";
+  }
+}
+
+function getPlanLabel(plan) {
+  switch (plan) {
+    case "basic":
+      return "Basic";
+    case "standard":
+      return "Standard";
+    case "premium":
+      return "Premium";
+    default:
+      return "Plan";
+  }
+}
+
+async function imageUrlToDataUrl(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("QR download failed");
+  }
+
+  const blob = await response.blob();
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function ensureCreatedEvent() {
+  if (!createdEventPayload) {
+    alert("Prvo kreiraj event.");
+    return false;
+  }
+
+  return true;
+}
+window.downloadClientPdf = async function () {
+  if (!ensureCreatedEvent()) return;
+
+  const { jsPDF } = window.jspdf;
+
+  const event = createdEventPayload;
+  const qrDataUrl = await imageUrlToDataUrl(event.qrUrl);
+
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4"
+  });
+
+  const pageWidth = 210;
+
+  // Background
+  pdf.setFillColor(9, 16, 30);
+  pdf.rect(0, 0, 210, 297, "F");
+
+  // Accent glow blocks
+  pdf.setFillColor(18, 33, 55);
+  pdf.roundedRect(14, 14, 182, 269, 8, 8, "F");
+
+  pdf.setFillColor(110, 168, 254);
+  pdf.roundedRect(22, 24, 166, 14, 4, 4, "F");
+
+  pdf.setTextColor(5, 12, 22);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(13);
+  pdf.text("PhotoDump Event", pageWidth / 2, 33, {
+    align: "center"
+  });
+
+  // Title
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(27);
+
+  const titleLines = pdf.splitTextToSize(event.title, 160);
+  pdf.text(titleLines, pageWidth / 2, 58, {
+    align: "center"
+  });
+
+  // Subtitle
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(12);
+  pdf.setTextColor(205, 215, 230);
+
+  const description =
+    "Dragi gosti, skenirajte QR kod i otvorite digitalnu galeriju eventa. " +
+    "Dodajte svoje fotografije, lajkajte najljepše trenutke i ostavite posvetu. " +
+    "Sve uspomene bit će spremljene na jednom mjestu.";
+
+  const descLines = pdf.splitTextToSize(description, 158);
+  pdf.text(descLines, pageWidth / 2, 82, {
+    align: "center",
+    lineHeightFactor: 1.45
+  });
+
+  // QR card
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(57, 113, 96, 96, 8, 8, "F");
+  pdf.addImage(qrDataUrl, "PNG", 65, 121, 80, 80);
+
+  // Link
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Link za goste:", pageWidth / 2, 226, {
+    align: "center"
+  });
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.setTextColor(145, 197, 253);
+
+  const linkLines = pdf.splitTextToSize(event.guestLink, 170);
+  pdf.text(linkLines, pageWidth / 2, 235, {
+    align: "center"
+  });
+
+  // Info
+  pdf.setFontSize(10);
+  pdf.setTextColor(160, 174, 192);
+  pdf.text(
+    `Tip eventa: ${getEventTypeLabel(event.type)}  |  Paket: ${getPlanLabel(event.plan)}  |  Limit: ${event.uploadLimit} fotografija`,
+    pageWidth / 2,
+    258,
+    { align: "center" }
+  );
+
+  pdf.setFontSize(9);
+  pdf.setTextColor(120, 135, 155);
+  pdf.text(
+    "Bez instalacije aplikacije - dovoljno je otvoriti link ili skenirati QR kod.",
+    pageWidth / 2,
+    269,
+    { align: "center" }
+  );
+
+  pdf.save(
+    `${safeFileName(event.title)}-info-za-klijenta.pdf`
+  );
+};
+window.downloadPrintPdf = async function () {
+  if (!ensureCreatedEvent()) return;
+
+  const { jsPDF } = window.jspdf;
+
+  const event = createdEventPayload;
+  const qrDataUrl = await imageUrlToDataUrl(event.qrUrl);
+
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4"
+  });
+
+  const pageWidth = 210;
+
+  // Cream background
+  pdf.setFillColor(250, 247, 240);
+  pdf.rect(0, 0, 210, 297, "F");
+
+  // Border
+  pdf.setDrawColor(210, 180, 120);
+  pdf.setLineWidth(1.2);
+  pdf.roundedRect(14, 14, 182, 269, 8, 8, "S");
+
+  pdf.setDrawColor(230, 210, 170);
+  pdf.setLineWidth(0.5);
+  pdf.roundedRect(20, 20, 170, 257, 6, 6, "S");
+
+  // Header
+  pdf.setTextColor(45, 45, 45);
+  pdf.setFont("times", "bold");
+  pdf.setFontSize(30);
+
+  const titleLines = pdf.splitTextToSize(event.title, 160);
+  pdf.text(titleLines, pageWidth / 2, 52, {
+    align: "center"
+  });
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(13);
+  pdf.setTextColor(90, 90, 90);
+  pdf.text(
+    "Podijelite svoje fotografije i uspomene",
+    pageWidth / 2,
+    78,
+    { align: "center" }
+  );
+
+  // Big QR
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(43, 95, 124, 124, 10, 10, "F");
+
+  pdf.setDrawColor(225, 205, 165);
+  pdf.setLineWidth(0.6);
+  pdf.roundedRect(43, 95, 124, 124, 10, 10, "S");
+
+  pdf.addImage(qrDataUrl, "PNG", 54, 106, 102, 102);
+
+  // Instructions
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(17);
+  pdf.setTextColor(45, 45, 45);
+  pdf.text(
+    "Skeniraj QR kod",
+    pageWidth / 2,
+    238,
+    { align: "center" }
+  );
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(12);
+  pdf.setTextColor(85, 85, 85);
+
+  const text =
+    "Otvori galeriju, upiši svoje ime i dodaj fotografije s eventa. " +
+    "Bez instalacije aplikacije.";
+
+  const textLines = pdf.splitTextToSize(text, 145);
+  pdf.text(textLines, pageWidth / 2, 250, {
+    align: "center",
+    lineHeightFactor: 1.35
+  });
+
+  pdf.setFontSize(9);
+  pdf.setTextColor(130, 130, 130);
+  pdf.text(
+    "PhotoDump Event",
+    pageWidth / 2,
+    274,
+    { align: "center" }
+  );
+
+  pdf.save(
+    `${safeFileName(event.title)}-qr-print.pdf`
+  );
+};
+window.downloadQrPng = async function () {
+  if (!ensureCreatedEvent()) return;
+
+  const event = createdEventPayload;
+
+  const response = await fetch(event.qrUrl);
+
+  if (!response.ok) {
+    alert("QR kod nije moguće preuzeti.");
+    return;
+  }
+
+  const blob = await response.blob();
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${safeFileName(event.title)}-qr-kod.png`;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+};
 /* ================= CREATE EVENT ================= */
 window.createNewEvent = async function () {
 
@@ -667,7 +963,22 @@ const guestLink =
 
     const adminLink =
       `${location.origin}/admin.html?event=${eventId}`;
+const qrUrl =
+  "https://api.qrserver.com/v1/create-qr-code/?size=1200x1200&data=" +
+  encodeURIComponent(guestLink);
 
+createdEventPayload = {
+  eventId,
+  title,
+  type,
+  plan,
+  guestLink,
+  appLink,
+  adminLink,
+  qrUrl,
+  uploadLimit,
+  allowOriginals
+};
     resultBox.innerHTML = `
       <p><b>Event kreiran ✅</b></p>
 
@@ -698,12 +1009,12 @@ const guestLink =
 
     resultBox.classList.add("show");
 
-    qrImage.src =
-      "https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=" +
-      encodeURIComponent(guestLink);
+qrImage.src = qrUrl;
 
     qrBox.classList.add("show");
-
+document
+  .getElementById("pdfTools")
+  ?.classList.add("show");
     createBtn.innerText = "Gotovo ✅";
 
   } catch (err) {

@@ -168,10 +168,32 @@
     <div id="qrBox" class="qr-box">
       <img id="qrImage" alt="QR kod">
     </div>
+    <div id="pdfTools" class="pdf-tools">
+  <h3>📄 Materijali za klijenta</h3>
+
+  <p>
+    Nakon kreiranja eventa možeš odmah preuzeti PDF za slanje klijentu,
+    PDF za print i čisti QR kod.
+  </p>
+
+  <div class="pdf-actions">
+    <button type="button" onclick="downloadClientPdf()">
+      📩 PDF za klijenta
+    </button>
+
+    <button type="button" onclick="downloadPrintPdf()">
+      🖨️ PDF za print
+    </button>
+
+    <button type="button" onclick="downloadQrPng()">
+      🔳 Čisti QR kod
+    </button>
+  </div>
+</div>
   </section>
 
 </main>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module" src="main-admin.js"></script>
 
 </body>
