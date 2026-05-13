@@ -11,24 +11,24 @@
 
 <body>
 
-<!-- 🔥 TOPBAR -->
+
 <div class="topbar" id="adminTopbar">✨ Admin panel</div>
 
 <div class="container">
 
-  <!-- 🔥 HEADER (EVENT INFO) -->
+  
   <div class="admin-header glass">
     <h2>Upravljanje sadržajem ⚙️</h2>
     <p id="eventName" style="opacity:.7;"></p>
   </div>
 
-  <!-- 🔥 STATISTIKA -->
+  
   <div class="admin-stats">
     <div>📸 <span id="photoCount">0</span></div>
     <div>💌 <span id="dedicationCount">0</span></div>
   </div>
 
-  <!-- 🔥 AKCIJE -->
+  
   <div class="admin-actions-grid">
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
 
@@ -54,30 +54,30 @@
 
   </div>
 
-  <!-- 🔥 FILTERI -->
+  
   <div class="admin-filters">
     <button onclick="filterPhotos('all')" class="active">Sve</button>
     <button onclick="filterPhotos('visible')">Vidljive</button>
     <button onclick="filterPhotos('hidden')">Skrivene</button>
   </div>
 
-  <!-- 🔥 TABS -->
+  
 
-  <!-- 📸 SLIKE -->
+  
   <div id="adminPhotos" class="tab-content active">
     <div id="gallery"></div>
   </div>
 
-  <!-- 💌 POSVETE -->
+  
   <div id="adminDedications" class="tab-content">
     <div id="dedicationsList"></div>
   </div>
 
 </div>
 
-<!-- 🔥 MODALI -->
 
-<!-- POSVETA -->
+
+
 <div id="dedicationModal" class="modal">
   <div class="modal-box">
     <p id="dedicationFullText"></p>
@@ -86,7 +86,7 @@
   </div>
 </div>
 
-<!-- DELETE / HIDE -->
+
 <div id="photoActionModal" class="modal">
   <div class="modal-box action-box">
     <h3 id="photoActionTitle"></h3>
@@ -97,7 +97,7 @@
   </div>
 </div>
 
-<!-- SETTINGS -->
+
 <div id="settingsModal" class="modal">
   <div class="modal-box settings-box">
 
@@ -147,7 +147,7 @@
   </div>
 </div>
 
-<!-- 🔥 NAVBAR -->
+
 <div class="admin-navbar">
 
   <div class="admin-nav-item active" onclick="switchAdminScreen('photos')">
@@ -160,10 +160,10 @@
 
 </div>
 
-<!-- 🔥 LIBS -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-<!-- 🔥 SCRIPT -->
+
 <script type="module" src="admin.js"></script>
 
 </body>

@@ -22,7 +22,7 @@
 
   <link rel="apple-touch-icon" href="icon.png">
 
-  <!-- Brzi theme iz cachea prije nego index.js učita event -->
+
   <script>
     const eventId =
       new URLSearchParams(location.search).get("event") ||
@@ -51,15 +51,15 @@
 
 <body>
 
-  <!-- FLOATING SLIKE -->
+  
   <div class="floating-container"></div>
 
-  <!-- TOP BAR -->
+  
   <div class="topbar" id="eventTitle">
     Učitavanje...
   </div>
 
-  <!-- MAIN CARD -->
+  
   <div class="center-wrapper">
 
     <div class="glass-card">
@@ -87,7 +87,7 @@
 
   </div>
 
-  <!-- ADMIN MODAL -->
+  
   <div id="adminModal" class="modal">
 
     <div class="admin-modal-box">
@@ -121,7 +121,7 @@
 
   </div>
 
-  <!-- SERVICE WORKER -->
+  
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
@@ -132,7 +132,7 @@
     }
   </script>
 
-  <!-- INDEX LOGIKA -->
+  
   <script type="module" src="event.js"></script>
 
 </body>
