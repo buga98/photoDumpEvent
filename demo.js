@@ -1,10 +1,3 @@
-/* ==============================
-   PHOTODUMP STATIC DEMO
-   NEMA FIREBASEA
-   NEMA UPLOADA
-   NEMA WRITEOVA
-============================== */
-
 const DEMO_EVENT_ID = "demo";
 
 const demoPhotos = [
@@ -37,10 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("loaded");
 });
 
-/* ==============================
-   ENTER DEMO
-============================== */
-
 window.enterDemoApp = function () {
   const input = document.getElementById("demoName");
   const name = input?.value.trim() || "Demo gost";
@@ -57,10 +46,6 @@ window.enterDemoApp = function () {
 
   demoToast("Dobrodošao/la u demo galeriju. Ovo je prikaz bez spremanja podataka.");
 };
-
-/* ==============================
-   SCREEN SWITCH
-============================== */
 
 window.switchDemoScreen = function (screen) {
   document.querySelectorAll(".screen").forEach((el) => {
@@ -90,10 +75,6 @@ window.switchDemoScreen = function (screen) {
     demoToast("Ovdje gost vidi fotografije koje je sam objavio.");
   }
 };
-
-/* ==============================
-   RENDER FEED
-============================== */
 
 function renderDemoFeed() {
   const feed = document.getElementById("feed");
@@ -168,10 +149,6 @@ function createPhotoCard(photo, isProfile) {
   return card;
 }
 
-/* ==============================
-   MODAL
-============================== */
-
 function openDemoImage(photo) {
   const modal = document.getElementById("demoImageModal");
   const img = document.getElementById("demoModalImage");
@@ -202,10 +179,6 @@ document.getElementById("demoImageModal")?.addEventListener("click", (e) => {
     closeDemoImage();
   }
 });
-
-/* ==============================
-   FAKE ACTIONS
-============================== */
 
 window.demoUploadMessage = function (type) {
   if (type === "camera") {
@@ -240,10 +213,6 @@ function showDemoHeart(card) {
   }, 800);
 }
 
-/* ==============================
-   STATS
-============================== */
-
 function updateDemoStats() {
   const photos = demoPhotos.length;
   const likes = demoPhotos.reduce((sum, photo) => sum + photo.likes, 0);
@@ -260,10 +229,6 @@ function setText(id, value) {
     el.innerText = value;
   }
 }
-
-/* ==============================
-   BUBBLES
-============================== */
 
 function renderDemoBubbles() {
   const container = document.getElementById("demoBubbles");
@@ -305,10 +270,6 @@ function renderDemoBubbles() {
   });
 }
 
-/* ==============================
-   TOAST
-============================== */
-
 window.demoToast = function (message) {
   const toast = document.getElementById("toast");
   if (!toast) {
@@ -325,11 +286,6 @@ window.demoToast = function (message) {
     toast.classList.remove("show");
   }, 2600);
 };
-
-/* ==============================
-   PLACEHOLDER IMAGE
-   ako nemaš assets/demo slike
-============================== */
 
 function createPlaceholderImage(number) {
   const colors = [

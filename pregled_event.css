@@ -210,9 +210,7 @@ textarea{
   font-weight:700;
   font-size:13px;
 }
-/* =====================================================
-   USERS PANEL
-===================================================== */
+
 
 .users-topbar{
   align-items:flex-start;
@@ -413,7 +411,7 @@ textarea{
   border-color:rgba(255,209,102,.25);
 }
 
-/* MOBILE */
+
 @media(max-width:850px){
   .users-toolbar{
     grid-template-columns:1fr;
@@ -450,9 +448,7 @@ textarea{
     width:100%;
   }
 }
-/* =====================================================
-   USERS PANEL — FIX CARD OVERFLOW
-===================================================== */
+
 
 .users-list{
   grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
@@ -493,7 +489,7 @@ textarea{
   line-height:1.2;
 }
 
-/* malo bolji layout za srednje ekrane */
+
 @media(max-width:1050px){
   .users-list{
     grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
@@ -504,7 +500,7 @@ textarea{
   }
 }
 
-/* mobitel */
+
 @media(max-width:620px){
   .users-list{
     grid-template-columns:1fr;
@@ -518,9 +514,7 @@ textarea{
     grid-template-columns:1fr !important;
   }
 }
-/* =====================================================
-   PREGLED EVENTOVA — ANALYTICS UPGRADE
-===================================================== */
+
 
 .pregled-topbar{
   gap:18px;
@@ -809,9 +803,7 @@ textarea{
     width:100%;
   }
 }
-/* =====================================================
-   ANALYTICS MODAL VERSION
-===================================================== */
+
 
 .events-toolbar{
   display:flex;
@@ -966,9 +958,6 @@ textarea{
     grid-column:span 1;
   }
 }
-/* =====================================================
-   PREGLED EVENTOVA — COMPACT TOOLBAR FIX
-===================================================== */
 
 .events-toolbar{
   width:100%;
@@ -1057,9 +1046,7 @@ textarea{
     max-width:none !important;
   }
 }
-/* =====================================================
-   EVENT EDITOR MODAL
-===================================================== */
+
 
 #editorModal.modal-overlay{
   position:fixed;
@@ -1143,9 +1130,7 @@ textarea{
     border-radius:26px 26px 0 0;
   }
 }
-/* =====================================================
-   EVENT CARD — COMPACT STATS
-===================================================== */
+
 
 .event-stats-grid{
   display:flex !important;

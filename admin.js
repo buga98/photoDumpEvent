@@ -15,7 +15,6 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -28,7 +27,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ================= EVENT ID ================= */
 const currentEventId =
   new URLSearchParams(window.location.search).get("event");
 
@@ -37,7 +35,6 @@ if (!currentEventId) {
   throw new Error("Missing eventId");
 }
 
-/* ================= SETTINGS ================= */
 const IMAGE_LIMIT = 24;
 const DEDICATION_LIMIT = 24;
 const SLIDESHOW_LIMIT = 200;
@@ -46,7 +43,6 @@ let lastVisible = null;
 let loadingMore = false;
 let hasMore = true;
 
-/* ================= STATE ================= */
 let currentFilter = "all";
 
 let selectedPhotoId = null;
@@ -71,7 +67,6 @@ let showDedications =
 let slideSpeed =
   Number(localStorage.getItem("slideSpeed")) || 3000;
 
-/* ================= EVENT INFO ================= */
 async function loadEventInfo() {
   const snap = await getDoc(
     doc(db, "events", currentEventId)
@@ -88,7 +83,6 @@ async function loadEventInfo() {
   }
 }
 
-/* ================= HELPERS ================= */
 function photosBaseRef() {
   return collection(
     db,
@@ -245,7 +239,6 @@ function setPhotoCount() {
   }
 }
 
-/* ================= FILTER ================= */
 window.filterPhotos = function (type) {
   currentFilter = type;
   lastVisible = null;
@@ -272,7 +265,6 @@ window.filterPhotos = function (type) {
   loadAllImages();
 };
 
-/* ================= GALLERY ================= */
 async function loadAllImages() {
   const gallery =
     document.getElementById("gallery");
@@ -380,7 +372,6 @@ async function loadMoreImages() {
   }
 }
 
-/* ================= PHOTO ACTION ================= */
 function openPhotoAction(id, wrapper) {
   selectedPhotoId = id;
   selectedWrapper = wrapper;
@@ -449,7 +440,6 @@ window.confirmPhotoAction = async function (confirm) {
   }
 };
 
-/* ================= DEDICATIONS ================= */
 async function loadDedications() {
   const list =
     document.getElementById("dedicationsList");
@@ -559,7 +549,6 @@ window.closeDedicationModal = function () {
   }
 };
 
-/* ================= SLIDESHOW ================= */
 function buildSlideshowQuery() {
   return query(
     photosBaseRef(),
@@ -808,7 +797,6 @@ window.startSlideshow = function () {
     );
 };
 
-/* ================= NAV ================= */
 window.switchAdminScreen = function (screen) {
   document
     .querySelectorAll(".tab-content")
@@ -843,7 +831,6 @@ window.switchAdminScreen = function (screen) {
   }
 };
 
-/* ================= SELECTION ================= */
 window.toggleSelectionMode = function () {
   selectionMode = !selectionMode;
 
@@ -948,7 +935,6 @@ window.showSelected = async function () {
   }
 };
 
-/* ================= SETTINGS ================= */
 window.openSettings = function () {
   const modal =
     document.getElementById("settingsModal");
@@ -1034,14 +1020,12 @@ window.closeSettings = function () {
   }
 };
 
-/* ================= DOWNLOAD ================= */
 window.downloadAllPhotos = function () {
   alert(
     "Za preuzimanje svih fotografija obratite se administratoru."
   );
 };
 
-/* ================= INIT ================= */
 loadEventInfo();
 loadAllImages();
 loadDedications();

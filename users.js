@@ -20,8 +20,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
-/* ================= FIREBASE ================= */
-
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -36,8 +34,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* ================= ELEMENTS ================= */
-
 const usersList =
   document.getElementById("usersList");
 
@@ -47,14 +43,10 @@ const userSearch =
 const filterButtons =
   document.querySelectorAll(".filter-btn");
 
-/* ================= STATE ================= */
-
 let allUsers = [];
 let allEvents = [];
 let currentFilter = "all";
 let searchValue = "";
-
-/* ================= AUTH ================= */
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -98,8 +90,6 @@ onAuthStateChanged(auth, async (user) => {
     location.href = "/main-admin.html";
   }
 });
-
-/* ================= LOAD DATA ================= */
 
 async function loadUsersAndEvents() {
 
@@ -174,8 +164,6 @@ async function loadUsersAndEvents() {
 
   renderUsers();
 }
-
-/* ================= RENDER ================= */
 
 function renderUsers() {
 
@@ -414,8 +402,6 @@ function createUserCard(user) {
   return card;
 }
 
-/* ================= ACTIONS ================= */
-
 async function handleUserAction(action, uid) {
 
   const user =
@@ -516,8 +502,6 @@ async function updateUser(uid, payload) {
   }
 }
 
-/* ================= FILTERS / SEARCH ================= */
-
 filterButtons.forEach((btn) => {
 
   btn.addEventListener("click", () => {
@@ -545,8 +529,6 @@ if (userSearch) {
     renderUsers();
   });
 }
-
-/* ================= HELPERS ================= */
 
 function updateSummary() {
 

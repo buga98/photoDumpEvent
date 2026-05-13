@@ -81,9 +81,7 @@ main{
   z-index:1;
 }
 
-/* =========================
-   GLOBAL GLASS
-========================= */
+
 
 .feature-card,
 .step-card,
@@ -102,9 +100,6 @@ main{
   -webkit-backdrop-filter:blur(var(--glass-blur));
 }
 
-/* =========================
-   HEADER
-========================= */
 
 .site-header{
   position:sticky;
@@ -344,9 +339,7 @@ main{
   margin-top:16px;
 }
 
-/* =========================
-   BUTTONS
-========================= */
+
 
 .btn{
   display:inline-flex;
@@ -392,9 +385,7 @@ main{
   width:100%;
 }
 
-/* =========================
-   HERO
-========================= */
+
 
 .hero{
   position:relative;
@@ -486,9 +477,7 @@ main{
   margin-top:30px;
 }
 
-/* =========================
-   EVENT JUMP
-========================= */
+
 
 .event-jump{
   max-width:620px;
@@ -546,9 +535,7 @@ main{
   color:var(--muted-2);
 }
 
-/* =========================
-   PHONE MOCKUP
-========================= */
+
 
 .hero-phone-wrap{
   position:relative;
@@ -685,9 +672,6 @@ main{
   bottom:18%;
 }
 
-/* =========================
-   SECTIONS
-========================= */
 
 .section{
   width:min(var(--max), calc(100% - 36px));
@@ -719,9 +703,7 @@ main{
   line-height:1.85;
 }
 
-/* =========================
-   CARDS / GRIDS
-========================= */
+
 
 .cards-grid{
   display:grid;
@@ -762,9 +744,7 @@ main{
   font-size:14px;
 }
 
-/* =========================
-   HOW
-========================= */
+
 
 .steps{
   display:grid;
@@ -801,9 +781,7 @@ main{
   line-height:1.8;
 }
 
-/* =========================
-   PREVIEW
-========================= */
+
 
 .preview-section{
   display:grid;
@@ -890,9 +868,7 @@ main{
   border-radius:14px;
 }
 
-/* =========================
-   PRICING
-========================= */
+
 
 .pricing-grid{
   display:grid;
@@ -967,9 +943,7 @@ main{
   margin-right:8px;
 }
 
-/* =========================
-   CTA
-========================= */
+
 
 .demo-cta{
   width:min(var(--max), calc(100% - 36px));
@@ -998,9 +972,7 @@ main{
   max-width:720px;
 }
 
-/* =========================
-   FAQ
-========================= */
+
 
 .faq-grid{
   max-width:1050px;
@@ -1026,9 +998,7 @@ main{
   line-height:1.8;
 }
 
-/* =========================
-   CONTACT
-========================= */
+
 
 .contact{
   padding-top:40px;
@@ -1051,9 +1021,7 @@ main{
   flex-wrap:wrap;
 }
 
-/* =========================
-   FOOTER
-========================= */
+
 
 .footer{
   width:min(var(--max), calc(100% - 36px));
@@ -1089,9 +1057,7 @@ main{
   font-weight:700;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+
 
 @media (max-width:1100px){
   .hero{
@@ -1271,12 +1237,7 @@ main{
     width:100%;
   }
 }
-/* =====================================================
-   PREMIUM MOTION / LIQUID GLASS ANIMATIONS
-   dodati NA KRAJ index.css
-===================================================== */
 
-/* smooth render */
 body{
   position:relative;
 }
@@ -1313,7 +1274,6 @@ body::after{
   opacity:.45;
 }
 
-/* subtle page entrance */
 .site-header{
   animation:slideDownGlass .75s cubic-bezier(.2,.8,.2,1) both;
 }
@@ -1330,7 +1290,7 @@ body::after{
   animation:softPop .85s cubic-bezier(.2,.8,.2,1) .28s both;
 }
 
-/* liquid edge glow */
+
 .phone-card,
 .feature-card,
 .step-card,
@@ -1385,7 +1345,7 @@ body::after{
   animation:glassSweep 1.35s ease forwards;
 }
 
-/* hover premium depth */
+
 .feature-card,
 .step-card,
 .price-card,
@@ -1413,7 +1373,7 @@ body::after{
     inset 0 1px 0 rgba(255,255,255,.12);
 }
 
-/* buttons: tiny premium pulse */
+
 .btn.primary,
 .header-cta,
 .event-jump button{
@@ -1449,7 +1409,7 @@ body::after{
   animation:buttonShine .85s ease forwards;
 }
 
-/* phone float */
+
 .main-phone{
   animation:phoneFloat 5.8s ease-in-out infinite;
   transform-style:preserve-3d;
@@ -1477,7 +1437,6 @@ body::after{
   animation-delay:.7s;
 }
 
-/* floating micro cards */
 .floating-card{
   animation:microFloat 4.8s ease-in-out infinite;
 }
@@ -1486,7 +1445,6 @@ body::after{
   animation-delay:1.1s;
 }
 
-/* scroll reveal */
 .reveal{
   opacity:0;
   transform:translateY(28px) scale(.985);
@@ -1503,7 +1461,7 @@ body::after{
   filter:blur(0);
 }
 
-/* stagger cards inside grids */
+
 .cards-grid .reveal:nth-child(2),
 .steps .reveal:nth-child(2),
 .pricing-grid .reveal:nth-child(2),
@@ -1523,7 +1481,6 @@ body::after{
   transition-delay:.24s;
 }
 
-/* animated premium divider glow between sections */
 .section{
   position:relative;
 }
@@ -1548,24 +1505,21 @@ body::after{
   opacity:.9;
 }
 
-/* pricing featured breathing glow */
 .price-card.featured{
   animation:featuredGlow 4.4s ease-in-out infinite;
 }
 
-/* small animated gradient text helper */
 .hero h1 span,
 .price{
   background-size:180% 180%;
   animation:gradientShift 7s ease infinite;
 }
 
-/* mobile menu smoother if hamburger exists */
 .mobile-menu.open{
   animation:menuPop .28s cubic-bezier(.2,.8,.2,1) both;
 }
 
-/* KEYFRAMES */
+
 @keyframes ambientDrift{
   0%{
     transform:translate3d(-2%, -1%, 0) rotate(0deg) scale(1);
@@ -1702,7 +1656,6 @@ body::after{
   }
 }
 
-/* respect accessibility */
 @media (prefers-reduced-motion: reduce){
   *,
   *::before,
@@ -1719,7 +1672,6 @@ body::after{
   }
 }
 
-/* mobile performance: manje efekata */
 @media(max-width:720px){
   body::after{
     opacity:.22;
@@ -1858,12 +1810,7 @@ body::after{
   font-size:13px;
   font-weight:700;
 }
-/* =====================================================
-   FINAL HERO / MOBILE / THEME POLISH
-   staviti NA KRAJ index.css
-===================================================== */
 
-/* theme-aware background */
 body.mock-theme-wedding{
   background:
     radial-gradient(circle at 16% 10%, rgba(116,192,252,.15), transparent 28%),
@@ -1888,7 +1835,7 @@ body.mock-theme-party{
     linear-gradient(140deg,#0b0714 0%,#141126 45%,#21113b 100%);
 }
 
-/* logo fallback / alignment */
+
 .logo{
   display:flex;
   align-items:center;
@@ -1897,7 +1844,6 @@ body.mock-theme-party{
   white-space:nowrap;
 }
 
-/* proof row under CTA */
 .hero-proof-row{
   display:flex;
   flex-wrap:wrap;
@@ -1932,7 +1878,7 @@ body.mock-theme-party{
   line-height:1.7;
 }
 
-/* theme switcher desktop */
+
 .theme-switcher{
   top:10px;
   width:max-content;
@@ -1943,7 +1889,6 @@ body.mock-theme-party{
   white-space:nowrap;
 }
 
-/* phone theme colors */
 .phone-card.theme-wedding{
   border-color:rgba(196,181,253,.22);
 }
@@ -1982,7 +1927,6 @@ body.mock-theme-party{
   transform:scale(.94);
 }
 
-/* better event input card */
 .event-jump{
   isolation:isolate;
 }
@@ -2001,7 +1945,7 @@ body.mock-theme-party{
   filter:saturate(1.08);
 }
 
-/* more selling clarity */
+
 .feature-card,
 .step-card,
 .price-card,
@@ -2009,7 +1953,7 @@ body.mock-theme-party{
   min-height:100%;
 }
 
-/* fix mobile hero stacking */
+
 @media(max-width:860px){
   body{
     overflow-x:hidden;
@@ -2192,7 +2136,7 @@ body.mock-theme-party{
   }
 }
 
-/* very small phones */
+
 @media(max-width:420px){
   .site-header{
     width:calc(100% - 14px);
@@ -2283,14 +2227,7 @@ body.mock-theme-party{
     grid-template-columns:1fr;
   }
 }
-/* =====================================================
-   FINAL PRODUCTION POLISH — HEADER / HERO / THEMES
-   staviti SKROZ NA KRAJ index.css
-===================================================== */
 
-/* =========================
-   HEADER FIX
-========================= */
 
 .site-header{
   position:sticky;
@@ -2340,7 +2277,7 @@ body.mock-theme-party{
   line-height:1;
 }
 
-/* logo nema više dupli glass obrub */
+
 .logo-icon{
   width:46px !important;
   height:46px !important;
@@ -2373,9 +2310,7 @@ body.mock-theme-party{
     drop-shadow(0 0 10px rgba(245,185,80,.18));
 }
 
-/* =========================
-   HERO LAYOUT DESKTOP
-========================= */
+
 
 .hero{
   width:min(var(--max), calc(100% - 36px));
@@ -2453,9 +2388,7 @@ body.mock-theme-party{
   line-height:1.65;
 }
 
-/* =========================
-   EVENT INPUT
-========================= */
+
 
 .event-jump{
   max-width:620px;
@@ -2490,9 +2423,7 @@ body.mock-theme-party{
   width:100%;
 }
 
-/* =========================
-   PHONE PREVIEW — DESKTOP
-========================= */
+
 
 .hero-phone-wrap{
   position:relative;
@@ -2514,7 +2445,7 @@ body.mock-theme-party{
   margin:0 auto;
 }
 
-/* theme switcher više nije absolute */
+
 .theme-switcher{
   position:relative !important;
   top:auto !important;
@@ -2601,7 +2532,7 @@ body.mock-theme-party{
     background .35s ease;
 }
 
-/* floating cards da ne prekrivaju ružno */
+
 .floating-card{
   pointer-events:none;
 }
@@ -2616,9 +2547,6 @@ body.mock-theme-party{
   bottom:18%;
 }
 
-/* =========================
-   THEME COLORS
-========================= */
 
 body.mock-theme-wedding{
   --accent:#a5f3fc;
@@ -2721,9 +2649,7 @@ body.mock-theme-party{
   filter:blur(5px);
 }
 
-/* =========================
-   VALUE STRIP
-========================= */
+
 
 .value-strip{
   display:grid;
@@ -2762,9 +2688,7 @@ body.mock-theme-party{
   line-height:1.6;
 }
 
-/* =========================
-   TABLET
-========================= */
+
 
 @media(max-width:1100px){
   .hero{
@@ -2800,9 +2724,7 @@ body.mock-theme-party{
   }
 }
 
-/* =========================
-   MOBILE
-========================= */
+
 
 @media(max-width:860px){
   .desktop-nav,
@@ -3042,9 +2964,7 @@ body.mock-theme-party{
   }
 }
 
-/* =========================
-   SMALL MOBILE
-========================= */
+
 
 @media(max-width:420px){
   .hero{
@@ -3067,10 +2987,7 @@ body.mock-theme-party{
     font-size:10px;
   }
 }
-/* =====================================================
-   MOBILE HERO CTA / PROOF CHIPS FIX
-   staviti SKROZ NA KRAJ index.css
-===================================================== */
+
 
 @media(max-width:860px){
 
@@ -3086,7 +3003,6 @@ body.mock-theme-party{
     min-height:50px;
   }
 
-  /* Ovo su ona 3: Bez instalacije / QR pristup / Custom dizajn */
   .hero-proof-row{
     display:flex !important;
     flex-direction:row !important;
@@ -3136,10 +3052,7 @@ body.mock-theme-party{
     font-size:10.5px;
   }
 }
-/* =====================================================
-   QR SHOWCASE SECTION
-   staviti SKROZ NA KRAJ index.css
-===================================================== */
+
 
 .qr-showcase{
   display:grid;
@@ -3400,7 +3313,7 @@ body.mock-theme-party{
   }
 }
 
-/* TABLET */
+
 @media(max-width:1100px){
   .qr-showcase{
     grid-template-columns:1fr;
@@ -3421,7 +3334,7 @@ body.mock-theme-party{
   }
 }
 
-/* MOBILE */
+
 @media(max-width:680px){
   .qr-showcase{
     padding-top:24px;

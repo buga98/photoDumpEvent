@@ -1,5 +1,3 @@
-// pregled_event.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 
 import {
@@ -20,8 +18,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
-/* ================= FIREBASE ================= */
-
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -35,8 +31,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* ================= STATE ================= */
-
 let currentEventId = null;
 let currentEventData = null;
 
@@ -45,15 +39,11 @@ let currentRole = null;
 
 let loadedEvents = [];
 
-/* ================= ELEMENTS ================= */
-
 const eventsList =
   document.getElementById("eventsList");
 
 const editor =
   document.getElementById("editor");
-
-/* ================= AUTH ================= */
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -110,7 +100,6 @@ document.getElementById("analyticsModal")?.addEventListener("click", (e) => {
     document.getElementById("analyticsModal")?.classList.add("hidden");
   }
 });
-/* ================= LOAD EVENTS ================= */
 
 async function loadEvents() {
 
@@ -161,8 +150,6 @@ async function loadEvents() {
       "<div class='loading error'>Greška kod učitavanja eventova.</div>";
   }
 }
-
-/* ================= RENDER ANALYTICS ================= */
 
 function renderAnalytics() {
 
@@ -270,8 +257,6 @@ function getTopOwnerText() {
 
   return `${top.name} · ${top.photos} slika · ${top.events} eventa`;
 }
-
-/* ================= RENDER EVENTS ================= */
 
 function renderEvents() {
 
@@ -401,8 +386,6 @@ function createEventCard(event) {
 
   return card;
 }
-
-/* ================= OPEN EDITOR ================= */
 
 async function openEditor(eventId) {
 
@@ -551,8 +534,6 @@ function renderEventUsage(data) {
   }
 }
 
-/* ================= SAVE ================= */
-
 document.getElementById("saveBtn").onclick = async () => {
 
   if (!currentEventId) return;
@@ -618,8 +599,6 @@ document.getElementById("saveBtn").onclick = async () => {
     alert("Greška kod spremanja eventa.");
   }
 };
-
-/* ================= QUICK ACTIONS ================= */
 
 function closeEditorModal() {
   document
@@ -726,8 +705,6 @@ document.getElementById("cleanedEventBtn")?.addEventListener("click", async () =
   await loadEvents();
   await openEditor(currentEventId);
 });
-
-/* ================= HELPERS ================= */
 
 function setRoleBadge() {
 

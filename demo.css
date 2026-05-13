@@ -1,7 +1,3 @@
-/* =====================================================
-   PHOTODUMP DEMO PAGE
-===================================================== */
-
 .demo-mode{
   min-height:100vh;
 }
@@ -90,7 +86,6 @@
   line-height:1.8;
 }
 
-/* demo feed */
 .demo-photo-card{
   cursor:pointer;
 }
@@ -99,7 +94,6 @@
   background:var(--bg-soft);
 }
 
-/* modal image */
 .demo-image-modal-box{
   position:relative;
 
@@ -167,17 +161,14 @@
   z-index:4;
 }
 
-/* demo mode topbar */
 .demo-mode .topbar{
   font-weight:700;
 }
 
-/* upload cards no native input */
 .demo-mode .upload-card{
   user-select:none;
 }
 
-/* toast little stronger for demo */
 .demo-mode #toast{
   bottom:92px;
   background:rgba(20,20,20,.92);
@@ -185,7 +176,6 @@
   font-weight:600;
 }
 
-/* landing bubbles above background */
 .demo-landing .floating-container{
   z-index:1;
 }
@@ -194,7 +184,6 @@
   z-index:2;
 }
 
-/* mobile */
 @media(max-width:420px){
   .demo-info-card{
     margin:12px 10px;

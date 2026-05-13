@@ -18,8 +18,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-/* ================= FIREBASE ================= */
-
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -33,8 +31,6 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-/* ================= ELEMENTS ================= */
 
 const formLogo =
   document.getElementById("formLogo");
@@ -83,8 +79,6 @@ const showRegisterBtn =
 
 const showLoginBtn =
   document.getElementById("showLoginBtn");
-
-/* ================= UI ================= */
 
 showRegisterBtn.onclick = () => {
   showRegister();
@@ -182,8 +176,6 @@ function getFirebaseErrorMessage(code) {
   }
 }
 
-/* ================= LOGIN ================= */
-
 async function login() {
   clearMessage();
 
@@ -256,8 +248,6 @@ async function login() {
     setLoading(loginBtn, false, "Prijavi se 🚀");
   }
 }
-
-/* ================= REGISTER ================= */
 
 async function register() {
   clearMessage();
@@ -343,8 +333,6 @@ async function register() {
   }
 }
 
-/* ================= ENTER KEY ================= */
-
 loginPasswordEl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     login();
@@ -356,8 +344,6 @@ registerPasswordEl.addEventListener("keydown", (e) => {
     register();
   }
 });
-
-/* ================= AUTO LOGIN ================= */
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;

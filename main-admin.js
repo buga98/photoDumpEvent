@@ -27,7 +27,6 @@ import {
   signOut
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -43,7 +42,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-/* ================= AUTH PROTECTION ================= */
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -86,7 +84,6 @@ if (data.role !== "superadmin") {
   }
 });
 
-/* ================= ELEMENTS ================= */
 const titleInput = document.getElementById("eventTitle");
 const typeInput = document.getElementById("eventType");
 const fileInput = document.getElementById("bubbleImages");
@@ -99,7 +96,6 @@ const qrImage = document.getElementById("qrImage");
 const planInput = document.getElementById("eventPlan");
 let createdEventPayload = null;
 
-/* ================= DEFAULT TEXTS ================= */
 const defaults = {
 
   krstenje: {
@@ -199,9 +195,9 @@ Ajmo napraviti uspomene koje ne blijede 💥`,
 
 Ova aplikacija služi za jednostavno dijeljenje fotografija i uspomena s eventa u realnom vremenu 📸
 
-👉 Uhvati trenutak  
-👉 Podijeli ga s drugima  
-👉 I sačuvaj uspomene zauvijek  
+👉 Uhvati trenutak
+👉 Podijeli ga s drugima
+👉 I sačuvaj uspomene zauvijek
 
 Sve fotografije koje podijelite odmah su vidljive svima ✨
 
@@ -215,7 +211,6 @@ Kreni i postani dio ove priče 🤍`,
   }
 };
 
-/* ================= HELPERS ================= */
 function getInput(id) {
   return document.getElementById(id);
 }
@@ -305,7 +300,6 @@ function getTextsFromInputs() {
   });
 }
 
-/* ================= DEFAULT FILL ================= */
 function fillAllDefaults() {
 
   [
@@ -331,7 +325,6 @@ function fillAllDefaults() {
   updatePreview();
 }
 
-/* ================= PREVIEW ================= */
 function getPreviewTitleWithEmoji(title, type) {
 
   switch (type) {
@@ -432,7 +425,6 @@ window.switchPreview = function(screen) {
       ?.classList.add("active");
   }
 };
-/* ================= LISTENERS ================= */
 typeInput.addEventListener("change", () => {
 
   fillAllDefaults();
@@ -441,7 +433,6 @@ typeInput.addEventListener("change", () => {
 
 titleInput.addEventListener("input", updatePreview);
 
-/* ================= FILE PREVIEW ================= */
 fileInput.addEventListener("change", () => {
 
   const files = [...fileInput.files];
@@ -471,7 +462,6 @@ fileInput.addEventListener("change", () => {
   });
 });
 
-/* ================= IMAGE RESIZE ================= */
 async function resizeImage(file, maxWidth = 900, quality = 0.82) {
 
   return new Promise((resolve, reject) => {
@@ -616,11 +606,9 @@ window.downloadClientPdf = async function () {
 
   const pageWidth = 210;
 
-  // Background
   pdf.setFillColor(9, 16, 30);
   pdf.rect(0, 0, 210, 297, "F");
 
-  // Accent glow blocks
   pdf.setFillColor(18, 33, 55);
   pdf.roundedRect(14, 14, 182, 269, 8, 8, "F");
 
@@ -634,7 +622,6 @@ window.downloadClientPdf = async function () {
     align: "center"
   });
 
-  // Title
   pdf.setTextColor(255, 255, 255);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(27);
@@ -644,7 +631,6 @@ window.downloadClientPdf = async function () {
     align: "center"
   });
 
-  // Subtitle
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(12);
   pdf.setTextColor(205, 215, 230);
@@ -660,12 +646,10 @@ window.downloadClientPdf = async function () {
     lineHeightFactor: 1.45
   });
 
-  // QR card
   pdf.setFillColor(255, 255, 255);
   pdf.roundedRect(57, 113, 96, 96, 8, 8, "F");
   pdf.addImage(qrDataUrl, "PNG", 65, 121, 80, 80);
 
-  // Link
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(12);
   pdf.setTextColor(255, 255, 255);
@@ -682,7 +666,6 @@ window.downloadClientPdf = async function () {
     align: "center"
   });
 
-  // Info
   pdf.setFontSize(10);
   pdf.setTextColor(160, 174, 192);
   pdf.text(
@@ -721,11 +704,9 @@ window.downloadPrintPdf = async function () {
 
   const pageWidth = 210;
 
-  // Cream background
   pdf.setFillColor(250, 247, 240);
   pdf.rect(0, 0, 210, 297, "F");
 
-  // Border
   pdf.setDrawColor(210, 180, 120);
   pdf.setLineWidth(1.2);
   pdf.roundedRect(14, 14, 182, 269, 8, 8, "S");
@@ -734,7 +715,6 @@ window.downloadPrintPdf = async function () {
   pdf.setLineWidth(0.5);
   pdf.roundedRect(20, 20, 170, 257, 6, 6, "S");
 
-  // Header
   pdf.setTextColor(45, 45, 45);
   pdf.setFont("times", "bold");
   pdf.setFontSize(30);
@@ -754,7 +734,6 @@ window.downloadPrintPdf = async function () {
     { align: "center" }
   );
 
-  // Big QR
   pdf.setFillColor(255, 255, 255);
   pdf.roundedRect(43, 95, 124, 124, 10, 10, "F");
 
@@ -764,7 +743,6 @@ window.downloadPrintPdf = async function () {
 
   pdf.addImage(qrDataUrl, "PNG", 54, 106, 102, 102);
 
-  // Instructions
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(17);
   pdf.setTextColor(45, 45, 45);
@@ -792,7 +770,7 @@ window.downloadPrintPdf = async function () {
   pdf.setFontSize(9);
   pdf.setTextColor(130, 130, 130);
   pdf.text(
-    "PhotoDump Event",
+    "PhotoDumpEventi.com",
     pageWidth / 2,
     274,
     { align: "center" }
@@ -828,7 +806,6 @@ window.downloadQrPng = async function () {
 
   URL.revokeObjectURL(url);
 };
-/* ================= CREATE EVENT ================= */
 window.createNewEvent = async function () {
 
   const title =
@@ -1028,6 +1005,5 @@ document
   }
 };
 
-/* ================= INIT ================= */
 fillAllDefaults();
 updatePreview();

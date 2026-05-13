@@ -37,9 +37,7 @@ body::before{
   z-index:0;
 }
 
-/* =====================================================
-   TYPOGRAPHY
-===================================================== */
+
 
 h1,h2,h3{
   font-family:'Playfair Display',serif;
@@ -51,9 +49,7 @@ p{
   line-height:1.6;
 }
 
-/* =====================================================
-   TOPBAR
-===================================================== */
+
 
 .topbar{
   position:fixed;
@@ -79,9 +75,7 @@ p{
   border-bottom:1px solid rgba(180,138,67,.12);
 }
 
-/* =====================================================
-   LANDING PAGE
-===================================================== */
+
 
 .center-wrapper{
   min-height:100vh;
@@ -128,9 +122,7 @@ p{
   font-weight:600;
 }
 
-/* =====================================================
-   INPUT
-===================================================== */
+
 
 input[type="text"],
 input[type="password"],
@@ -155,9 +147,7 @@ textarea{
   min-height:100px;
 }
 
-/* =====================================================
-   BUTTONS
-===================================================== */
+
 
 button,
 .btn-primary{
@@ -205,9 +195,7 @@ button:active,
   color:#fff;
 }
 
-/* =====================================================
-   FLOATING BUBBLES
-===================================================== */
+
 
 .floating-container{
   position:fixed;
@@ -233,15 +221,13 @@ button:active,
     0 0 22px rgba(212,176,106,.20);
 }
 
-/* =====================================================
-   APP
-===================================================== */
+
 
 .app{
   padding-bottom:85px;
 }
 
-/* screens */
+
 .screen{
   display:none;
   padding:80px 10px 90px;
@@ -251,9 +237,7 @@ button:active,
   display:block;
 }
 
-/* =====================================================
-   GLASS SECTIONS
-===================================================== */
+
 
 .feed-header,
 .profile-header,
@@ -280,9 +264,7 @@ button:active,
   margin-top:4px;
 }
 
-/* =====================================================
-   FEED / GALLERY GRID
-===================================================== */
+
 
 .feed.grid,
 #gallery{
@@ -308,9 +290,7 @@ button:active,
   transform:scale(.96);
 }
 
-/* =====================================================
-   UPLOAD
-===================================================== */
+
 
 .upload-actions{
   display:flex;
@@ -363,9 +343,6 @@ button:active,
   backdrop-filter:blur(14px);
 }
 
-/* =====================================================
-   NAVBAR
-===================================================== */
 
 .navbar,
 .admin-navbar{
@@ -424,9 +401,7 @@ button:active,
   box-shadow:0 0 10px rgba(180,138,67,.55);
 }
 
-/* =====================================================
-   MODALS
-===================================================== */
+
 
 .modal{
   display:none;
@@ -478,9 +453,7 @@ button:active,
   margin-top:10px;
 }
 
-/* =====================================================
-   ADMIN
-===================================================== */
+
 
 .admin-stats{
   display:flex;
@@ -533,9 +506,7 @@ button:active,
   opacity:.45;
 }
 
-/* =====================================================
-   DEDICATIONS
-===================================================== */
+
 
 #dedicationsList{
   display:flex;
@@ -563,9 +534,7 @@ button:active,
   font-weight:600;
 }
 
-/* =====================================================
-   TABS
-===================================================== */
+
 
 .tab-content{
   display:none;
@@ -575,9 +544,6 @@ button:active,
   display:block;
 }
 
-/* =====================================================
-   SLIDESHOW
-===================================================== */
 
 #slideshowOverlay{
   position:fixed;
@@ -614,9 +580,7 @@ button:active,
   opacity:.9;
 }
 
-/* =====================================================
-   TOAST
-===================================================== */
+
 
 #toast{
   position:fixed;
@@ -650,9 +614,7 @@ button:active,
   opacity:1;
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+
 
 @media (max-width:380px){
 
@@ -852,12 +814,7 @@ body.fullscreen-open{
   height: 100%;
   object-fit: cover;
 }
-/* =====================================================
-   PREMIUM THEME SYSTEM
-   index + app
-===================================================== */
 
-/* BASE TOKENS */
 body {
   --bg-main: linear-gradient(135deg, #ffffff, #fcfaf6);
   --bg-card: rgba(255,255,255,.78);
@@ -880,11 +837,7 @@ body {
   --icon-active: brightness(0) saturate(100%) invert(56%) sepia(34%) saturate(594%) hue-rotate(9deg) brightness(92%) contrast(90%);
 }
 
-/* =====================================================
-   THEME TOKENS
-===================================================== */
 
-/* 👶 KRŠTENJE — baby / spiritual / soft */
 body.theme-krstenje {
   --bg-main:
     radial-gradient(circle at 20% 15%, rgba(255,255,255,.95), transparent 24%),
@@ -911,7 +864,7 @@ body.theme-krstenje {
   --icon-active: brightness(0) saturate(100%) invert(66%) sepia(38%) saturate(706%) hue-rotate(176deg) brightness(95%);
 }
 
-/* 💍 SVADBA — romantic / sweet / elegant */
+
 body.theme-svadba {
   --bg-main:
     radial-gradient(circle at 18% 18%, rgba(255,255,255,.9), transparent 23%),
@@ -938,7 +891,7 @@ body.theme-svadba {
   --icon-active: brightness(0) saturate(100%) invert(54%) sepia(49%) saturate(689%) hue-rotate(300deg) brightness(96%);
 }
 
-/* 🎂 ROĐENDAN — universal / fun / modern */
+
 body.theme-rodendan {
   --bg-main:
     radial-gradient(circle at 15% 20%, rgba(255,255,255,.9), transparent 22%),
@@ -965,7 +918,7 @@ body.theme-rodendan {
   --icon-active: brightness(0) saturate(100%) invert(44%) sepia(67%) saturate(913%) hue-rotate(216deg) brightness(96%);
 }
 
-/* ✝️ PRIČEST — calm / holy / elegant */
+
 body.theme-pricest {
   --bg-main:
     radial-gradient(circle at 18% 18%, rgba(255,255,255,.92), transparent 22%),
@@ -992,7 +945,7 @@ body.theme-pricest {
   --icon-active: brightness(0) saturate(100%) invert(42%) sepia(42%) saturate(993%) hue-rotate(226deg) brightness(95%);
 }
 
-/* 🎉 PARTY — dark / neon / high contrast */
+
 body.theme-party {
   --bg-main:
     radial-gradient(circle at 12% 18%, rgba(255,64,129,.18), transparent 25%),
@@ -1019,9 +972,7 @@ body.theme-party {
   --icon-active: brightness(0) saturate(100%) invert(45%) sepia(89%) saturate(2455%) hue-rotate(315deg) brightness(105%);
 }
 
-/* =====================================================
-   GLOBAL APPLICATION OF TOKENS
-===================================================== */
+
 
 body {
   background: var(--bg-main) !important;
@@ -1043,7 +994,7 @@ body.theme-party::before {
   opacity: 1;
 }
 
-/* TITLES */
+
 h1, h2, h3,
 .glass-card h1,
 .feed-header h2,
@@ -1064,7 +1015,6 @@ p,
   color: var(--text-soft) !important;
 }
 
-/* TOPBAR */
 .topbar {
   background: var(--topbar-bg) !important;
   color: var(--title) !important;
@@ -1072,7 +1022,7 @@ p,
   box-shadow: 0 6px 26px rgba(0,0,0,.04);
 }
 
-/* CARDS */
+
 .glass,
 .glass-card,
 .feed-header,
@@ -1097,7 +1047,6 @@ p,
   backdrop-filter: blur(18px);
 }
 
-/* PARTY contrast cards */
 body.theme-party .glass,
 body.theme-party .glass-card,
 body.theme-party .feed-header,
@@ -1113,7 +1062,6 @@ body.theme-party .delete-box {
     inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
 
-/* INPUTS */
 input[type="text"],
 input[type="password"],
 select,
@@ -1139,7 +1087,7 @@ select:focus {
     0 0 22px var(--accent-glow) !important;
 }
 
-/* BUTTONS */
+
 button,
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important;
@@ -1166,7 +1114,7 @@ button:active,
   background: linear-gradient(135deg, #ff7070, #e24f4f) !important;
 }
 
-/* LIVE STATS */
+
 .live-stats div {
   background: var(--bg-soft) !important;
   color: var(--title) !important;
@@ -1181,7 +1129,7 @@ body.theme-party .live-stats div {
   background: rgba(255,255,255,.10) !important;
 }
 
-/* UPLOAD CARDS */
+
 .upload-text {
   color: var(--title) !important;
 }
@@ -1200,7 +1148,7 @@ body.theme-party .live-stats div {
   pointer-events: none;
 }
 
-/* FEED / GALLERY */
+
 .feed-card img,
 #gallery img,
 .photo-card img {
@@ -1217,7 +1165,7 @@ body.theme-party #gallery img {
     0 0 18px rgba(255,64,129,.18);
 }
 
-/* LIKE BOX */
+
 .like-box {
   background: rgba(0,0,0,.55) !important;
   color: #fff !important;
@@ -1230,7 +1178,7 @@ body:not(.theme-party) .like-box {
   border: 1px solid var(--accent-soft);
 }
 
-/* NAVBAR */
+
 .navbar,
 .admin-navbar {
   background: var(--navbar-bg) !important;
@@ -1240,7 +1188,7 @@ body:not(.theme-party) .like-box {
     0 0 24px var(--accent-soft);
 }
 
-/* NAV ICONS */
+
 .nav-item img,
 .admin-nav-item img {
   opacity: .46;
@@ -1261,7 +1209,7 @@ body:not(.theme-party) .like-box {
   box-shadow: 0 0 14px var(--accent-glow) !important;
 }
 
-/* BUBBLES */
+
 .bubble {
   border: 2px solid var(--accent-soft) !important;
   box-shadow:
@@ -1283,7 +1231,7 @@ body:not(.theme-party) .like-box {
   }
 }
 
-/* TOAST */
+
 
 body.theme-party #toast {
   background: rgba(255,255,255,.12) !important;
@@ -1291,7 +1239,6 @@ body.theme-party #toast {
   border: 1px solid var(--accent-soft);
 }
 
-/* SKELETON */
 .skeleton-card {
   background: var(--bg-soft) !important;
 }
@@ -1305,9 +1252,7 @@ body.theme-party #toast {
   ) !important;
 }
 
-/* =====================================================
-   MICRO ANIMATIONS
-===================================================== */
+
 
 .glass-card,
 .feed-header,
@@ -1329,7 +1274,7 @@ body.theme-party #toast {
   }
 }
 
-/* SVADBA - subtle romantic breathing */
+
 body.theme-svadba .glass,
 body.theme-svadba .glass-card {
   animation: cardEnter .38s ease both, romanticGlow 5s ease-in-out infinite;
@@ -1340,7 +1285,6 @@ body.theme-svadba .glass-card {
   50% { box-shadow: 0 18px 42px rgba(0,0,0,.06), 0 0 38px rgba(216,107,140,.26); }
 }
 
-/* ROĐENDAN - confetti dots */
 body.theme-rodendan::after {
   content: "";
   position: fixed;
@@ -1361,7 +1305,7 @@ body.theme-rodendan::after {
   to { background-position: 0 120px, 80px 160px, -60px 120px; }
 }
 
-/* PARTY - neon pulse */
+
 body.theme-party .topbar,
 body.theme-party .navbar {
   box-shadow:
@@ -1378,7 +1322,6 @@ body.theme-party .btn-primary {
   50% { box-shadow: 0 0 32px rgba(255,64,129,.75); }
 }
 
-/* KRŠTENJE / PRIČEST - gentle calm feel */
 body.theme-krstenje .glass,
 body.theme-pricest .glass {
   animation: cardEnter .38s ease both, calmFloat 6s ease-in-out infinite;
@@ -1389,7 +1332,7 @@ body.theme-pricest .glass {
   50% { transform: translateY(-2px); }
 }
 
-/* MOBILE: keep it crisp */
+
 @media (max-width: 480px) {
   .topbar {
     height: 58px;
@@ -1556,9 +1499,6 @@ body.theme-pricest .glass {
   font-size:20px;
   font-weight:800;
 }
-/* =====================================================
-   ADMIN SLIDESHOW — FINAL POLISH
-===================================================== */
 
 body.slideshow-open{
   overflow:hidden !important;
@@ -1584,7 +1524,7 @@ body.slideshow-open{
   overflow:hidden !important;
 }
 
-/* drži sliku pod kontrolom */
+
 .slideshow-image-wrap{
   width:100vw;
   height:100vh;
@@ -1598,7 +1538,7 @@ body.slideshow-open{
   pointer-events:none;
 }
 
-/* najbitniji dio — slika se NE rasteže agresivno */
+
 #slideshowImage{
   display:block;
 
@@ -1631,7 +1571,6 @@ body.slideshow-open{
   transform:scale(1);
 }
 
-/* X gumb — neutralan, ne zlatan */
 .slideshow-close{
   position:absolute !important;
   top:18px !important;
@@ -1683,12 +1622,12 @@ body.slideshow-open{
   transform:scale(.94) !important;
 }
 
-/* brojač sakriven — nepotreban */
+
 #slideshowCounter{
   display:none !important;
 }
 
-/* autor slike — diskretno */
+
 #slideshowCaption{
   position:absolute !important;
   left:50% !important;
@@ -1720,7 +1659,7 @@ body.slideshow-open{
   text-overflow:ellipsis;
 }
 
-/* loading poruka */
+
 #slideshowLoading{
   position:absolute !important;
   inset:0 !important;
@@ -1737,7 +1676,7 @@ body.slideshow-open{
   pointer-events:none;
 }
 
-/* mobiteli */
+
 @media(max-width:700px){
   .slideshow-image-wrap{
     padding:54px 14px 76px;
@@ -1763,10 +1702,6 @@ body.slideshow-open{
     max-width:90vw;
   }
 }
-/* =====================================================
-   ADMIN PANEL — COMPACT ACTION LAYOUT
-   staviti NA KRAJ style.css
-===================================================== */
 
 body:has(#adminTopbar) .admin-header{
   padding:18px 16px !important;
@@ -1783,7 +1718,7 @@ body:has(#adminTopbar) .admin-header p{
   margin-top:4px !important;
 }
 
-/* stats ostaju mali */
+
 body:has(#adminTopbar) .admin-stats{
   grid-template-columns:1fr 1fr !important;
   gap:10px !important;
@@ -1795,7 +1730,7 @@ body:has(#adminTopbar) .admin-stats > div{
   border-radius:17px !important;
 }
 
-/* cijeli action dio kao kompaktni 3 stupca */
+
 body:has(#adminTopbar) .admin-actions-grid{
   display:grid !important;
   grid-template-columns:repeat(3, 1fr) !important;
@@ -1805,12 +1740,12 @@ body:has(#adminTopbar) .admin-actions-grid{
   padding:0 !important;
 }
 
-/* prvi div s 4 gumba prestaje biti vertikalni stupac */
+
 body:has(#adminTopbar) .admin-actions-grid > div:first-child{
   display:contents !important;
 }
 
-/* sva 4 action gumba */
+
 body:has(#adminTopbar) .admin-actions-grid > div:first-child button{
   height:42px !important;
 
@@ -1841,7 +1776,7 @@ body:has(#adminTopbar) .admin-actions-grid > div:first-child button{
     inset 0 1px 0 rgba(255,255,255,.65) !important;
 }
 
-/* slideshow/postavke postaju isti mali gumbi kao ostali */
+
 body:has(#adminTopbar) .admin-card{
   min-height:42px !important;
   height:42px !important;
@@ -1879,7 +1814,7 @@ body:has(#adminTopbar) .admin-card span{
   line-height:1.1 !important;
 }
 
-/* filteri još kompaktniji */
+
 body:has(#adminTopbar) .admin-filters{
   gap:8px !important;
   margin:0 0 10px !important;
@@ -1891,13 +1826,11 @@ body:has(#adminTopbar) .admin-filters button{
   font-size:12.5px !important;
 }
 
-/* galerija ide odmah ispod */
 body:has(#adminTopbar) #gallery{
   margin-top:0 !important;
   padding-top:0 !important;
 }
 
-/* mobitel — i dalje 3 u redu, ali malo sitnije */
 @media(max-width:420px){
   body:has(#adminTopbar) .admin-actions-grid{
     gap:7px !important;

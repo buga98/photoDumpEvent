@@ -6,7 +6,6 @@ let currentEventId =
   window.location.href = "/";
 }
 
-/* ===== FIREBASE ===== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 
 import {
@@ -49,7 +48,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-/* ===== THEME / EVENT BOOT ===== */
 const THEME_CLASSES = [
   "theme-svadba",
   "theme-rodendan",
@@ -76,14 +74,8 @@ function getTitleWithEmoji(title, type) {
 function applyEvent(event) {
   if (!event) return;
 window.eventData = event;
-  // ==============================
-  // 🎨 THEME
-  // ==============================
   setTheme(event.type);
 
-  // ==============================
-  // 🌐 TITLE
-  // ==============================
   document.title = event.title + " | PhotoDump";
 
   const eventTitle = document.getElementById("eventTitle");
@@ -91,9 +83,6 @@ window.eventData = event;
     eventTitle.innerText = getTitleWithEmoji(event.title, event.type);
   }
 
-  // ==============================
-  // 🧠 DEFAULT TEXTS (fallback)
-  // ==============================
   const defaults = {
     home_title: "Galerija uspomena 🤍",
     home_subtitle: "Svaka fotografija postaje dio uspomena",
@@ -105,9 +94,6 @@ window.eventData = event;
     profile_subtitle: "Ovdje su tvoje fotografije"
   };
 
-  // ==============================
-  // 📥 TEXTS IZ BAZE
-  // ==============================
   const homeTitle =
     event.texts?.index?.title || defaults.home_title;
 
@@ -123,32 +109,22 @@ window.eventData = event;
   const profileSubtitle =
     event.texts?.profile?.subtitle || defaults.profile_subtitle;
 
-  // ==============================
-  // 🖥️ UI UPDATE
-  // ==============================
-
-  // HOME
   const homeTitleEl = document.getElementById("homeTitle");
   const homeSubtitleEl = document.getElementById("homeSubtitle");
 
   if (homeTitleEl) homeTitleEl.innerText = homeTitle;
   if (homeSubtitleEl) homeSubtitleEl.innerText = homeSubtitle;
 
-  // UPLOAD
   const uploadTitleEl = document.getElementById("uploadTitle");
   const uploadSubtitleEl = document.getElementById("uploadSubtitle");
 
   if (uploadTitleEl) uploadTitleEl.innerText = uploadTitle;
   if (uploadSubtitleEl) uploadSubtitleEl.innerText = uploadSubtitle;
 
-  // PROFILE
   const profileSubtitleEl = document.getElementById("profileSubtitle");
 
   if (profileSubtitleEl) profileSubtitleEl.innerText = profileSubtitle;
 
-  // ==============================
-  // 💾 SAVE
-  // ==============================
   localStorage.setItem("eventId", currentEventId);
 
   console.log("✅ App texts applied");
@@ -160,7 +136,6 @@ function bootEventFromCache() {
 
   try {
     const event = JSON.parse(cached);
-    // 🔥 EXPIRED EVENT
 if (
   event.expiresAt &&
   Date.now() > event.expiresAt
@@ -196,7 +171,6 @@ async function loadEventDataFallback() {
   }
 
   const event = snap.data();
-// 🔥 EXPIRED EVENT
 if (
   event.expiresAt &&
   Date.now() > event.expiresAt
@@ -213,7 +187,6 @@ if (
   return true;
 }
 
-/* ===== LIVE FEED ===== */
 const FEED_PAGE_SIZE = 18;
 const likedCache = new Set(
   JSON.parse(localStorage.getItem("likedPhotos_" + currentEventId) || "[]")
@@ -254,7 +227,6 @@ function loadFeed() {
 
   feedStarted = true;
 
-  // 🔥 pokaži skeleton
   renderFeedSkeleton();
 
   const firstQuery = query(
@@ -267,23 +239,19 @@ function loadFeed() {
   onSnapshot(
     firstQuery,
 
-    // ✅ SUCCESS
     (snapshot) => {
 
-      // 🔥 makni skeleton samo prvi put
       if (feed.dataset.loaded !== "true") {
         feed.innerHTML = "";
         feed.dataset.loaded = "true";
       }
 
-      // 🔥 AKO NEMA SLIKA
 const visibleDocs = snapshot.docs.filter(
   d => d.data().visible !== false
 );
 
 if (visibleDocs.length === 0) {
 
-  // 🔥 SAMO ako još ništa nije renderirano
   if (renderedPhotos.size === 0) {
 
     feed.innerHTML = `
@@ -301,19 +269,15 @@ if (visibleDocs.length === 0) {
   return;
 }
 
-      // 🔥 pagination pointer
       lastVisiblePhoto = snapshot.docs[snapshot.docs.length - 1];
 
-      // 🔥 render promjena
       snapshot.docChanges().forEach((change) => {
         renderFeedChange(change, feed, true);
       });
 
-      // 🔥 infinite scroll
       createFeedObserver(feed);
     },
 
-    // ❌ ERROR HANDLER (NAJBITNIJE)
     (error) => {
       console.error("🔥 Feed error:", error);
 
@@ -337,7 +301,6 @@ function renderFeedChange(change, feed, isLiveTop = false) {
   const docSnap = change.doc;
   const photoId = docSnap.id;
 
-  // 🔥 REMOVED
   if (change.type === "removed") {
 
     const existing =
@@ -353,7 +316,6 @@ function renderFeedChange(change, feed, isLiveTop = false) {
 
   const data = docSnap.data();
 
-  // 🔥 HIDDEN
   if (data.visible === false) {
 
     const existing =
@@ -367,7 +329,6 @@ function renderFeedChange(change, feed, isLiveTop = false) {
     return;
   }
 
-  // 🔥 MODIFIED
   if (change.type === "modified") {
 
     const existing =
@@ -393,10 +354,8 @@ function renderFeedChange(change, feed, isLiveTop = false) {
     return;
   }
 
-  // 🔥 ALREADY EXISTS
   if (renderedPhotos.has(photoId)) return;
 
-  // 🔥 CREATE
   const card =
     createFeedCard(photoId, data);
 
@@ -619,7 +578,6 @@ function showBigHeart(parent) {
   }, 900);
 }
 
-/* ===== IMAGE RESIZE ===== */
 async function resizeImage(file, maxWidth, quality) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -659,10 +617,8 @@ async function resizeImage(file, maxWidth, quality) {
   });
 }
 
-/* ===== UPLOAD ===== */
 window.uploadToFirebase = function (file, user, onProgress) {
   return new Promise(async (resolve, reject) => {
-    // 🔥 PROVJERA LIMITA
 const eventSnap = await getDoc(
   doc(db, "events", currentEventId)
 );
@@ -673,7 +629,6 @@ if (!eventSnap.exists()) {
 }
 
 const eventData = eventSnap.data();
-// 🔥 EXPIRED EVENT
 if (
   eventData.expiresAt &&
   Date.now() > eventData.expiresAt
@@ -708,7 +663,6 @@ if (
         `events/${currentEventId}/thumbs/${timestamp}_${safeName}`
       );
 
-      // 🔥 upload glavne slike
       const uploadTask = uploadBytesResumable(bigRef, bigFile);
 
       uploadTask.on(
@@ -724,11 +678,9 @@ if (
           try {
             const imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
-            // 🔥 upload thumbnail
             await uploadBytesResumable(thumbRef, thumbFile);
             const thumbUrl = await getDownloadURL(thumbRef);
 
-            // 🔥 ORIGINAL (samo ako je uključeno)
             if (window.eventData?.allowOriginals) {
               const originalRef = ref(
                 storage,
@@ -738,12 +690,10 @@ if (
               await uploadBytesResumable(originalRef, file);
             }
 
-            // 🔥 zapis u bazu
 await addDoc(collection(db, "events", currentEventId, "photos"), {
   imageUrl,
   thumbUrl,
 
-  // 🔥 STORAGE PATHS
   path: uploadTask.snapshot.ref.fullPath,
   thumbPath: thumbRef.fullPath,
 
@@ -760,7 +710,6 @@ await addDoc(collection(db, "events", currentEventId, "photos"), {
   visible: true
 });
 
-            // 🔥 stats
 await updateDoc(doc(db, "events", currentEventId), {
   photoCount: increment(1)
 });
@@ -809,7 +758,6 @@ const task = uploadToFirebase(file, user, (percent) => {
 })
 .catch((err) => {
 
-  // 🔥 EVENT EXPIRED
   if (err === "EVENT_EXPIRED") {
     progress.remove();
     wrapper.remove();
@@ -818,7 +766,6 @@ const task = uploadToFirebase(file, user, (percent) => {
     return;
   }
 
-  // 🔥 LIMIT
   if (err === "UPLOAD_LIMIT") {
     progress.remove();
     wrapper.remove();
@@ -827,7 +774,6 @@ const task = uploadToFirebase(file, user, (percent) => {
     return;
   }
 
-  // 🔥 EVENT NOT FOUND
   if (err === "EVENT_NOT_FOUND") {
     progress.remove();
     wrapper.remove();
@@ -836,7 +782,6 @@ const task = uploadToFirebase(file, user, (percent) => {
     return;
   }
 
-  // 🔥 OFFLINE / NETWORK
   let pending = JSON.parse(
     localStorage.getItem("pendingUploads") || "[]"
   );
@@ -864,7 +809,6 @@ uploads.push(task);
   showToast("Upload završen 🤍");
 };
 
-/* ===== DELETE ===== */
 let selectedPhotoId = null;
 
 window.confirmDelete = async function () {
@@ -879,21 +823,18 @@ const data = snap.exists()
 if (data) {
   try {
 
-    // 🔥 MAIN IMAGE
     if (data.path) {
       await deleteObject(
         ref(storage, data.path)
       );
     }
 
-    // 🔥 THUMB
     if (data.thumbPath) {
       await deleteObject(
         ref(storage, data.thumbPath)
       );
     }
 
-    // 🔥 ORIGINAL
     if (data.originalPath) {
       await deleteObject(
         ref(storage, data.originalPath)
@@ -925,7 +866,6 @@ window.closeDelete = function () {
   document.getElementById("deleteModal").style.display = "none";
 };
 
-/* ===== NAVIGATION ===== */
 window.switchScreen = function (screen) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
@@ -947,7 +887,6 @@ window.switchScreen = function (screen) {
   }
 };
 
-/* ===== DEDICATION ===== */
 window.saveDedication = async function () {
   const text = document.getElementById("dedicationText").value.trim();
   const name = localStorage.getItem("name");
@@ -971,7 +910,6 @@ await updateDoc(doc(db, "events", currentEventId), {
   showToast("🤍 Hvala na lijepim riječima");
 };
 
-/* ===== PROFILE ===== */
 window.loadMyImages = async function () {
   const gallery = document.getElementById("gallery");
   const name = localStorage.getItem("name");
@@ -1034,7 +972,6 @@ window.loadMyImages = async function () {
       "<p style='grid-column:1/-1;'>Greška pri učitavanju</p>";
   }
 };
-/* ===== SECRET ADMIN BUTTON ===== */
 
 const secretBtn =
   document.getElementById("secretAdminBtn");
@@ -1057,7 +994,6 @@ if (secretBtn) {
     }
   };
 }
-/* ===== LIVE COUNTERS ===== */
 function loadLiveCounters() {
   const photoEl = document.getElementById("livePhotoCount");
   const dedicationEl = document.getElementById("liveDedicationCount");
@@ -1065,19 +1001,16 @@ function loadLiveCounters() {
 
   if (!photoEl || !dedicationEl || !currentEventId) return;
 
-  // 🔥 EVENT STATS
   const statsRef = doc(db, "events", currentEventId);
 
   onSnapshot(
     statsRef,
 
-    // ✅ SUCCESS
     (snap) => {
       if (!snap.exists()) return;
 
       const data = snap.data();
 
-      // 🔥 EVENT COUNTERS
       photoEl.innerText = data.photoCount || 0;
       dedicationEl.innerText = data.dedicationCount || 0;
 
@@ -1086,14 +1019,12 @@ function loadLiveCounters() {
       }
     },
 
-    // ❌ ERROR
     (err) => {
       console.error("Live counter error:", err);
     }
   );
 }
 
-/* ===== FULLSCREEN ===== */
 function openFullscreen(url, startIndex = null) {
   if (document.querySelector(".admin-fullscreen")) return;
 
@@ -1194,7 +1125,6 @@ function openFullscreen(url, startIndex = null) {
   render();
 }
 
-/* ===== ADMIN LOGIN ===== */
 window.checkAdmin = function () {
   const pass = document.getElementById("adminPass")?.value;
 
@@ -1206,7 +1136,6 @@ window.checkAdmin = function () {
   }
 };
 
-/* ===== TOAST ===== */
 function showToast(message) {
   const toast = document.getElementById("toast");
   if (!toast) return;
@@ -1216,14 +1145,12 @@ function showToast(message) {
 
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
-/* ===== USER ID FIX ===== */
 if (!localStorage.getItem("userId")) {
   localStorage.setItem(
     "userId",
     crypto.randomUUID()
   );
 }
-/* ===== USER ===== */
 const user = localStorage.getItem("name");
 const welcomeEl = document.getElementById("welcome");
 
@@ -1236,7 +1163,6 @@ if (user && welcomeEl) {
   welcomeEl.innerText = "Pozdrav, " + user;
 }
 
-/* ===== INIT ===== */
 async function initApp() {
   const booted = bootEventFromCache();
 

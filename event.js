@@ -1,15 +1,9 @@
-// ==============================
-// ⚡ PERFORMANCE TIMER
-// ==============================
 const t0 = performance.now();
 function logTime(label) {
   const t = (performance.now() - t0).toFixed(1);
   console.log(`⏱️ ${label}: ${t}ms`);
 }
 
-// ==============================
-// 🔗 EVENT ID
-// ==============================
 const eventIdFromUrl =
   new URLSearchParams(location.search).get("event");
 
@@ -21,23 +15,14 @@ if (eventIdFromUrl) {
   localStorage.setItem("eventId", eventIdFromUrl);
 }
 
-// ==============================
 // 🌍 GLOBAL STATE
-// ==============================
 let eventData = null;
 
-// ==============================
-// 🎯 ELEMENTI
-// ==============================
 const titleEl = document.getElementById("eventTitle");
 const headingEl = document.getElementById("eventHeading");
 const subtitleEl = document.getElementById("eventSubtitle");
 const container = document.querySelector(".floating-container");
 
-
-// ==============================
-// 🚪 ENTER APP
-// ==============================
 window.enterApp = function () {
   const nameInput = document.getElementById("name");
   const name = nameInput ? nameInput.value.trim() : "";
@@ -69,9 +54,6 @@ window.enterApp = function () {
   window.location.href =
     "/app.html?event=" + encodeURIComponent(activeEventId);
 };
-// ==============================
-// 🧠 SUBTITLE
-// ==============================
 function getSubtitle(type) {
   switch(type) {
     case "svadba": return "Dobrodošli na našu svadbu 💍";
@@ -83,9 +65,6 @@ function getSubtitle(type) {
   }
 }
 
-// ==============================
-// 🫧 BUBBLES
-// ==============================
 let bubblesRendered = false;
 
 function renderBubbles(images) {
@@ -136,9 +115,6 @@ function formatText(text) {
     .map(line => line ? `<p>${line}</p>` : `<br>`)
     .join("");
 }
-// ==============================
-// 🎨 APPLY EVENT (centralno)
-// ==============================
 function applyEvent(event) {
   if (!event) return;
 
@@ -158,9 +134,6 @@ if (enterBtn) {
   enterBtn.style.display = "";
   enterBtn.disabled = false;
 }
-  // ==============================
-  // 🎨 THEME
-  // ==============================
   document.body.classList.remove(
     "theme-svadba",
     "theme-rodendan",
@@ -173,42 +146,26 @@ if (enterBtn) {
     document.body.classList.add("theme-" + event.type);
   }
 
-  // ==============================
-  // 🧠 FALLBACK TEXTS
-  // ==============================
 const defaultTexts = {
   index_title: event.title || "PhotoDump",
   index_subtitle: getSubtitle(event.type || "default")
 };
 
-  // ==============================
-  // 📝 INDEX TEKSTOVI (DB → fallback)
-  // ==============================
   const indexTitle =
     event.texts?.index?.title || defaultTexts.index_title;
 
   const indexSubtitle =
     event.texts?.index?.subtitle || defaultTexts.index_subtitle;
 
-  // ==============================
-  // 🖥️ UI UPDATE
-  // ==============================
   titleEl.innerText = event.title || "PhotoDump";
   headingEl.innerText = indexTitle;
 
-  // ⚠️ HTML jer ima enter (formatText!)
   subtitleEl.innerHTML = formatText(indexSubtitle);
 
-  // ==============================
-  // 🌐 TITLE (tab)
-  // ==============================
   document.title = (event.title || "PhotoDump") + " | PhotoDump";
 
-  // ==============================
-  // 🫧 BUBBLES
-  // ==============================
   if (event.bubbles && event.bubbles.length) {
-    bubblesRendered = false; // reset ako dolazi novi event
+    bubblesRendered = false;
     renderBubbles(event.bubbles);
   }
 
@@ -234,9 +191,6 @@ function renderNoEvent() {
     enterBtn.style.display = "none";
   }
 }
-// ==============================
-// ⚡ BOOT FROM CACHE
-// ==============================
 function bootFromCache() {
   if (!eventId) return false;
 
@@ -256,9 +210,6 @@ function bootFromCache() {
   }
 }
 
-// ==============================
-// 🚀 AUTO LOGIN
-// ==============================
 function tryAutoLogin() {
   const savedName = localStorage.getItem("name");
   const savedUserId = localStorage.getItem("userId");
@@ -273,9 +224,6 @@ function tryAutoLogin() {
   }
 }
 
-// ==============================
-// 🔵 FIREBASE (background sync)
-// ==============================
 async function fetchEvent() {
   if (!eventId) return;
 
@@ -301,10 +249,8 @@ if (!snap.exists()) {
 
     const event = snap.data();
 
-    // 🔥 cache update
     localStorage.setItem("eventData_" + eventId, JSON.stringify(event));
 
-    // 🔥 ako nije bilo cache-a → sad primijeni
     if (!eventData) {
       applyEvent(event);
     }
@@ -316,8 +262,6 @@ if (!snap.exists()) {
   }
 }
 
-// ==============================
-// 🥇 FALLBACK
 function renderFallback() {
   titleEl.innerText = "PhotoDump";
   headingEl.innerText = "Učitavanje eventa...";
@@ -341,9 +285,6 @@ function renderFallback() {
   }
 }
 
-// ==============================
-// 🚀 START
-// ==============================
 if (!eventId) {
   renderFallback();
 } else {
@@ -358,9 +299,6 @@ if (!eventId) {
   setTimeout(fetchEvent, 100);
 }
 
-// ==============================
-// ✅ FINAL
-// ==============================
 window.addEventListener("load", () => {
   document.body.classList.add("loaded");
   logTime("Page loaded");
@@ -393,7 +331,7 @@ window.closeAdminModal = function () {
 window.checkAdmin = function () {
   const pass = document.getElementById("adminPass").value;
 
-  if (pass === "1234") { // 🔥 TU STAVI SVOJU LOZINKU
+  if (pass === "1234") {
     window.location.href = "/admin.html?event=" + eventId;
   } else {
     alert("Kriva lozinka");
