@@ -1262,9 +1262,7 @@ window.downloadAllPhotos = async function () {
 
     alert(
       "ZIP je pripremljen.\n" +
-      `Preuzeto fotografija: ${downloaded}/${total}\n` +
-      `Originali: ${originalsUsed}\n` +
-      `Komprimirane: ${photosUsed}`
+      `Preuzeto fotografija: ${downloaded}/${total}\n` 
     );
 
   } catch (err) {
