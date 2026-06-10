@@ -825,29 +825,33 @@ window.confirmDelete = async function () {
     return;
   }
 
+  const photoIdToDelete = selectedPhotoId;
+
   try {
     await updateDoc(
-      doc(db, "events", currentEventId, "photos", selectedPhotoId),
+      doc(db, "events", currentEventId, "photos", photoIdToDelete),
       {
-        visible: false,
-        deletedByUser: true,
-        deletedAt: Date.now()
+        visible: false
       }
     );
 
-    await updateDoc(
-      doc(db, "events", currentEventId),
-      {
-        photoCount: increment(-1)
-      }
-    );
+    try {
+      await updateDoc(
+        doc(db, "events", currentEventId),
+        {
+          photoCount: increment(-1)
+        }
+      );
+    } catch (counterErr) {
+      console.warn("Photo counter update skipped:", counterErr);
+    }
 
     const feedCard =
-      renderedPhotos.get(selectedPhotoId);
+      renderedPhotos.get(photoIdToDelete);
 
     if (feedCard) {
       feedCard.remove();
-      renderedPhotos.delete(selectedPhotoId);
+      renderedPhotos.delete(photoIdToDelete);
     }
 
     if (selectedProfileImageEl) {
@@ -863,6 +867,12 @@ window.confirmDelete = async function () {
 
   } catch (err) {
     console.error("Delete photo error:", err);
+
+    if (err.code === "permission-denied") {
+      showToast("Nemaš dozvolu za brisanje ove fotografije 😕");
+      return;
+    }
+
     showToast("Greška kod brisanja fotografije 😕");
   }
 };
