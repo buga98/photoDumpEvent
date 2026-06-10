@@ -1057,11 +1057,30 @@ function openFullscreen(url, startIndex = null) {
   const full = document.createElement("div");
   full.className = "admin-fullscreen";
 
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "fullscreen-close-btn";
+  closeBtn.type = "button";
+  closeBtn.innerText = "×";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "fullscreen-nav-btn fullscreen-prev-btn";
+  prevBtn.type = "button";
+  prevBtn.innerText = "‹";
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "fullscreen-nav-btn fullscreen-next-btn";
+  nextBtn.type = "button";
+  nextBtn.innerText = "›";
+
   const img = document.createElement("img");
   img.className = "admin-fullscreen-img";
   img.src = "";
 
   full.appendChild(img);
+  full.appendChild(closeBtn);
+  full.appendChild(prevBtn);
+  full.appendChild(nextBtn);
+
   document.body.appendChild(full);
   document.body.classList.add("fullscreen-open");
 
@@ -1070,6 +1089,8 @@ function openFullscreen(url, startIndex = null) {
 
   if (!photos.length) {
     img.src = url;
+    prevBtn.style.display = "none";
+    nextBtn.style.display = "none";
   } else {
     const currentId = [...renderedPhotos.entries()]
       .find(([id, el]) => el.dataset.full === url);
@@ -1085,6 +1106,11 @@ function openFullscreen(url, startIndex = null) {
   }
 
   function render() {
+    if (!photos.length) {
+      img.src = url;
+      return;
+    }
+
     const id = photos[index];
     if (!id) return;
 
@@ -1103,15 +1129,52 @@ function openFullscreen(url, startIndex = null) {
     newImg.src = card.dataset.full;
   }
 
+  function showPrev() {
+    if (!photos.length) return;
+
+    index =
+      (index - 1 + photos.length) % photos.length;
+
+    render();
+  }
+
+  function showNext() {
+    if (!photos.length) return;
+
+    index =
+      (index + 1) % photos.length;
+
+    render();
+  }
+
+  closeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeFullscreen();
+  });
+
+  prevBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showPrev();
+  });
+
+  nextBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showNext();
+  });
+
   let startX = 0;
   let startY = 0;
 
   full.addEventListener("touchstart", (e) => {
+    if (!e.touches.length) return;
+
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
   }, { passive: true });
 
   full.addEventListener("touchend", (e) => {
+    if (!e.changedTouches.length) return;
+
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
 
@@ -1123,30 +1186,37 @@ function openFullscreen(url, startIndex = null) {
 
     if (absX > absY && absX > 50) {
       if (diffX > 0) {
-        index = (index + 1) % photos.length;
+        showNext();
       } else {
-        index = (index - 1 + photos.length) % photos.length;
+        showPrev();
       }
 
-      render();
       return;
     }
+  }, { passive: true });
 
-    if (absY > absX && absY > 90) {
-      closeFullscreen();
-      return;
-    }
+  document.addEventListener(
+    "keydown",
+    function fullscreenKeyHandler(e) {
+      if (!document.body.classList.contains("fullscreen-open")) {
+        document.removeEventListener("keydown", fullscreenKeyHandler);
+        return;
+      }
 
-    if (absX < 10 && absY < 10) {
-      closeFullscreen();
-    }
-  });
+      if (e.key === "Escape") {
+        closeFullscreen();
+        document.removeEventListener("keydown", fullscreenKeyHandler);
+      }
 
-  full.addEventListener("click", (e) => {
-    if (e.target === full || e.target === img) {
-      closeFullscreen();
+      if (e.key === "ArrowLeft") {
+        showPrev();
+      }
+
+      if (e.key === "ArrowRight") {
+        showNext();
+      }
     }
-  });
+  );
 
   render();
 }
