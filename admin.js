@@ -15,6 +15,12 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
+import {
+  getStorage,
+  ref,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -26,6 +32,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 const currentEventId =
   new URLSearchParams(window.location.search).get("event");
@@ -1102,15 +1109,15 @@ window.downloadAllPhotos = async function () {
 
     let index = 1;
     let downloaded = 0;
-    const total = photosSnapshot.size;
+    let originalsUsed = 0;
+    let photosUsed = 0;
+
+    const total =
+      photosSnapshot.size;
 
     for (const docSnap of photosSnapshot.docs) {
-      const data = docSnap.data();
-
-      const imageUrl =
-        data.imageUrl || data.thumbUrl;
-
-      if (!imageUrl) continue;
+      const data =
+        docSnap.data();
 
       if (btn) {
         btn.innerHTML =
@@ -1118,9 +1125,45 @@ window.downloadAllPhotos = async function () {
           `<small>Preporučeno preko laptopa/računala</small>`;
       }
 
+      let downloadUrl = null;
+      let usedOriginal = false;
+
+      if (data.originalPath) {
+        try {
+          downloadUrl =
+            await getDownloadURL(
+              ref(storage, data.originalPath)
+            );
+
+          usedOriginal = true;
+
+        } catch (err) {
+          console.warn(
+            "Original nije dostupan, koristim komprimiranu fotografiju:",
+            docSnap.id,
+            err
+          );
+        }
+      }
+
+      if (!downloadUrl && data.imageUrl) {
+        downloadUrl =
+          data.imageUrl;
+
+        usedOriginal = false;
+      }
+
+      if (!downloadUrl) {
+        console.warn(
+          "Preskačem fotografiju bez URL-a:",
+          docSnap.id
+        );
+        continue;
+      }
+
       try {
         const response =
-          await fetch(imageUrl);
+          await fetch(downloadUrl);
 
         if (!response.ok) {
           console.warn(
@@ -1134,13 +1177,23 @@ window.downloadAllPhotos = async function () {
         const blob =
           await response.blob();
 
+        const extension =
+          getFileExtensionFromUrl(downloadUrl) || "jpg";
+
         const fileName =
           String(index).padStart(4, "0") +
           "-" +
           docSnap.id +
-          ".jpg";
+          "." +
+          extension;
 
         zip.file(fileName, blob);
+
+        if (usedOriginal) {
+          originalsUsed++;
+        } else {
+          photosUsed++;
+        }
 
         index++;
         downloaded++;
@@ -1208,7 +1261,10 @@ window.downloadAllPhotos = async function () {
     URL.revokeObjectURL(url);
 
     alert(
-      `ZIP je pripremljen.\nPreuzeto fotografija: ${downloaded}/${total}`
+      "ZIP je pripremljen.\n" +
+      `Preuzeto fotografija: ${downloaded}/${total}\n` +
+      `Originali: ${originalsUsed}\n` +
+      `Komprimirane: ${photosUsed}`
     );
 
   } catch (err) {
@@ -1221,6 +1277,31 @@ window.downloadAllPhotos = async function () {
     }
   }
 };
+function getFileExtensionFromUrl(url) {
+  try {
+    const cleanUrl =
+      decodeURIComponent(url.split("?")[0]);
+
+    const match =
+      cleanUrl.match(/\.([a-zA-Z0-9]+)$/);
+
+    if (!match) return null;
+
+    const ext =
+      match[1].toLowerCase();
+
+    if (
+      ["jpg", "jpeg", "png", "webp", "heic"].includes(ext)
+    ) {
+      return ext === "jpeg" ? "jpg" : ext;
+    }
+
+    return null;
+
+  } catch (err) {
+    return null;
+  }
+}
 
 loadEventInfo();
 loadAllImages();
