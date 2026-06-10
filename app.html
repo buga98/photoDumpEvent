@@ -83,15 +83,13 @@
 </div>
 
   
-  <div class="dedication-card-modern">
-    <textarea id="dedicationText" placeholder="Napiši posvetu"></textarea>
-  </div>
+<button class="btn-primary dedication-open-btn" onclick="openDedicationComposer()">
+  💌 Napiši posvetu
+</button>
 
-  <button class="btn-primary" onclick="saveDedication()">
-     Dodaj posvetu ✉
-  </button>
-
-</div>
+<p class="dedication-helper">
+  Posvetu vide mladenci ili organizator eventa.
+</p>
 
   
   <div id="profileTab" class="screen">
@@ -123,7 +121,41 @@
 
   </div>
 </div>
+<div id="dedicationComposerModal" class="modal">
+  <div class="dedication-modal-box">
 
+    <div class="dedication-modal-header">
+      <div>
+        <h3>Napiši posvetu 💌</h3>
+        <p>Posvete vide mladenci ili organizator eventa.</p>
+      </div>
+
+      <button
+        type="button"
+        class="modal-x-btn"
+        onclick="closeDedicationComposer()"
+      >
+        ×
+      </button>
+    </div>
+
+    <textarea
+      id="dedicationText"
+      placeholder="Napiši lijepu poruku, čestitku ili uspomenu..."
+    ></textarea>
+
+    <div class="dedication-modal-actions">
+      <button class="btn-primary" onclick="saveDedication()">
+        Pošalji posvetu ✉
+      </button>
+
+      <button class="btn-secondary" onclick="closeDedicationComposer()">
+        Odustani
+      </button>
+    </div>
+
+  </div>
+</div>
 <div class="navbar">
   <div class="nav-item active" onclick="switchScreen('home')">
     <img src="home.png">

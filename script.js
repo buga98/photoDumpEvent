@@ -907,8 +907,34 @@ await updateDoc(doc(db, "events", currentEventId), {
 });
 
   document.getElementById("dedicationText").value = "";
+  closeDedicationComposer();
   showToast("🤍 Hvala na lijepim riječima");
 };
+
+window.openDedicationComposer = function () {
+  const modal =
+    document.getElementById("dedicationComposerModal");
+
+  if (modal) {
+    modal.style.display = "flex";
+  }
+
+  setTimeout(() => {
+    document
+      .getElementById("dedicationText")
+      ?.focus();
+  }, 120);
+};
+
+window.closeDedicationComposer = function () {
+  const modal =
+    document.getElementById("dedicationComposerModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+};
+
 
 window.loadMyImages = async function () {
   const gallery = document.getElementById("gallery");
