@@ -2168,7 +2168,7 @@ body.fullscreen-open{
   overflow:hidden;
 
   overscroll-behavior:contain;
-  touch-action:none;
+   touch-action:pinch-zoom;
 }
 
 .admin-fullscreen-img{
@@ -2308,4 +2308,22 @@ body.fullscreen-open{
   .fullscreen-next-btn{
     right:8px;
   }
+}
+body.fullscreen-open{
+  overflow:hidden !important;
+  position:fixed !important;
+  width:100% !important;
+  height:100% !important;
+  touch-action:auto !important;
+}
+
+.admin-fullscreen{
+  touch-action:auto !important;
+}
+
+.admin-fullscreen-img{
+  touch-action:auto !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
 }
