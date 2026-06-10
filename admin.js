@@ -859,8 +859,13 @@ window.switchAdminScreen = function (screen) {
 };
 
 window.goBackFromAdmin = function () {
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+
   window.location.href =
-    "/pregled_event.html";
+    "/app.html?event=" + encodeURIComponent(currentEventId);
 };
 
 window.toggleSelectionMode = function () {
