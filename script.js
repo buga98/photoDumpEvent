@@ -1165,16 +1165,16 @@ function openFullscreen(url, startIndex = null) {
   let startX = 0;
   let startY = 0;
 
-  full.addEventListener("touchstart", (e) => {
-    if (!e.touches.length) return;
+full.addEventListener("touchstart", (e) => {
+  if (e.touches.length !== 1) return;
 
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-  }, { passive: true });
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+}, { passive: true });
 
   full.addEventListener("touchend", (e) => {
     if (!e.changedTouches.length) return;
-
+      if (e.touches && e.touches.length > 0) return;
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
 
