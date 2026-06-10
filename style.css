@@ -1931,3 +1931,104 @@ body:has(#adminTopbar) #photoAdminFilters.admin-hidden{
     text-align:center;
   }
 }
+.topbar-wrap{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:64px;
+  z-index:500;
+
+  display:grid;
+  grid-template-columns:44px 1fr 44px;
+  align-items:center;
+
+  padding:0 12px;
+
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--accent-soft);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+
+  box-shadow:0 6px 26px rgba(0,0,0,.04);
+}
+
+.topbar-wrap .topbar{
+  position:static !important;
+  width:auto !important;
+  height:auto !important;
+
+  grid-column:2;
+
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+
+  padding:0 !important;
+
+  text-align:center;
+  justify-content:center;
+
+  font-size:20px;
+  line-height:1.15;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+#secretAdminBtn{
+  grid-column:3;
+
+  width:40px !important;
+  height:40px !important;
+  min-width:40px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  justify-self:end;
+
+  border-radius:50% !important;
+
+  font-size:18px !important;
+
+  color:var(--title) !important;
+  background:var(--bg-card) !important;
+
+  border:1px solid var(--accent-soft) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.06),
+    0 0 16px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.5) !important;
+}
+
+#secretAdminBtn:active{
+  transform:scale(.94);
+}
+
+@media(max-width:420px){
+  .topbar-wrap{
+    height:60px;
+    grid-template-columns:38px 1fr 38px;
+    padding:0 10px;
+  }
+
+  .topbar-wrap .topbar{
+    font-size:17px;
+  }
+
+  #secretAdminBtn{
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    font-size:16px !important;
+  }
+}
