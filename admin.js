@@ -810,6 +810,12 @@ window.switchAdminScreen = function (screen) {
       el.classList.remove("active")
     );
 
+  const photoActions =
+    document.getElementById("photoAdminActions");
+
+  const photoFilters =
+    document.getElementById("photoAdminFilters");
+
   if (screen === "photos") {
     document
       .getElementById("adminPhotos")
@@ -818,6 +824,11 @@ window.switchAdminScreen = function (screen) {
     document
       .querySelectorAll(".admin-nav-item")[0]
       ?.classList.add("active");
+
+    photoActions?.classList.remove("admin-hidden");
+    photoFilters?.classList.remove("admin-hidden");
+
+    return;
   }
 
   if (screen === "dedications") {
@@ -828,7 +839,28 @@ window.switchAdminScreen = function (screen) {
     document
       .querySelectorAll(".admin-nav-item")[1]
       ?.classList.add("active");
+
+    photoActions?.classList.add("admin-hidden");
+    photoFilters?.classList.add("admin-hidden");
+
+    if (selectionMode) {
+      selectionMode = false;
+      selectedIds.clear();
+
+      document.body.classList.remove("select-mode");
+
+      document
+        .querySelectorAll(".photo-card")
+        .forEach((card) => {
+          card.classList.remove("selected");
+        });
+    }
   }
+};
+
+window.goBackFromAdmin = function () {
+  window.location.href =
+    "/pregled_event.html";
 };
 
 window.toggleSelectionMode = function () {

@@ -12,7 +12,15 @@
 <body>
 
 
-<div class="topbar" id="adminTopbar">✨ Admin panel</div>
+<div class="topbar admin-topbar-enhanced" id="adminTopbar">
+  <button class="admin-back-btn" onclick="goBackFromAdmin()">
+    ← Nazad
+  </button>
+
+  <span>✨ Admin panel</span>
+
+  <span class="admin-topbar-spacer"></span>
+</div>
 
 <div class="container">
 
@@ -29,7 +37,7 @@
   </div>
 
   
-  <div class="admin-actions-grid">
+  <div class="admin-actions-grid" id="photoAdminActions">
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
 
   <button onclick="toggleSelectionMode()">🟣 Odabir</button>
@@ -55,7 +63,7 @@
   </div>
 
   
-  <div class="admin-filters">
+  <div class="admin-filters" id="photoAdminFilters">
     <button onclick="filterPhotos('all')" class="active">Sve</button>
     <button onclick="filterPhotos('visible')">Vidljive</button>
     <button onclick="filterPhotos('hidden')">Skrivene</button>

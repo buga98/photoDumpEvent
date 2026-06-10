@@ -1852,3 +1852,82 @@ body:has(#adminTopbar) #gallery{
     font-size:22px !important;
   }
 }
+.admin-hidden{
+  display:none !important;
+}
+
+.admin-topbar-enhanced{
+  display:grid !important;
+  grid-template-columns:1fr auto 1fr !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:0 12px !important;
+}
+
+.admin-back-btn{
+  width:auto !important;
+  min-width:88px !important;
+  height:40px !important;
+
+  margin:0 !important;
+  padding:0 14px !important;
+
+  justify-self:start !important;
+
+  border-radius:999px !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+
+  font-size:13px !important;
+  font-weight:800 !important;
+
+  color:var(--title) !important;
+  background:rgba(255,255,255,.68) !important;
+
+  border:1px solid var(--accent-soft) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.05),
+    0 0 16px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+
+.admin-back-btn:active{
+  transform:scale(.96);
+}
+
+.admin-topbar-spacer{
+  justify-self:end;
+  width:88px;
+  height:1px;
+}
+
+body:has(#adminTopbar) #photoAdminActions.admin-hidden,
+body:has(#adminTopbar) #photoAdminFilters.admin-hidden{
+  display:none !important;
+}
+
+@media(max-width:420px){
+  .admin-topbar-enhanced{
+    grid-template-columns:auto 1fr auto !important;
+  }
+
+  .admin-back-btn{
+    min-width:auto !important;
+    height:36px !important;
+    padding:0 11px !important;
+    font-size:12px !important;
+  }
+
+  .admin-topbar-spacer{
+    width:36px;
+  }
+
+  .admin-topbar-enhanced span:nth-child(2){
+    font-size:17px;
+    text-align:center;
+  }
+}
