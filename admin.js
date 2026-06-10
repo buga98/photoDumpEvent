@@ -1057,10 +1057,169 @@ window.closeSettings = function () {
   }
 };
 
-window.downloadAllPhotos = function () {
-  alert(
-    "Za preuzimanje svih fotografija obratite se administratoru."
+window.downloadAllPhotos = async function () {
+  const btn =
+    document.getElementById("downloadZipBtn");
+
+  if (!window.JSZip) {
+    alert("ZIP alat nije učitan. Osvježi stranicu i pokušaj ponovno.");
+    return;
+  }
+
+  const confirmDownload = confirm(
+    "Preuzimanje ZIP datoteke može potrajati.\n\n" +
+    "Preporučeno preuzimanje preko laptopa/računala zbog veličine datoteke.\n\n" +
+    "Želiš nastaviti?"
   );
+
+  if (!confirmDownload) return;
+
+  const originalText =
+    btn ? btn.innerHTML : "";
+
+  try {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML =
+        "⏳ Pripremam fotografije...<br><small>Ovo može potrajati</small>";
+    }
+
+    const zip = new JSZip();
+
+    const photosSnapshot =
+      await getDocs(
+        query(
+          photosBaseRef(),
+          where("visible", "==", true),
+          orderBy("created", "desc")
+        )
+      );
+
+    if (photosSnapshot.empty) {
+      alert("Nema vidljivih fotografija za preuzimanje.");
+      return;
+    }
+
+    let index = 1;
+    let downloaded = 0;
+    const total = photosSnapshot.size;
+
+    for (const docSnap of photosSnapshot.docs) {
+      const data = docSnap.data();
+
+      const imageUrl =
+        data.imageUrl || data.thumbUrl;
+
+      if (!imageUrl) continue;
+
+      if (btn) {
+        btn.innerHTML =
+          `⏳ Preuzimam ${downloaded + 1}/${total}...<br>` +
+          `<small>Preporučeno preko laptopa/računala</small>`;
+      }
+
+      try {
+        const response =
+          await fetch(imageUrl);
+
+        if (!response.ok) {
+          console.warn(
+            "Preskačem fotografiju:",
+            docSnap.id,
+            response.status
+          );
+          continue;
+        }
+
+        const blob =
+          await response.blob();
+
+        const fileName =
+          String(index).padStart(4, "0") +
+          "-" +
+          docSnap.id +
+          ".jpg";
+
+        zip.file(fileName, blob);
+
+        index++;
+        downloaded++;
+
+      } catch (err) {
+        console.warn(
+          "Greška kod preuzimanja fotografije:",
+          docSnap.id,
+          err
+        );
+      }
+    }
+
+    if (downloaded === 0) {
+      alert("Nije moguće preuzeti fotografije.");
+      return;
+    }
+
+    if (btn) {
+      btn.innerHTML =
+        "📦 Stvaram ZIP datoteku...<br><small>Još malo</small>";
+    }
+
+    const zipBlob =
+      await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: {
+          level: 6
+        }
+      });
+
+    const eventSnap =
+      await getDoc(
+        doc(db, "events", currentEventId)
+      );
+
+    const eventTitle =
+      eventSnap.exists()
+        ? eventSnap.data().title || currentEventId
+        : currentEventId;
+
+    const safeTitle =
+      eventTitle
+        .toString()
+        .trim()
+        .replace(/[^\p{L}\p{N}]+/gu, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60) || currentEventId;
+
+    const url =
+      URL.createObjectURL(zipBlob);
+
+    const a =
+      document.createElement("a");
+
+    a.href = url;
+    a.download =
+      `PhotoDump-${safeTitle}-${currentEventId}.zip`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+    alert(
+      `ZIP je pripremljen.\nPreuzeto fotografija: ${downloaded}/${total}`
+    );
+
+  } catch (err) {
+    console.error("Download ZIP error:", err);
+    alert("Greška kod pripreme ZIP datoteke.");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
 };
 
 loadEventInfo();

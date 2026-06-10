@@ -2390,3 +2390,16 @@ body.fullscreen-open{
 .profile-fullscreen .admin-fullscreen-img{
   opacity:1 !important;
 }
+.download-zip-btn{
+  line-height:1.25 !important;
+  padding:14px 16px !important;
+}
+
+.download-zip-btn small{
+  display:block;
+  margin-top:5px;
+  font-size:11px;
+  font-weight:600;
+  opacity:.82;
+  line-height:1.35;
+}
