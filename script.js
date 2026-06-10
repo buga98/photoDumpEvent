@@ -810,56 +810,61 @@ uploads.push(task);
 };
 
 let selectedPhotoId = null;
+let selectedProfileImageEl = null;
 
 window.confirmDelete = async function () {
-  document.getElementById("deleteModal").style.display = "none";
+  const modal =
+    document.getElementById("deleteModal");
 
-  const docRef = doc(db, "events", currentEventId, "photos", selectedPhotoId);
-  const snap = await getDoc(docRef);
-const data = snap.exists()
-  ? snap.data()
-  : null;
-
-if (data) {
-  try {
-
-    if (data.path) {
-      await deleteObject(
-        ref(storage, data.path)
-      );
-    }
-
-    if (data.thumbPath) {
-      await deleteObject(
-        ref(storage, data.thumbPath)
-      );
-    }
-
-    if (data.originalPath) {
-      await deleteObject(
-        ref(storage, data.originalPath)
-      );
-    }
-
-  } catch (e) {
-    console.log("Storage delete fail:", e);
+  if (modal) {
+    modal.style.display = "none";
   }
-}
 
-  await deleteDoc(docRef);
-  const existing =
-  renderedPhotos.get(selectedPhotoId);
+  if (!selectedPhotoId) {
+    showToast("Fotografija nije odabrana 😕");
+    return;
+  }
 
-if (existing) {
-  existing.remove();
-  renderedPhotos.delete(selectedPhotoId);
-}
+  try {
+    await updateDoc(
+      doc(db, "events", currentEventId, "photos", selectedPhotoId),
+      {
+        visible: false,
+        deletedByUser: true,
+        deletedAt: Date.now()
+      }
+    );
 
-await updateDoc(doc(db, "events", currentEventId), {
-  photoCount: increment(-1)
-});
+    await updateDoc(
+      doc(db, "events", currentEventId),
+      {
+        photoCount: increment(-1)
+      }
+    );
 
-  loadMyImages();
+    const feedCard =
+      renderedPhotos.get(selectedPhotoId);
+
+    if (feedCard) {
+      feedCard.remove();
+      renderedPhotos.delete(selectedPhotoId);
+    }
+
+    if (selectedProfileImageEl) {
+      selectedProfileImageEl.remove();
+      selectedProfileImageEl = null;
+    }
+
+    selectedPhotoId = null;
+
+    showToast("Fotografija je obrisana 🗑️");
+
+    loadMyImages();
+
+  } catch (err) {
+    console.error("Delete photo error:", err);
+    showToast("Greška kod brisanja fotografije 😕");
+  }
 };
 
 window.closeDelete = function () {
@@ -962,15 +967,18 @@ window.loadMyImages = async function () {
     }
 
     snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
+  const data = docSnap.data();
 
-      const img = document.createElement("img");
-      img.src = data.thumbUrl || data.imageUrl;
-      img.addEventListener("click", () => {
+  if (data.visible === false) return;
+
+  const img = document.createElement("img");
+  img.src = data.thumbUrl || data.imageUrl;
+img.addEventListener("click", () => {
   selectedPhotoId = docSnap.id;
+  selectedProfileImageEl = img;
 
   openProfileFullscreen(
-    data.imageUrl,
+    data.imageUrl || data.thumbUrl,
     docSnap.id
   );
 });
@@ -983,6 +991,7 @@ window.loadMyImages = async function () {
         pressTimer = setTimeout(() => {
           isLongPress = true;
           selectedPhotoId = docSnap.id;
+          selectedProfileImageEl = img;
 
           document.getElementById("deleteModal").style.display = "flex";
 
@@ -1047,9 +1056,15 @@ function openProfileFullscreen(url, photoId) {
   deleteBtn.type = "button";
   deleteBtn.innerText = "Izbriši fotografiju";
 
-  const img = document.createElement("img");
-  img.className = "admin-fullscreen-img";
-  img.src = url;
+const img = document.createElement("img");
+img.className = "admin-fullscreen-img profile-fullscreen-img";
+img.src = "";
+
+img.onload = () => {
+  img.style.opacity = "1";
+};
+
+img.src = url;
 
   full.appendChild(img);
   full.appendChild(closeBtn);

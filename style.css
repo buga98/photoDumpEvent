@@ -2383,3 +2383,10 @@ body.fullscreen-open{
     max-height:calc(100dvh - 104px) !important;
   }
 }
+.profile-fullscreen-img{
+  opacity:1 !important;
+}
+
+.profile-fullscreen .admin-fullscreen-img{
+  opacity:1 !important;
+}
