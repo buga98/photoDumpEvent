@@ -2327,3 +2327,59 @@ body.fullscreen-open{
   user-select:none !important;
   -webkit-touch-callout:none !important;
 }
+.profile-delete-btn{
+  position:absolute;
+  left:50%;
+  bottom:24px;
+
+  transform:translateX(-50%);
+
+  width:auto !important;
+  min-width:190px !important;
+  max-width:calc(100vw - 48px) !important;
+
+  height:46px !important;
+
+  margin:0 !important;
+  padding:0 18px !important;
+
+  z-index:6;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:999px !important;
+
+  background:linear-gradient(135deg,#ff7070,#e24f4f) !important;
+  color:white !important;
+
+  border:1px solid rgba(255,255,255,.18) !important;
+
+  font-size:14px !important;
+  font-weight:800 !important;
+
+  box-shadow:
+    0 14px 38px rgba(226,79,79,.34),
+    0 8px 22px rgba(0,0,0,.34) !important;
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.profile-fullscreen .admin-fullscreen-img{
+  max-height:calc(100dvh - 110px) !important;
+}
+
+@media(max-width:520px){
+  .profile-delete-btn{
+    bottom:20px;
+    height:44px !important;
+    min-width:180px !important;
+    font-size:13px !important;
+  }
+
+  .profile-fullscreen .admin-fullscreen-img{
+    max-height:calc(100dvh - 104px) !important;
+  }
+}

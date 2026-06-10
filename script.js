@@ -966,7 +966,14 @@ window.loadMyImages = async function () {
 
       const img = document.createElement("img");
       img.src = data.thumbUrl || data.imageUrl;
+      img.addEventListener("click", () => {
+  selectedPhotoId = docSnap.id;
 
+  openProfileFullscreen(
+    data.imageUrl,
+    docSnap.id
+  );
+});
       let pressTimer;
       let isLongPress = false;
 
@@ -1020,6 +1027,61 @@ if (secretBtn) {
     }
   };
 }
+
+
+function openProfileFullscreen(url, photoId) {
+  if (document.querySelector(".admin-fullscreen")) return;
+
+  selectedPhotoId = photoId;
+
+  const full = document.createElement("div");
+  full.className = "admin-fullscreen profile-fullscreen";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "fullscreen-close-btn";
+  closeBtn.type = "button";
+  closeBtn.innerText = "×";
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "profile-delete-btn";
+  deleteBtn.type = "button";
+  deleteBtn.innerText = "Izbriši fotografiju";
+
+  const img = document.createElement("img");
+  img.className = "admin-fullscreen-img";
+  img.src = url;
+
+  full.appendChild(img);
+  full.appendChild(closeBtn);
+  full.appendChild(deleteBtn);
+
+  document.body.appendChild(full);
+  document.body.classList.add("fullscreen-open");
+
+  function closeFullscreen() {
+    document.body.classList.remove("fullscreen-open");
+    full.remove();
+  }
+
+  closeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeFullscreen();
+  });
+
+  deleteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    closeFullscreen();
+
+    const modal =
+      document.getElementById("deleteModal");
+
+    if (modal) {
+      modal.style.display = "flex";
+    }
+  });
+}
+
 function loadLiveCounters() {
   const photoEl = document.getElementById("livePhotoCount");
   const dedicationEl = document.getElementById("liveDedicationCount");
