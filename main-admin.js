@@ -299,10 +299,11 @@ function getModeratorCredentialsFromForm() {
   return { email, password };
 }
 
-async function createOrReuseModeratorAccount(credentials) {
+async function createOrReuseModeratorAccount(credentials, options = {}) {
   if (!credentials) return null;
 
   let credential;
+  let createdNewAuthUser = false;
 
   try {
     credential = await createUserWithEmailAndPassword(
@@ -310,6 +311,8 @@ async function createOrReuseModeratorAccount(credentials) {
       credentials.email,
       credentials.password
     );
+
+    createdNewAuthUser = true;
   } catch (err) {
     if (err?.code !== "auth/email-already-in-use") {
       throw err;
@@ -324,20 +327,26 @@ async function createOrReuseModeratorAccount(credentials) {
 
   const moderatorUser = credential.user;
 
-  await setDoc(
-    doc(db, "users", moderatorUser.uid),
-    {
-      firstName: "",
-      lastName: "",
-      name: credentials.email,
-      email: credentials.email,
-      role: "moderator",
-      approved: true,
-      disabled: false,
-      created: Date.now()
-    },
-    { merge: true }
-  );
+  // New moderator accounts need their Firestore user document.
+  // Superadmin may also refresh an existing moderator user document.
+  // Organizers can reuse existing moderator accounts, but should not overwrite
+  // global user records that may belong to another event/customer.
+  if (createdNewAuthUser || options.canUpdateExistingModeratorUser === true) {
+    await setDoc(
+      doc(db, "users", moderatorUser.uid),
+      {
+        firstName: "",
+        lastName: "",
+        name: credentials.email,
+        email: credentials.email,
+        role: "moderator",
+        approved: true,
+        disabled: false,
+        created: Date.now()
+      },
+      { merge: true }
+    );
+  }
 
   await signOut(moderatorCreatorAuth).catch(() => {});
 
@@ -920,7 +929,12 @@ window.createNewEvent = async function () {
 
     if (moderatorCredentials) {
       createBtn.innerText = "Kreiram moderatora...";
-      moderatorAccount = await createOrReuseModeratorAccount(moderatorCredentials);
+      moderatorAccount = await createOrReuseModeratorAccount(
+        moderatorCredentials,
+        {
+          canUpdateExistingModeratorUser: userData?.role === "superadmin"
+        }
+      );
     }
 
     const eventRef =

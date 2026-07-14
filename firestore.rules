@@ -287,8 +287,13 @@ function canCreateEvent() {
         && request.resource.data.created is number;
     }
 
-    function isValidModeratorUserCreate() {
+    function canCreateModeratorUserDoc() {
       return isSuperAdmin()
+        || isOrganizer();
+    }
+
+    function isValidModeratorUserCreate() {
+      return canCreateModeratorUserDoc()
 
         && request.resource.data.keys().hasOnly([
           "firstName",

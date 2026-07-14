@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v25-role-access-fix";
+const CACHE_NAME = "photodump-v26-organizer-moderator-fix";
 
 const APP_SHELL = [
   "/",
