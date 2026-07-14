@@ -79,6 +79,15 @@ onAuthStateChanged(auth, async (user) => {
   currentRole =
     userData.role || "organizer";
 
+  if (
+    currentRole !== "superadmin" &&
+    currentRole !== "organizer"
+  ) {
+    alert("Ovaj račun ima samo moderatorski pristup za event i nema pristup pregledu eventova.");
+    window.location.href = "/login.html";
+    return;
+  }
+
   setRoleBadge();
 
   if (currentRole !== "superadmin") {

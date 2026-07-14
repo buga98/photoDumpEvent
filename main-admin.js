@@ -63,19 +63,35 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const data = snap.data();
-if (data.role !== "superadmin") {
+    const role = data.role || "organizer";
 
-  const adminActions =
-    document.getElementById("superAdminActions");
-
-  if (adminActions) {
-    adminActions.classList.add("hidden-admin");
-  }
-}
-    if (!data.approved) {
-      alert("Račun još nije odobren");
+    if (
+      data.approved !== true ||
+      data.disabled === true
+    ) {
+      alert("Račun nije odobren ili je deaktiviran");
       window.location.href = "/login.html";
       return;
+    }
+
+    if (
+      role !== "superadmin" &&
+      role !== "organizer"
+    ) {
+      await signOut(auth).catch(() => {});
+      alert("Ovaj račun ima samo moderatorski pristup za event i nema pristup glavnom adminu.");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    if (role !== "superadmin") {
+
+      const adminActions =
+        document.getElementById("superAdminActions");
+
+      if (adminActions) {
+        adminActions.classList.add("hidden-admin");
+      }
     }
 
   } catch (err) {

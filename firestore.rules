@@ -41,6 +41,18 @@ function isSuperAdmin() {
     && currentUser().role == "superadmin";
 }
 
+function isOrganizer() {
+  return userDocExists()
+    && currentUser().approved == true
+    && currentUser().disabled != true
+    && currentUser().role == "organizer";
+}
+
+function canCreateEvent() {
+  return isSuperAdmin()
+    || isOrganizer();
+}
+
     function isEventOwner(eventId) {
       return isApproved()
         && get(
@@ -67,6 +79,34 @@ function isSuperAdmin() {
     function canManageEventModerators(eventId) {
       return isSuperAdmin()
         || isEventOwner(eventId);
+    }
+
+
+    function isPublicActiveEventDoc() {
+      return resource.data.active == true
+        && resource.data.status == "active"
+        && resource.data.expiresAt is number
+        && resource.data.expiresAt > request.time.toMillis();
+    }
+
+    function isEventOwnerDoc() {
+      return isApproved()
+        && resource.data.ownerId == request.auth.uid;
+    }
+
+    function canReadEventDoc(eventId) {
+      return isPublicActiveEventDoc()
+        || isSuperAdmin()
+        || isEventOwnerDoc()
+        || isEventModerator(eventId);
+    }
+
+    function canListEventDocs() {
+      return isSuperAdmin()
+        || (
+          isOrganizer()
+          && resource.data.ownerId == request.auth.uid
+        );
     }
 
     function eventData(eventId) {
@@ -416,10 +456,18 @@ match /users/{userId} {
 
     match /events/{eventId} {
 
-      allow read: if true;
+      // Public guests may only fetch a known, active event by ID.
+      // They can no longer list all events.
+      allow get: if
+        canReadEventDoc(eventId);
+
+      // Listing events is limited to superadmin, or to organizer queries
+      // constrained to their own ownerId.
+      allow list: if
+        canListEventDocs();
 
       allow create: if
-        isApproved()
+        canCreateEvent()
         && isValidEventCreate();
 
       allow update: if
