@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v20-download-icon";
+const CACHE_NAME = "photodump-v21-userid-hardening";
 
 const APP_SHELL = [
   "/",

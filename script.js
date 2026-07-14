@@ -31,6 +31,35 @@ function getPwaCookie(name) {
   return "";
 }
 
+function createGuestUserId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(bytes, (byte) =>
+      byte.toString(16).padStart(2, "0")
+    );
+
+    return (
+      hex.slice(0, 4).join("") + "-" +
+      hex.slice(4, 6).join("") + "-" +
+      hex.slice(6, 8).join("") + "-" +
+      hex.slice(8, 10).join("") + "-" +
+      hex.slice(10, 16).join("")
+    );
+  }
+
+  return "guest-" + Date.now().toString(36) + "-" +
+    Math.random().toString(36).slice(2, 12);
+}
+
 const storedEventIdBeforeOpen = localStorage.getItem("eventId");
 const cookieEventId = getPwaCookie("pde_eventId");
 
@@ -47,6 +76,38 @@ if (!currentEventId) {
   setPwaCookie("pde_eventId", currentEventId);
 }
 
+function getStoredEventUserId(eventId) {
+  if (!eventId) return "";
+
+  const eventUserId = localStorage.getItem("userId_" + eventId);
+  if (eventUserId) return eventUserId;
+
+  if (localStorage.getItem("eventId") === eventId) {
+    return localStorage.getItem("userId") || "";
+  }
+
+  return "";
+}
+
+function getActiveUserId() {
+  return (
+    getStoredEventUserId(currentEventId) ||
+    (cookieEventId === currentEventId ? getPwaCookie("pde_userId") : "") ||
+    ""
+  );
+}
+
+function getActiveUserName() {
+  return (
+    localStorage.getItem("name_" + currentEventId) ||
+    (localStorage.getItem("eventId") === currentEventId
+      ? localStorage.getItem("name")
+      : "") ||
+    (cookieEventId === currentEventId ? getPwaCookie("pde_name") : "") ||
+    ""
+  );
+}
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 
 import {
@@ -61,7 +122,6 @@ import {
   getDocs,
   query,
   where,
-  deleteDoc,
   updateDoc,
   increment,
   limit,
@@ -72,8 +132,7 @@ import {
   getStorage,
   ref,
   uploadBytesResumable,
-  getDownloadURL,
-  deleteObject
+  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -631,7 +690,7 @@ function updateGalleryBadges() {
 }
 
 async function likePhoto(photoId, animationParent = null) {
-  const userId = localStorage.getItem("userId");
+  const userId = getActiveUserId();
   if (!photoId || !userId) return false;
 
   if (animationParent) showBigHeart(animationParent);
@@ -748,8 +807,6 @@ function getFeedAuthorInitial(name) {
 }
 
 function createFeedCard(photoId, data) {
-  const userId = localStorage.getItem("userId");
-
   const card = document.createElement("div");
   card.className = "feed-card";
   card.dataset.id = photoId;
@@ -1149,7 +1206,7 @@ window.uploadToFirebase = function (file, user, onProgress) {
                 originalPath,
 
                 user,
-                userId: localStorage.getItem("userId"),
+                userId: getActiveUserId(),
 
                 created: Date.now(),
                 likes: 0,
@@ -1243,7 +1300,7 @@ window.uploadFile = async function (files) {
   if (!gallery || !files || !files.length) return;
 
   const user =
-    localStorage.getItem("name");
+    getActiveUserName();
 
   let fileList =
     Array.from(files);
@@ -1498,7 +1555,7 @@ window.switchScreen = function (screen) {
 
 window.saveDedication = async function () {
   const text = document.getElementById("dedicationText").value.trim();
-  const name = localStorage.getItem("name");
+  const name = getActiveUserName();
 
   if (!text) {
     alert("Napiši poruku 🤍");
@@ -1547,17 +1604,23 @@ window.closeDedicationComposer = function () {
 
 window.loadMyImages = async function () {
   const gallery = document.getElementById("gallery");
-  const name = localStorage.getItem("name");
+  const userId = getActiveUserId();
 
   if (!gallery) return;
 
   gallery.innerHTML =
     "<p style='grid-column:1/-1; opacity:0.6;'>Učitavam...</p>";
 
+  if (!userId) {
+    gallery.innerHTML =
+      "<p style='grid-column:1/-1; opacity:0.6;'>Nema još tvojih slika 📸</p>";
+    return;
+  }
+
   try {
     const q = query(
       collection(db, "events", currentEventId, "photos"),
-      where("user", "==", name)
+      where("userId", "==", userId)
     );
 
     const snapshot = await getDocs(q);
@@ -2039,7 +2102,7 @@ let activeUserId =
     : "");
 
 if (!activeUserId) {
-  activeUserId = crypto.randomUUID();
+  activeUserId = createGuestUserId();
 }
 
 const user =
