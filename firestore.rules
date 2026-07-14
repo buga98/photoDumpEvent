@@ -200,6 +200,15 @@ function isSuperAdmin() {
         && request.resource.data.created is number;
     }
 
+    function isValidOptionalUploaderUid() {
+      return !request.resource.data.keys().hasAny(["uploaderUid"])
+        || (
+          signedIn()
+          && request.resource.data.uploaderUid is string
+          && request.resource.data.uploaderUid == request.auth.uid
+        );
+    }
+
     function isValidPhotoCreate(eventId) {
       return eventIsActive(eventId)
         && eventHasPhotoSpace(eventId)
@@ -212,6 +221,7 @@ function isSuperAdmin() {
           "originalPath",
           "user",
           "userId",
+          "uploaderUid",
           "created",
           "likes",
           "visible"
@@ -229,6 +239,7 @@ function isSuperAdmin() {
 
         && request.resource.data.user is string
         && request.resource.data.userId is string
+        && isValidOptionalUploaderUid()
 
         && request.resource.data.created is number
         && request.resource.data.likes == 0

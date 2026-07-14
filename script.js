@@ -135,6 +135,12 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
 
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -147,6 +153,88 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const auth = getAuth(app);
+
+let guestAuthPromise = null;
+
+function storeAuthUid(firebaseUser) {
+  if (!firebaseUser || !firebaseUser.uid) return "";
+
+  localStorage.setItem("authUid", firebaseUser.uid);
+  localStorage.setItem("authUid_" + currentEventId, firebaseUser.uid);
+  setPwaCookie("pde_authUid", firebaseUser.uid);
+
+  return firebaseUser.uid;
+}
+
+function getStoredAuthUid() {
+  return (
+    localStorage.getItem("authUid_" + currentEventId) ||
+    localStorage.getItem("authUid") ||
+    getPwaCookie("pde_authUid") ||
+    ""
+  );
+}
+
+function waitForAuthState(timeoutMs = 900) {
+  return new Promise((resolve) => {
+    if (auth.currentUser) {
+      resolve(auth.currentUser);
+      return;
+    }
+
+    let settled = false;
+    let unsubscribe = () => {};
+
+    const finish = (user) => {
+      if (settled) return;
+      settled = true;
+      unsubscribe();
+      resolve(user || null);
+    };
+
+    unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => finish(user),
+      () => finish(null)
+    );
+
+    setTimeout(() => finish(auth.currentUser || null), timeoutMs);
+  });
+}
+
+async function ensureGuestAuth() {
+  if (auth.currentUser) {
+    storeAuthUid(auth.currentUser);
+    return auth.currentUser;
+  }
+
+  if (!guestAuthPromise) {
+    guestAuthPromise = (async () => {
+      const existingUser = await waitForAuthState();
+
+      if (existingUser) {
+        storeAuthUid(existingUser);
+        return existingUser;
+      }
+
+      try {
+        const credential = await signInAnonymously(auth);
+        storeAuthUid(credential.user);
+        return credential.user;
+      } catch (err) {
+        console.warn("Anonymous auth nije dostupan, nastavljam sa starim guest userId fallbackom:", err);
+        return null;
+      }
+    })();
+  }
+
+  return guestAuthPromise;
+}
+
+function getActiveUploaderUid() {
+  return auth.currentUser?.uid || getStoredAuthUid();
+}
 
 const THEME_CLASSES = [
   "theme-svadba",
@@ -1194,24 +1282,33 @@ window.uploadToFirebase = function (file, user, onProgress) {
               await originalUploadPromise;
             }
 
+            const authUser = await ensureGuestAuth();
+            const uploaderUid = authUser?.uid || getActiveUploaderUid();
+
+            const photoData = {
+              imageUrl,
+              thumbUrl,
+
+              path: uploadTask.snapshot.ref.fullPath,
+              thumbPath: thumbRef.fullPath,
+
+              originalPath,
+
+              user,
+              userId: getActiveUserId(),
+
+              created: Date.now(),
+              likes: 0,
+              visible: true
+            };
+
+            if (uploaderUid) {
+              photoData.uploaderUid = uploaderUid;
+            }
+
             await addDoc(
               collection(db, "events", currentEventId, "photos"),
-              {
-                imageUrl,
-                thumbUrl,
-
-                path: uploadTask.snapshot.ref.fullPath,
-                thumbPath: thumbRef.fullPath,
-
-                originalPath,
-
-                user,
-                userId: getActiveUserId(),
-
-                created: Date.now(),
-                likes: 0,
-                visible: true
-              }
+              photoData
             );
 
             await updateDoc(
@@ -2131,6 +2228,11 @@ if (!user) {
   setPwaCookie("pde_eventId", currentEventId);
   setPwaCookie("pde_name", user);
   setPwaCookie("pde_userId", activeUserId);
+
+  const storedAuthUid = getStoredAuthUid();
+  if (storedAuthUid) {
+    localStorage.setItem("authUid_" + currentEventId, storedAuthUid);
+  }
 }
 
 if (user && welcomeEl) {
@@ -2178,4 +2280,5 @@ if (pending.length > 0) {
 }
 });
 
+void ensureGuestAuth();
 initApp();

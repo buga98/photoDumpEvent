@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v21-userid-hardening";
+const CACHE_NAME = "photodump-v22-anonymous-auth";
 
 const APP_SHELL = [
   "/",
