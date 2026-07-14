@@ -3,7 +3,10 @@ from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 
 import {
   getAuth,
-  onAuthStateChanged
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
@@ -23,10 +26,7 @@ import {
   getDownloadURL
 }
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import {
-  signOut
-}
-from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
   authDomain: "photodumpevent-4578c.firebaseapp.com",
@@ -37,8 +37,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const moderatorCreatorApp = initializeApp(firebaseConfig, "moderatorCreator");
 
 const auth = getAuth(app);
+const moderatorCreatorAuth = getAuth(moderatorCreatorApp);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
@@ -94,6 +96,8 @@ const resultBox = document.getElementById("resultBox");
 const qrBox = document.getElementById("qrBox");
 const qrImage = document.getElementById("qrImage");
 const planInput = document.getElementById("eventPlan");
+const moderatorEmailInput = document.getElementById("moderatorEmail");
+const moderatorPasswordInput = document.getElementById("moderatorPassword");
 let createdEventPayload = null;
 
 const defaults = {
@@ -254,6 +258,79 @@ window.logout = async function () {
   window.location.href =
     "/login.html";
 };
+function normalizeEmail(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function getModeratorCredentialsFromForm() {
+  const email = normalizeEmail(moderatorEmailInput?.value);
+  const password = String(moderatorPasswordInput?.value || "").trim();
+
+  if (!email && !password) {
+    return null;
+  }
+
+  if (!email || !password) {
+    throw new Error("Moderator email i lozinka moraju biti upisani zajedno.");
+  }
+
+  if (password.length < 6) {
+    throw new Error("Moderator lozinka mora imati minimalno 6 znakova.");
+  }
+
+  return { email, password };
+}
+
+async function createOrReuseModeratorAccount(credentials) {
+  if (!credentials) return null;
+
+  let credential;
+
+  try {
+    credential = await createUserWithEmailAndPassword(
+      moderatorCreatorAuth,
+      credentials.email,
+      credentials.password
+    );
+  } catch (err) {
+    if (err?.code !== "auth/email-already-in-use") {
+      throw err;
+    }
+
+    credential = await signInWithEmailAndPassword(
+      moderatorCreatorAuth,
+      credentials.email,
+      credentials.password
+    );
+  }
+
+  const moderatorUser = credential.user;
+
+  await setDoc(
+    doc(db, "users", moderatorUser.uid),
+    {
+      firstName: "",
+      lastName: "",
+      name: credentials.email,
+      email: credentials.email,
+      role: "moderator",
+      approved: true,
+      disabled: false,
+      created: Date.now()
+    },
+    { merge: true }
+  );
+
+  await signOut(moderatorCreatorAuth).catch(() => {});
+
+  return {
+    uid: moderatorUser.uid,
+    email: credentials.email
+  };
+}
+
 function cleanTexts(obj) {
 
   const result = {};
@@ -809,10 +886,26 @@ window.createNewEvent = async function () {
   const userData =
     userSnap.data();
 
+  let moderatorCredentials = null;
+
+  try {
+    moderatorCredentials = getModeratorCredentialsFromForm();
+  } catch (err) {
+    alert(err.message || "Provjeri moderator podatke.");
+    return;
+  }
+
   createBtn.disabled = true;
   createBtn.innerText = "Kreiram event...";
 
   try {
+
+    let moderatorAccount = null;
+
+    if (moderatorCredentials) {
+      createBtn.innerText = "Kreiram moderatora...";
+      moderatorAccount = await createOrReuseModeratorAccount(moderatorCredentials);
+    }
 
     const eventRef =
       doc(collection(db, "events"));
@@ -898,6 +991,24 @@ window.createNewEvent = async function () {
       created: Date.now()
     });
 
+    if (moderatorAccount) {
+      await setDoc(
+        doc(
+          db,
+          "events",
+          eventId,
+          "moderators",
+          moderatorAccount.uid
+        ),
+        {
+          email: moderatorAccount.email,
+          role: "moderator",
+          active: true,
+          created: Date.now()
+        }
+      );
+    }
+
 const guestLink =
   `${location.origin}/?event=${eventId}`;
 
@@ -920,7 +1031,9 @@ createdEventPayload = {
   adminLink,
   qrUrl,
   uploadLimit,
-  allowOriginals
+  allowOriginals,
+  moderatorEmail: moderatorAccount?.email || "",
+  moderatorPassword: moderatorCredentials?.password || ""
 };
     resultBox.innerHTML = `
       <p><b>Event kreiran ✅</b></p>
@@ -948,6 +1061,14 @@ createdEventPayload = {
       <a href="${adminLink}" target="_blank">
         ${adminLink}
       </a>
+
+      ${moderatorAccount ? `
+        <br><br>
+        <p><b>Moderator pristup:</b></p>
+        <p>Email: ${moderatorAccount.email}</p>
+        <p>Lozinka: ${moderatorCredentials.password}</p>
+        <p style="opacity:.7; font-size:13px;">Spremi ovu lozinku odmah — ne sprema se kao običan tekst u Firestore.</p>
+      ` : ""}
     `;
 
     resultBox.classList.add("show");

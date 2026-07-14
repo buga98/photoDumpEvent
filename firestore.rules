@@ -48,6 +48,27 @@ function isSuperAdmin() {
         ).data.ownerId == request.auth.uid;
     }
 
+    function isEventModerator(eventId) {
+      return isApproved()
+        && exists(
+          /databases/$(database)/documents/events/$(eventId)/moderators/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/events/$(eventId)/moderators/$(request.auth.uid)
+        ).data.active == true;
+    }
+
+    function canModerateEvent(eventId) {
+      return isSuperAdmin()
+        || isEventOwner(eventId)
+        || isEventModerator(eventId);
+    }
+
+    function canManageEventModerators(eventId) {
+      return isSuperAdmin()
+        || isEventOwner(eventId);
+    }
+
     function eventData(eventId) {
       return get(
         /databases/$(database)/documents/events/$(eventId)
@@ -226,6 +247,46 @@ function isSuperAdmin() {
         && request.resource.data.created is number;
     }
 
+    function isValidModeratorUserCreate() {
+      return isSuperAdmin()
+
+        && request.resource.data.keys().hasOnly([
+          "firstName",
+          "lastName",
+          "name",
+          "email",
+          "role",
+          "approved",
+          "disabled",
+          "created"
+        ])
+
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string
+        && request.resource.data.name is string
+        && request.resource.data.email is string
+
+        && request.resource.data.role == "moderator"
+        && request.resource.data.approved == true
+        && request.resource.data.disabled == false
+        && request.resource.data.created is number;
+    }
+
+    function isValidModeratorEventAccessCreate(eventId, moderatorUid) {
+      return canManageEventModerators(eventId)
+
+        && request.resource.data.keys().hasOnly([
+          "email",
+          "role",
+          "active",
+          "created"
+        ])
+        && request.resource.data.email is string
+        && request.resource.data.role == "moderator"
+        && request.resource.data.active == true
+        && request.resource.data.created is number;
+    }
+
     function isValidOptionalUploaderUid() {
       return !request.resource.data.keys().hasAny(["uploaderUid"])
         || (
@@ -340,7 +401,8 @@ match /users/{userId} {
     isSuperAdmin();
 
   allow create: if
-    isValidUserCreate(userId);
+    isValidUserCreate(userId)
+    || isValidModeratorUserCreate();
 
   allow update: if
     isSuperAdmin();
@@ -380,8 +442,16 @@ match /users/{userId} {
 
         allow update: if
           isPhotoLikeIncrement(eventId, photoId)
-          || isPhotoVisibilityUpdate()
-          || isSuperAdmin();
+          || (
+            isPhotoVisibilityUpdate()
+            && canModerateEvent(eventId)
+          )
+          || (
+            isPhotoVisibilityUpdate()
+            && signedIn()
+            && resource.data.uploaderUid == request.auth.uid
+            && request.resource.data.visible == false
+          );
 
         allow delete: if
           isSuperAdmin()
@@ -418,6 +488,40 @@ match /users/{userId} {
         allow update: if false;
 
         allow delete: if false;
+      }
+
+      // =====================
+      // MODERATORS
+      // jedan ili više moderatora po eventu
+      // =====================
+
+      match /moderators/{moderatorUid} {
+
+        allow read: if
+          canModerateEvent(eventId)
+          || (
+            signedIn()
+            && request.auth.uid == moderatorUid
+          );
+
+        allow create: if
+          isValidModeratorEventAccessCreate(eventId, moderatorUid);
+
+        allow update: if
+          canManageEventModerators(eventId)
+          && request.resource.data.keys().hasOnly([
+            "email",
+            "role",
+            "active",
+            "created"
+          ])
+          && request.resource.data.email is string
+          && request.resource.data.role == "moderator"
+          && request.resource.data.active is bool
+          && request.resource.data.created is number;
+
+        allow delete: if
+          canManageEventModerators(eventId);
       }
 
       // =====================

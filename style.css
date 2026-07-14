@@ -3104,3 +3104,89 @@ body[data-pde-page="app"] .view-icon-grid i{
     font-size:15px !important;
   }
 }
+
+/* Moderator login modal (app hamburger) */
+.moderator-login-modal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:rgba(4,8,18,.68);
+  backdrop-filter:blur(14px);
+}
+
+.moderator-login-modal.show{
+  display:flex;
+}
+
+.moderator-login-box{
+  width:min(420px,100%);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:24px;
+  padding:18px;
+  background:rgba(12,18,34,.92);
+  box-shadow:0 24px 80px rgba(0,0,0,.38);
+  color:#fff;
+}
+
+.moderator-login-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+  font-size:18px;
+}
+
+.moderator-login-close{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-size:24px;
+  line-height:1;
+}
+
+.moderator-login-box input{
+  width:100%;
+  margin:8px 0;
+  padding:13px 14px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  outline:0;
+}
+
+.moderator-login-box input::placeholder{
+  color:rgba(255,255,255,.58);
+}
+
+.moderator-login-submit{
+  width:100%;
+  margin-top:10px;
+  padding:13px 16px;
+  border:0;
+  border-radius:16px;
+  background:#fff;
+  color:#111827;
+  font-weight:800;
+}
+
+.moderator-login-submit:disabled{
+  opacity:.65;
+}
+
+.moderator-login-error{
+  min-height:20px;
+  margin:10px 2px 0;
+  color:#ff9a9a;
+  font-size:13px;
+}

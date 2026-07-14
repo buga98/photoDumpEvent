@@ -138,7 +138,9 @@ import {
 import {
   getAuth,
   signInAnonymously,
-  onAuthStateChanged
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -246,6 +248,160 @@ async function requireGuestAuth(actionLabel = "Ova radnja") {
 
   storeAuthUid(user);
   return user;
+}
+
+function normalizeEmail(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+async function hasModeratorAccess(user) {
+  if (!user?.uid) return false;
+
+  const [eventSnap, userSnap, moderatorSnap] = await Promise.all([
+    getDoc(doc(db, "events", currentEventId)),
+    getDoc(doc(db, "users", user.uid)),
+    getDoc(doc(db, "events", currentEventId, "moderators", user.uid))
+  ]);
+
+  if (!eventSnap.exists() || !userSnap.exists()) return false;
+
+  const eventInfo = eventSnap.data();
+  const userInfo = userSnap.data();
+
+  const approved =
+    userInfo.approved === true && userInfo.disabled !== true;
+
+  if (!approved) return false;
+
+  return (
+    userInfo.role === "superadmin" ||
+    eventInfo.ownerId === user.uid ||
+    (moderatorSnap.exists() && moderatorSnap.data().active === true)
+  );
+}
+
+function getModeratorLoginModal() {
+  let modal = document.getElementById("moderatorLoginModal");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.id = "moderatorLoginModal";
+  modal.className = "moderator-login-modal";
+  modal.innerHTML = `
+    <div class="moderator-login-box">
+      <div class="moderator-login-head">
+        <strong>Moderator pristup</strong>
+        <button type="button" class="moderator-login-close" aria-label="Zatvori">×</button>
+      </div>
+
+      <input id="moderatorLoginEmail" type="email" placeholder="Moderator email" autocomplete="username">
+      <input id="moderatorLoginPassword" type="password" placeholder="Moderator lozinka" autocomplete="current-password">
+
+      <button type="button" class="moderator-login-submit">Ulaz</button>
+      <p class="moderator-login-error" aria-live="polite"></p>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal
+    .querySelector(".moderator-login-close")
+    ?.addEventListener("click", closeModeratorLoginModal);
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) closeModeratorLoginModal();
+  });
+
+  modal
+    .querySelector(".moderator-login-submit")
+    ?.addEventListener("click", submitModeratorLogin);
+
+  modal
+    .querySelector("#moderatorLoginPassword")
+    ?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") submitModeratorLogin();
+    });
+
+  return modal;
+}
+
+function setModeratorLoginError(message) {
+  const modal = getModeratorLoginModal();
+  const error = modal.querySelector(".moderator-login-error");
+  if (error) error.innerText = message || "";
+}
+
+function openModeratorLoginModal() {
+  const modal = getModeratorLoginModal();
+  modal.classList.add("show");
+  setModeratorLoginError("");
+
+  setTimeout(() => {
+    modal.querySelector("#moderatorLoginEmail")?.focus();
+  }, 50);
+}
+
+function closeModeratorLoginModal() {
+  const modal = document.getElementById("moderatorLoginModal");
+  modal?.classList.remove("show");
+}
+
+async function submitModeratorLogin() {
+  const modal = getModeratorLoginModal();
+  const email = normalizeEmail(modal.querySelector("#moderatorLoginEmail")?.value);
+  const password = String(modal.querySelector("#moderatorLoginPassword")?.value || "").trim();
+  const button = modal.querySelector(".moderator-login-submit");
+
+  if (!email || !password) {
+    setModeratorLoginError("Unesi moderator email i lozinku.");
+    return;
+  }
+
+  if (password.length < 6) {
+    setModeratorLoginError("Lozinka mora imati minimalno 6 znakova.");
+    return;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Provjeravam...";
+  }
+
+  try {
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+    storeAuthUid(credential.user);
+
+    const allowed = await hasModeratorAccess(credential.user);
+
+    if (!allowed) {
+      await signOut(auth).catch(() => {});
+      guestAuthPromise = null;
+      setModeratorLoginError("Ovaj račun nema pristup moderator panelu za ovaj event.");
+      return;
+    }
+
+    window.location.href =
+      "/admin.html?event=" + encodeURIComponent(currentEventId);
+
+  } catch (err) {
+    console.error("Moderator login error:", err);
+
+    const message =
+      err?.code === "auth/invalid-credential" ||
+      err?.code === "auth/user-not-found" ||
+      err?.code === "auth/wrong-password"
+        ? "Pogrešan email ili lozinka."
+        : "Greška kod prijave moderatora.";
+
+    setModeratorLoginError(message);
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerText = "Ulaz";
+    }
+  }
 }
 
 const THEME_CLASSES = [
@@ -1855,21 +2011,8 @@ const secretBtn =
   document.getElementById("secretAdminBtn");
 
 if (secretBtn) {
-
   secretBtn.onclick = () => {
-
-    const pass =
-      prompt("Admin šifra");
-
-    if (pass === "admin") {
-
-      window.location.href =
-        "/admin.html?event=" + currentEventId;
-
-    } else {
-
-      alert("Kriva šifra");
-    }
+    openModeratorLoginModal();
   };
 }
 
@@ -2242,14 +2385,7 @@ function openFullscreen(url, startIndex = null) {
 }
 
 window.checkAdmin = function () {
-  const pass = document.getElementById("adminPass")?.value;
-
-  if (pass === "admin") {
-    window.location.href =
-      "/admin.html?event=" + encodeURIComponent(currentEventId);
-  } else {
-    alert("Kriva šifra");
-  }
+  openModeratorLoginModal();
 };
 
 function showToast(message) {

@@ -16,6 +16,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+import {
   getStorage,
   ref,
   getDownloadURL
@@ -33,6 +39,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const auth = getAuth(app);
 
 const currentEventId =
   new URLSearchParams(window.location.search).get("event");
@@ -40,6 +47,98 @@ const currentEventId =
 if (!currentEventId) {
   alert("Nema event ID-a");
   throw new Error("Missing eventId");
+}
+
+function redirectToEventLogin() {
+  window.location.href =
+    "/app.html?event=" + encodeURIComponent(currentEventId);
+}
+
+function waitForAuthUser() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        unsubscribe();
+        resolve(user || null);
+      },
+      () => {
+        unsubscribe();
+        resolve(null);
+      }
+    );
+  });
+}
+
+async function hasModeratorDoc(uid) {
+  if (!uid) return false;
+
+  const snap = await getDoc(
+    doc(
+      db,
+      "events",
+      currentEventId,
+      "moderators",
+      uid
+    )
+  );
+
+  return snap.exists() && snap.data().active === true;
+}
+
+async function requireModeratorAccess() {
+  const user = await waitForAuthUser();
+
+  if (!user) {
+    alert("Prvo se prijavi kao moderator.");
+    redirectToEventLogin();
+    return false;
+  }
+
+  try {
+    const [eventSnap, userSnap] = await Promise.all([
+      getDoc(doc(db, "events", currentEventId)),
+      getDoc(doc(db, "users", user.uid))
+    ]);
+
+    if (!eventSnap.exists() || !userSnap.exists()) {
+      await signOut(auth).catch(() => {});
+      alert("Nemaš pristup ovom moderator panelu.");
+      redirectToEventLogin();
+      return false;
+    }
+
+    const eventData = eventSnap.data();
+    const userData = userSnap.data();
+
+    const approved =
+      userData.approved === true && userData.disabled !== true;
+
+    const isSuperAdmin =
+      approved && userData.role === "superadmin";
+
+    const isOwner =
+      approved && eventData.ownerId === user.uid;
+
+    const isModerator =
+      approved && await hasModeratorDoc(user.uid);
+
+    if (!isSuperAdmin && !isOwner && !isModerator) {
+      await signOut(auth).catch(() => {});
+      alert("Nemaš pristup ovom moderator panelu.");
+      redirectToEventLogin();
+      return false;
+    }
+
+    document.body.classList.add("admin-auth-ready");
+    return true;
+
+  } catch (err) {
+    console.error("Moderator access error:", err);
+    alert("Greška kod provjere moderator pristupa.");
+    redirectToEventLogin();
+    return false;
+  }
 }
 
 const IMAGE_LIMIT = 24;
@@ -1301,10 +1400,17 @@ function getFileExtensionFromUrl(url) {
   }
 }
 
-loadEventInfo();
-loadAllImages();
-loadDedications();
-switchAdminScreen("photos");
+async function initAdminPanel() {
+  const allowed = await requireModeratorAccess();
+  if (!allowed) return;
+
+  loadEventInfo();
+  loadAllImages();
+  loadDedications();
+  switchAdminScreen("photos");
+}
+
+initAdminPanel();
 
 window.addEventListener("scroll", () => {
   if (

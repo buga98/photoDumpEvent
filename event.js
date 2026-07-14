@@ -278,14 +278,18 @@ async function fetchEvent() {
   logTime("Start Firebase");
 
   try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js");
+    const { initializeApp, getApps, getApp } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js");
     const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
 
-    const app = initializeApp({
+    const firebaseConfig = {
       apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
       authDomain: "photodumpevent-4578c.firebaseapp.com",
       projectId: "photodumpevent-4578c"
-    });
+    };
+
+    const app = getApps().length
+      ? getApp()
+      : initializeApp(firebaseConfig);
 
     const db = getFirestore(app);
     const snap = await getDoc(doc(db, "events", eventId));
@@ -378,13 +382,81 @@ window.closeAdminModal = function () {
   document.getElementById("adminModal").style.display = "none";
 };
 
-window.checkAdmin = function () {
-  const pass = document.getElementById("adminPass").value;
+function normalizeEmail(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
 
-  if (pass === "1234") {
-    window.location.href = "/admin.html?event=" + eventId;
-  } else {
-    alert("Kriva lozinka");
+async function checkModeratorAccess(user, app, db) {
+  if (!user?.uid || !eventId) return false;
+
+  const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
+
+  const [eventSnap, userSnap, moderatorSnap] = await Promise.all([
+    getDoc(doc(db, "events", eventId)),
+    getDoc(doc(db, "users", user.uid)),
+    getDoc(doc(db, "events", eventId, "moderators", user.uid))
+  ]);
+
+  if (!eventSnap.exists() || !userSnap.exists()) return false;
+
+  const eventInfo = eventSnap.data();
+  const userInfo = userSnap.data();
+
+  const approved =
+    userInfo.approved === true && userInfo.disabled !== true;
+
+  if (!approved) return false;
+
+  return (
+    userInfo.role === "superadmin" ||
+    eventInfo.ownerId === user.uid ||
+    (moderatorSnap.exists() && moderatorSnap.data().active === true)
+  );
+}
+
+window.checkAdmin = async function () {
+  const email = normalizeEmail(document.getElementById("adminEmail")?.value);
+  const pass = String(document.getElementById("adminPass")?.value || "").trim();
+
+  if (!email || !pass) {
+    alert("Unesi moderator email i lozinku");
+    return;
+  }
+
+  try {
+    const { initializeApp, getApps, getApp } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js");
+    const { getAuth, signInWithEmailAndPassword, signOut } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+    const { getFirestore } = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
+      authDomain: "photodumpevent-4578c.firebaseapp.com",
+      projectId: "photodumpevent-4578c"
+    };
+
+    const app = getApps().length
+      ? getApp()
+      : initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const credential = await signInWithEmailAndPassword(auth, email, pass);
+    const allowed = await checkModeratorAccess(credential.user, app, db);
+
+    if (!allowed) {
+      await signOut(auth).catch(() => {});
+      alert("Ovaj račun nema pristup moderator panelu za ovaj event.");
+      return;
+    }
+
+    window.location.href = "/admin.html?event=" + encodeURIComponent(eventId);
+
+  } catch (err) {
+    console.error("Moderator login error:", err);
+    alert("Pogrešan email ili lozinka");
   }
 };
 window.addEventListener("click", (e) => {
@@ -399,6 +471,6 @@ window.openAdminModal = function () {
   modal.style.display = "flex";
 
   setTimeout(() => {
-    document.getElementById("adminPass").focus();
+    document.getElementById("adminEmail")?.focus();
   }, 50);
 };
