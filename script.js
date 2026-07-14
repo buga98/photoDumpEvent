@@ -623,6 +623,7 @@ function getFeedOrderConstraints() {
 
 function buildFeedQuery(afterDoc = null) {
   const constraints = [
+    where("visible", "==", true),
     ...getFeedOrderConstraints(),
     ...(afterDoc ? [startAfter(afterDoc)] : []),
     limit(FEED_PAGE_SIZE)
@@ -1896,8 +1897,9 @@ window.saveDedication = async function () {
     return;
   }
 
+  let authUser;
   try {
-    await requireGuestAuth("Slanje posvete");
+    authUser = await requireGuestAuth("Slanje posvete");
   } catch (err) {
     console.warn("Dedication skipped because auth is not ready:", err);
     return;
@@ -1906,12 +1908,18 @@ window.saveDedication = async function () {
   await addDoc(collection(db, "events", currentEventId, "dedications"), {
     name,
     text,
+    userId: getActiveUserId(),
+    uploaderUid: authUser.uid,
     created: Date.now()
   });
 
-await updateDoc(doc(db, "events", currentEventId), {
-  dedicationCount: increment(1)
-});
+try {
+  await updateDoc(doc(db, "events", currentEventId), {
+    dedicationCount: increment(1)
+  });
+} catch (counterErr) {
+  console.warn("Dedication counter update skipped:", counterErr);
+}
 
   document.getElementById("dedicationText").value = "";
   closeDedicationComposer();
@@ -1966,7 +1974,11 @@ window.loadMyImages = async function () {
 
     if (uploaderUid) {
       const authSnap = await getDocs(
-        query(photosRef, where("uploaderUid", "==", uploaderUid))
+        query(
+          photosRef,
+          where("uploaderUid", "==", uploaderUid),
+          where("visible", "==", true)
+        )
       );
 
       authSnap.forEach((docSnap) => {
@@ -1977,7 +1989,11 @@ window.loadMyImages = async function () {
 
     if (userId) {
       const legacySnap = await getDocs(
-        query(photosRef, where("userId", "==", userId))
+        query(
+          photosRef,
+          where("userId", "==", userId),
+          where("visible", "==", true)
+        )
       );
 
       legacySnap.forEach((docSnap) => {

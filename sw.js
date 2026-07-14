@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v27-security-maintenance";
+const CACHE_NAME = "photodump-v28-sprint-a-security";
 
 const APP_SHELL = [
   "/",

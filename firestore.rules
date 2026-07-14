@@ -69,6 +69,18 @@ function isNullableStringMax(value, maxLength) {
     || (value is string && value.size() <= maxLength);
 }
 
+function isFirebaseStorageUrl(value) {
+  return value is string
+    && value.size() <= 2000
+    && value.matches('https://firebasestorage[.]googleapis[.]com/.*');
+}
+
+function isEventStoragePath(value, eventId, folder, maxLength) {
+  return value is string
+    && value.size() <= maxLength
+    && value.matches('^events/' + eventId + '/' + folder + '/[^/]+$');
+}
+
     function isEventOwner(eventId) {
       return isApproved()
         && get(
@@ -78,9 +90,6 @@ function isNullableStringMax(value, maxLength) {
 
     function isEventModerator(eventId) {
       return isApproved()
-        && exists(
-          /databases/$(database)/documents/events/$(eventId)/moderators/$(request.auth.uid)
-        )
         && get(
           /databases/$(database)/documents/events/$(eventId)/moderators/$(request.auth.uid)
         ).data.active == true;
@@ -349,17 +358,32 @@ function isNullableStringMax(value, maxLength) {
         && request.resource.data.created is number;
     }
 
-    function isValidOptionalUploaderUid() {
-      return !request.resource.data.keys().hasAny(["uploaderUid"])
-        || (
-          signedIn()
-          && isStringMax(request.resource.data.uploaderUid, 128)
-          && request.resource.data.uploaderUid == request.auth.uid
-        );
+    function isValidUploaderUid() {
+      return signedIn()
+        && isStringMax(request.resource.data.uploaderUid, 128)
+        && request.resource.data.uploaderUid == request.auth.uid;
+    }
+
+    function isPhotoPublicReadable(eventId) {
+      return eventIsActive(eventId)
+        && resource.data.visible == true;
+    }
+
+    function isPhotoUploader() {
+      return signedIn()
+        && resource.data.uploaderUid is string
+        && resource.data.uploaderUid == request.auth.uid;
+    }
+
+    function canReadPhoto(eventId) {
+      return isPhotoPublicReadable(eventId)
+        || canModerateEvent(eventId)
+        || isPhotoUploader();
     }
 
     function isValidPhotoCreate(eventId) {
-      return eventIsActive(eventId)
+      return signedIn()
+        && eventIsActive(eventId)
         && eventHasPhotoSpace(eventId)
 
         && request.resource.data.keys().hasOnly([
@@ -376,19 +400,22 @@ function isNullableStringMax(value, maxLength) {
           "visible"
         ])
 
-        && isStringMax(request.resource.data.imageUrl, 2000)
-        && isStringMax(request.resource.data.thumbUrl, 2000)
-        && isStringMax(request.resource.data.path, 500)
-        && isStringMax(request.resource.data.thumbPath, 500)
+        && isFirebaseStorageUrl(request.resource.data.imageUrl)
+        && isFirebaseStorageUrl(request.resource.data.thumbUrl)
+        && isEventStoragePath(request.resource.data.path, eventId, "photos", 500)
+        && isEventStoragePath(request.resource.data.thumbPath, eventId, "thumbs", 500)
 
         && (
           request.resource.data.originalPath == null
-          || isStringMax(request.resource.data.originalPath, 500)
+          || (
+            eventData(eventId).allowOriginals == true
+            && isEventStoragePath(request.resource.data.originalPath, eventId, "originals", 500)
+          )
         )
 
         && isStringBetween(request.resource.data.user, 1, 80)
         && isStringBetween(request.resource.data.userId, 1, 160)
-        && isValidOptionalUploaderUid()
+        && isValidUploaderUid()
 
         && request.resource.data.created is number
         && request.resource.data.likes == 0
@@ -419,16 +446,22 @@ function isNullableStringMax(value, maxLength) {
     }
 
     function isValidDedicationCreate(eventId) {
-      return eventIsActive(eventId)
+      return signedIn()
+        && eventIsActive(eventId)
 
         && request.resource.data.keys().hasOnly([
           "name",
           "text",
+          "userId",
+          "uploaderUid",
           "created"
         ])
 
         && isStringBetween(request.resource.data.name, 1, 80)
         && isStringBetween(request.resource.data.text, 1, 1000)
+        && isStringBetween(request.resource.data.userId, 1, 160)
+        && isStringMax(request.resource.data.uploaderUid, 128)
+        && request.resource.data.uploaderUid == request.auth.uid
         && request.resource.data.created is number;
     }
 
@@ -503,7 +536,8 @@ match /users/{userId} {
 
       match /photos/{photoId} {
 
-        allow read: if true;
+        allow read: if
+          canReadPhoto(eventId);
 
         allow create: if
           isValidPhotoCreate(eventId);
@@ -531,7 +565,16 @@ match /users/{userId} {
 
         match /likes/{likeId} {
 
-          allow read: if true;
+          allow get: if
+            signedIn()
+            && (
+              likeId == request.auth.uid
+              || canModerateEvent(eventId)
+            )
+            && eventIsActive(eventId);
+
+          allow list: if
+            canModerateEvent(eventId);
 
           allow create: if
             isValidLikeCreate(eventId, likeId);
@@ -549,7 +592,9 @@ match /users/{userId} {
 
       match /dedications/{id} {
 
-        allow read: if true;
+        // Posvete su privatne: čitaju ih samo superadmin, owner ili moderator eventa.
+        allow read: if
+          canModerateEvent(eventId);
 
         allow create: if
           isValidDedicationCreate(eventId);
@@ -606,7 +651,10 @@ match /users/{userId} {
           || isEventOwner(eventId);
 
         allow create: if
-          request.resource.data.keys().hasOnly([
+          signedIn()
+          && eventIsActive(eventId)
+          && userId == request.auth.uid
+          && request.resource.data.keys().hasOnly([
             "name",
             "created"
           ])
