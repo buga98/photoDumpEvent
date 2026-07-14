@@ -154,22 +154,48 @@ function isSuperAdmin() {
         && request.resource.data.expiresAt > request.resource.data.created;
     }
 
-    function isOnlyCounterUpdate() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "photoCount",
-          "dedicationCount",
-          "likeCount"
-        ])
+    function counterChangedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
 
+    function isPhotoCountPlusOne() {
+      return counterChangedKeys().hasOnly(["photoCount"])
+        && resource.data.photoCount is number
         && request.resource.data.photoCount is number
-        && request.resource.data.dedicationCount is number
-        && request.resource.data.likeCount is number
-
-        && request.resource.data.photoCount >= 0
-        && request.resource.data.dedicationCount >= 0
-        && request.resource.data.likeCount >= 0
-
+        && request.resource.data.photoCount == resource.data.photoCount + 1
         && request.resource.data.photoCount <= resource.data.uploadLimit;
+    }
+
+    function isPhotoCountMinusOne() {
+      return counterChangedKeys().hasOnly(["photoCount"])
+        && resource.data.photoCount is number
+        && request.resource.data.photoCount is number
+        && request.resource.data.photoCount == resource.data.photoCount - 1
+        && request.resource.data.photoCount >= 0;
+    }
+
+    function isDedicationCountPlusOne() {
+      return counterChangedKeys().hasOnly(["dedicationCount"])
+        && resource.data.dedicationCount is number
+        && request.resource.data.dedicationCount is number
+        && request.resource.data.dedicationCount == resource.data.dedicationCount + 1;
+    }
+
+    function isLikeCountPlusOne() {
+      return counterChangedKeys().hasOnly(["likeCount"])
+        && resource.data.likeCount is number
+        && request.resource.data.likeCount is number
+        && request.resource.data.likeCount == resource.data.likeCount + 1;
+    }
+
+    function isOnlyCounterUpdate() {
+      return signedIn()
+        && (
+          isPhotoCountPlusOne()
+          || isPhotoCountMinusOne()
+          || isDedicationCountPlusOne()
+          || isLikeCountPlusOne()
+        );
     }
 
     function isValidUserCreate(userId) {
@@ -250,24 +276,23 @@ function isSuperAdmin() {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
 
-    function isSafePhotoUpdate() {
-      return photoChangedKeys().hasOnly([
-          "visible",
-          "likes"
-        ])
+    function likeDocPath(eventId, photoId) {
+      return /databases/$(database)/documents/events/$(eventId)/photos/$(photoId)/likes/$(request.auth.uid);
+    }
 
-        && (
-          !photoChangedKeys().hasAny(["visible"])
-          || request.resource.data.visible is bool
-        )
+    function isPhotoLikeIncrement(eventId, photoId) {
+      return signedIn()
+        && photoChangedKeys().hasOnly(["likes"])
+        && resource.data.likes is number
+        && request.resource.data.likes is number
+        && request.resource.data.likes == resource.data.likes + 1
+        && !exists(likeDocPath(eventId, photoId))
+        && existsAfter(likeDocPath(eventId, photoId));
+    }
 
-        && (
-          !photoChangedKeys().hasAny(["likes"])
-          || (
-            request.resource.data.likes is number
-            && request.resource.data.likes >= resource.data.likes
-          )
-        );
+    function isPhotoVisibilityUpdate() {
+      return photoChangedKeys().hasOnly(["visible"])
+        && request.resource.data.visible is bool;
     }
 
     function isValidDedicationCreate(eventId) {
@@ -286,8 +311,10 @@ function isSuperAdmin() {
         && request.resource.data.created is number;
     }
 
-    function isValidLikeCreate(eventId) {
-      return eventIsActive(eventId)
+    function isValidLikeCreate(eventId, likeId) {
+      return signedIn()
+        && eventIsActive(eventId)
+        && likeId == request.auth.uid
 
         && request.resource.data.keys().hasOnly([
           "created"
@@ -352,7 +379,8 @@ match /users/{userId} {
           isValidPhotoCreate(eventId);
 
         allow update: if
-          isSafePhotoUpdate()
+          isPhotoLikeIncrement(eventId, photoId)
+          || isPhotoVisibilityUpdate()
           || isSuperAdmin();
 
         allow delete: if
@@ -368,7 +396,7 @@ match /users/{userId} {
           allow read: if true;
 
           allow create: if
-            isValidLikeCreate(eventId);
+            isValidLikeCreate(eventId, likeId);
 
           allow update: if false;
 

@@ -115,8 +115,8 @@ import {
   onSnapshot,
   orderBy,
   doc,
-  setDoc,
   addDoc,
+  writeBatch,
   collection,
   getDoc,
   getDocs,
@@ -234,6 +234,18 @@ async function ensureGuestAuth() {
 
 function getActiveUploaderUid() {
   return auth.currentUser?.uid || getStoredAuthUid();
+}
+
+async function requireGuestAuth(actionLabel = "Ova radnja") {
+  const user = await ensureGuestAuth();
+
+  if (!user?.uid) {
+    showToast(`${actionLabel} trenutno nije dostupna. Osvježi stranicu i pokušaj ponovno.`);
+    throw new Error("AUTH_REQUIRED");
+  }
+
+  storeAuthUid(user);
+  return user;
 }
 
 const THEME_CLASSES = [
@@ -778,8 +790,17 @@ function updateGalleryBadges() {
 }
 
 async function likePhoto(photoId, animationParent = null) {
-  const userId = getActiveUserId();
-  if (!photoId || !userId) return false;
+  if (!photoId) return false;
+
+  let authUser;
+  try {
+    authUser = await requireGuestAuth("Lajkanje");
+  } catch (err) {
+    console.warn("Like skipped because auth is not ready:", err);
+    return false;
+  }
+
+  const userId = authUser.uid;
 
   if (animationParent) showBigHeart(animationParent);
 
@@ -790,6 +811,14 @@ async function likePhoto(photoId, animationParent = null) {
     card?.querySelector(".heart")?.classList.add("liked");
     return false;
   }
+
+  const photoRef = doc(
+    db,
+    "events",
+    currentEventId,
+    "photos",
+    photoId
+  );
 
   const userLikeRef = doc(
     db,
@@ -815,19 +844,35 @@ async function likePhoto(photoId, animationParent = null) {
   card?.querySelector(".heart")?.classList.add("liked");
   updateCardLikeDisplay(photoId, currentCount + 1);
 
-  await setDoc(userLikeRef, {
-    created: Date.now()
+  const batch = writeBatch(db);
+  const now = Date.now();
+
+  batch.set(userLikeRef, {
+    created: now
   });
 
-  await updateDoc(doc(db, "events", currentEventId, "photos", photoId), {
+  batch.update(photoRef, {
     likes: increment(1)
   });
 
-  await updateDoc(doc(db, "events", currentEventId), {
+  batch.update(doc(db, "events", currentEventId), {
     likeCount: increment(1)
   });
 
-  return true;
+  try {
+    await batch.commit();
+    return true;
+  } catch (err) {
+    console.error("Like commit error:", err);
+
+    likedCache.delete(photoId);
+    saveLikedCache();
+    card?.querySelector(".heart")?.classList.remove("liked");
+    updateCardLikeDisplay(photoId, currentCount);
+
+    showToast("Lajk nije spremljen. Osvježi stranicu i pokušaj ponovno.");
+    return false;
+  }
 }
 
 function getPhotoDownloadFileName(photoId = "fotografija") {
@@ -1206,6 +1251,9 @@ window.uploadToFirebase = function (file, user, onProgress) {
     }
 
     try {
+      const authUser = await requireGuestAuth("Upload fotografije");
+      const uploaderUid = authUser.uid;
+
       const [bigFile, thumbFile] =
         await Promise.all([
           resizeImage(file, 1200, 0.72),
@@ -1282,9 +1330,6 @@ window.uploadToFirebase = function (file, user, onProgress) {
               await originalUploadPromise;
             }
 
-            const authUser = await ensureGuestAuth();
-            const uploaderUid = authUser?.uid || getActiveUploaderUid();
-
             const photoData = {
               imageUrl,
               thumbUrl,
@@ -1296,15 +1341,12 @@ window.uploadToFirebase = function (file, user, onProgress) {
 
               user,
               userId: getActiveUserId(),
+              uploaderUid,
 
               created: Date.now(),
               likes: 0,
               visible: true
             };
-
-            if (uploaderUid) {
-              photoData.uploaderUid = uploaderUid;
-            }
 
             await addDoc(
               collection(db, "events", currentEventId, "photos"),
@@ -1576,6 +1618,8 @@ window.confirmDelete = async function () {
   const photoIdToDelete = selectedPhotoId;
 
   try {
+    await requireGuestAuth("Brisanje fotografije");
+
     await updateDoc(
       doc(db, "events", currentEventId, "photos", photoIdToDelete),
       {
@@ -1659,6 +1703,13 @@ window.saveDedication = async function () {
     return;
   }
 
+  try {
+    await requireGuestAuth("Slanje posvete");
+  } catch (err) {
+    console.warn("Dedication skipped because auth is not ready:", err);
+    return;
+  }
+
   await addDoc(collection(db, "events", currentEventId, "dedications"), {
     name,
     text,
@@ -1702,35 +1753,56 @@ window.closeDedicationComposer = function () {
 window.loadMyImages = async function () {
   const gallery = document.getElementById("gallery");
   const userId = getActiveUserId();
+  const uploaderUid = getActiveUploaderUid();
 
   if (!gallery) return;
 
   gallery.innerHTML =
     "<p style='grid-column:1/-1; opacity:0.6;'>Učitavam...</p>";
 
-  if (!userId) {
+  if (!userId && !uploaderUid) {
     gallery.innerHTML =
       "<p style='grid-column:1/-1; opacity:0.6;'>Nema još tvojih slika 📸</p>";
     return;
   }
 
   try {
-    const q = query(
-      collection(db, "events", currentEventId, "photos"),
-      where("userId", "==", userId)
-    );
+    const photosRef = collection(db, "events", currentEventId, "photos");
+    let docs = [];
+    const seen = new Set();
 
-    const snapshot = await getDocs(q);
+    if (uploaderUid) {
+      const authSnap = await getDocs(
+        query(photosRef, where("uploaderUid", "==", uploaderUid))
+      );
+
+      authSnap.forEach((docSnap) => {
+        seen.add(docSnap.id);
+        docs.push(docSnap);
+      });
+    }
+
+    if (userId) {
+      const legacySnap = await getDocs(
+        query(photosRef, where("userId", "==", userId))
+      );
+
+      legacySnap.forEach((docSnap) => {
+        if (seen.has(docSnap.id)) return;
+        seen.add(docSnap.id);
+        docs.push(docSnap);
+      });
+    }
 
     gallery.innerHTML = "";
 
-    if (snapshot.empty) {
+    if (!docs.length) {
       gallery.innerHTML =
         "<p style='grid-column:1/-1; opacity:0.6;'>Nema još tvojih slika 📸</p>";
       return;
     }
 
-    snapshot.forEach((docSnap) => {
+    docs.forEach((docSnap) => {
   const data = docSnap.data();
 
   if (data.visible === false) return;
