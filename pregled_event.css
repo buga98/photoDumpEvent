@@ -1203,3 +1203,29 @@ textarea{
     font-size:16px !important;
   }
 }
+.maintenance-status{
+  margin:14px 0 22px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#0f1115;
+  border:1px solid rgba(255,255,255,.08);
+  color:#dbeafe;
+  font-size:14px;
+  line-height:1.45;
+  white-space:pre-line;
+}
+
+.maintenance-status.success{
+  border-color:rgba(119,255,176,.28);
+  color:#b7ffd0;
+}
+
+.maintenance-status.error{
+  border-color:rgba(255,123,123,.35);
+  color:#ffc9c9;
+}
+
+.maintenance-status.warning{
+  border-color:rgba(255,209,102,.32);
+  color:#ffe7a3;
+}

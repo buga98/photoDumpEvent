@@ -142,7 +142,17 @@ function clearMessage() {
 function normalizeEmail(value) {
   return String(value || "")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .slice(0, 254);
+}
+
+function sanitizeSingleLine(value, maxLength = 80) {
+  return String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }
 
 function validatePassword(password) {
@@ -253,10 +263,13 @@ async function register() {
   clearMessage();
 
   const firstName =
-    firstNameEl.value.trim();
+    sanitizeSingleLine(firstNameEl.value, 80);
 
   const lastName =
-    lastNameEl.value.trim();
+    sanitizeSingleLine(lastNameEl.value, 80);
+
+  firstNameEl.value = firstName;
+  lastNameEl.value = lastName;
 
   const email =
     normalizeEmail(registerEmailEl.value);

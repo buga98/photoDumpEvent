@@ -235,8 +235,50 @@ function getInput(id) {
   return document.getElementById(id);
 }
 
-function getTextValue(id) {
-  return getInput(id)?.value.trim() || "";
+function sanitizeSingleLine(value, maxLength = 120) {
+  return String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function sanitizeLongText(value, maxLength = 1000) {
+  return String(value || "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function sanitizeFileName(value, maxLength = 120) {
+  const name = String(value || "file.jpg")
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/[\/\\?%*:|"<>]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim()
+    .slice(0, maxLength);
+
+  return name || "file.jpg";
+}
+
+function escapeHTML(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeHTML(value);
+}
+
+function getTextValue(id, maxLength = 1000) {
+  return sanitizeLongText(getInput(id)?.value || "", maxLength);
 }
 
 function setText(id, value) {
@@ -262,7 +304,7 @@ function formatText(text) {
   return text
     .split("\n")
     .map(line => line.trim())
-    .map(line => line ? `<p>${line}</p>` : `<br>`)
+    .map(line => line ? `<p>${escapeHTML(line)}</p>` : `<br>`)
     .join("");
 }
 window.logout = async function () {
@@ -454,7 +496,7 @@ function getPreviewTitleWithEmoji(title, type) {
 function updatePreview() {
 
   const title =
-    titleInput.value.trim() || "Naziv eventa";
+    sanitizeSingleLine(titleInput.value, 120) || "Naziv eventa";
 
   const type =
     typeInput.value || "default";
@@ -877,7 +919,11 @@ window.downloadQrPng = async function () {
 window.createNewEvent = async function () {
 
   const title =
-    titleInput.value.trim();
+    sanitizeSingleLine(titleInput.value, 120);
+
+  if (titleInput) {
+    titleInput.value = title;
+  }
 
   const type =
     typeInput.value;
@@ -954,10 +1000,7 @@ window.createNewEvent = async function () {
         await resizeImage(files[i], 300, 0.6);
 
       const cleanName =
-        files[i].name
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9.-]/g, "");
+        sanitizeFileName(files[i].name.toLowerCase());
 
       const fileRef =
         ref(
@@ -1072,31 +1115,31 @@ createdEventPayload = {
 
       <p><b>Guest link:</b></p>
 
-      <a href="${guestLink}" target="_blank">
-        ${guestLink}
+      <a href="${escapeAttr(guestLink)}" target="_blank" rel="noopener noreferrer">
+        ${escapeHTML(guestLink)}
       </a>
 
       <br><br>
 
       <p><b>App link:</b></p>
 
-      <a href="${appLink}" target="_blank">
-        ${appLink}
+      <a href="${escapeAttr(appLink)}" target="_blank" rel="noopener noreferrer">
+        ${escapeHTML(appLink)}
       </a>
 
       <br><br>
 
       <p><b>Admin link:</b></p>
 
-      <a href="${adminLink}" target="_blank">
-        ${adminLink}
+      <a href="${escapeAttr(adminLink)}" target="_blank" rel="noopener noreferrer">
+        ${escapeHTML(adminLink)}
       </a>
 
       ${moderatorAccount ? `
         <br><br>
         <p><b>Moderator pristup:</b></p>
-        <p>Email: ${moderatorAccount.email}</p>
-        <p>Lozinka: ${moderatorCredentials.password}</p>
+        <p>Email: ${escapeHTML(moderatorAccount.email)}</p>
+        <p>Lozinka: ${escapeHTML(moderatorCredentials.password)}</p>
         <p style="opacity:.7; font-size:13px;">Spremi ovu lozinku odmah — ne sprema se kao običan tekst u Firestore.</p>
       ` : ""}
     `;

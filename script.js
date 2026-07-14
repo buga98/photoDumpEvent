@@ -98,7 +98,7 @@ function getActiveUserId() {
 }
 
 function getActiveUserName() {
-  return (
+  const rawName = (
     localStorage.getItem("name_" + currentEventId) ||
     (localStorage.getItem("eventId") === currentEventId
       ? localStorage.getItem("name")
@@ -106,6 +106,38 @@ function getActiveUserName() {
     (cookieEventId === currentEventId ? getPwaCookie("pde_name") : "") ||
     ""
   );
+
+  return sanitizeSingleLine(rawName, 80);
+}
+
+
+function sanitizeSingleLine(value, maxLength = 80) {
+  return String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function sanitizeLongText(value, maxLength = 1000) {
+  return String(value || "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function sanitizeFileName(value, maxLength = 120) {
+  const name = String(value || "photo.jpg")
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/[\/\\?%*:|"<>]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim()
+    .slice(0, maxLength);
+
+  return name || "photo.jpg";
 }
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -1086,7 +1118,7 @@ function getFeedAuthorName(data) {
       ? data.user.trim()
       : "";
 
-  return rawName || "Gost";
+  return sanitizeSingleLine(rawName || "Gost", 80) || "Gost";
 }
 
 function getFeedAuthorInitial(name) {
@@ -1417,7 +1449,7 @@ window.uploadToFirebase = function (file, user, onProgress) {
         ]);
 
       const safeName =
-        file.name.replace(/\s+/g, "-");
+        sanitizeFileName(file.name);
 
       const timestamp =
         Date.now();
@@ -1851,8 +1883,13 @@ window.switchScreen = function (screen) {
 };
 
 window.saveDedication = async function () {
-  const text = document.getElementById("dedicationText").value.trim();
-  const name = getActiveUserName();
+  const textInput = document.getElementById("dedicationText");
+  const text = sanitizeLongText(textInput?.value || "", 1000);
+  const name = sanitizeSingleLine(getActiveUserName(), 80) || "Gost";
+
+  if (textInput) {
+    textInput.value = text;
+  }
 
   if (!text) {
     alert("Napiši poruku 🤍");
@@ -2410,14 +2447,16 @@ if (!activeUserId) {
   activeUserId = createGuestUserId();
 }
 
-const user =
+const user = sanitizeSingleLine(
   localStorage.getItem("name_" + currentEventId) ||
   (storedEventIdBeforeOpen === currentEventId
     ? localStorage.getItem("name")
     : "") ||
   (cookieEventId === currentEventId
     ? getPwaCookie("pde_name")
-    : "");
+    : ""),
+  80
+);
 
 const welcomeEl = document.getElementById("welcome");
 

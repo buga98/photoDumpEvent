@@ -6,6 +6,25 @@ function logTime(label) {
   console.log(`⏱️ ${label}: ${t}ms`);
 }
 
+
+function sanitizeSingleLine(value, maxLength = 80) {
+  return String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function escapeHTML(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function createGuestUserId() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
     return window.crypto.randomUUID();
@@ -58,7 +77,14 @@ const container = document.querySelector(".floating-container");
 
 window.enterApp = function () {
   const nameInput = document.getElementById("name");
-  const name = nameInput ? nameInput.value.trim() : "";
+  const name = sanitizeSingleLine(
+    nameInput ? nameInput.value : "",
+    80
+  );
+
+  if (nameInput) {
+    nameInput.value = name;
+  }
 
   if (!name || name.length < 2) {
     alert("Upiši ime i prezime");
@@ -152,7 +178,7 @@ function formatText(text) {
   return text
     .split("\n")
     .map(line => line.trim())
-    .map(line => line ? `<p>${line}</p>` : `<br>`)
+    .map(line => line ? `<p>${escapeHTML(line)}</p>` : `<br>`)
     .join("");
 }
 function applyEvent(event) {

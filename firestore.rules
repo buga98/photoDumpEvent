@@ -53,6 +53,22 @@ function canCreateEvent() {
     || isOrganizer();
 }
 
+function isStringBetween(value, minLength, maxLength) {
+  return value is string
+    && value.size() >= minLength
+    && value.size() <= maxLength;
+}
+
+function isStringMax(value, maxLength) {
+  return value is string
+    && value.size() <= maxLength;
+}
+
+function isNullableStringMax(value, maxLength) {
+  return value == null
+    || (value is string && value.size() <= maxLength);
+}
+
     function isEventOwner(eventId) {
       return isApproved()
         && get(
@@ -187,12 +203,12 @@ function canCreateEvent() {
           "created"
         ])
 
-        && request.resource.data.title is string
-        && request.resource.data.title.size() >= 2
+        && isStringBetween(request.resource.data.title, 2, 120)
 
         && request.resource.data.ownerId == request.auth.uid
         && request.resource.data.ownerEmail == request.auth.token.email
-        && request.resource.data.ownerName is string
+        && isStringMax(request.resource.data.ownerEmail, 254)
+        && isStringMax(request.resource.data.ownerName, 120)
 
         && isValidEventType()
         && isValidPlanConfig()
@@ -274,11 +290,12 @@ function canCreateEvent() {
           "created"
         ])
 
-        && request.resource.data.firstName is string
-        && request.resource.data.lastName is string
-        && request.resource.data.name is string
+        && isStringMax(request.resource.data.firstName, 80)
+        && isStringMax(request.resource.data.lastName, 80)
+        && isStringMax(request.resource.data.name, 120)
 
         && request.resource.data.email == request.auth.token.email
+        && isStringMax(request.resource.data.email, 254)
 
         && request.resource.data.role == "organizer"
         && request.resource.data.approved == false
@@ -306,10 +323,10 @@ function canCreateEvent() {
           "created"
         ])
 
-        && request.resource.data.firstName is string
-        && request.resource.data.lastName is string
-        && request.resource.data.name is string
-        && request.resource.data.email is string
+        && isStringMax(request.resource.data.firstName, 80)
+        && isStringMax(request.resource.data.lastName, 80)
+        && isStringMax(request.resource.data.name, 120)
+        && isStringMax(request.resource.data.email, 254)
 
         && request.resource.data.role == "moderator"
         && request.resource.data.approved == true
@@ -326,7 +343,7 @@ function canCreateEvent() {
           "active",
           "created"
         ])
-        && request.resource.data.email is string
+        && isStringMax(request.resource.data.email, 254)
         && request.resource.data.role == "moderator"
         && request.resource.data.active == true
         && request.resource.data.created is number;
@@ -336,7 +353,7 @@ function canCreateEvent() {
       return !request.resource.data.keys().hasAny(["uploaderUid"])
         || (
           signedIn()
-          && request.resource.data.uploaderUid is string
+          && isStringMax(request.resource.data.uploaderUid, 128)
           && request.resource.data.uploaderUid == request.auth.uid
         );
     }
@@ -359,18 +376,18 @@ function canCreateEvent() {
           "visible"
         ])
 
-        && request.resource.data.imageUrl is string
-        && request.resource.data.thumbUrl is string
-        && request.resource.data.path is string
-        && request.resource.data.thumbPath is string
+        && isStringMax(request.resource.data.imageUrl, 2000)
+        && isStringMax(request.resource.data.thumbUrl, 2000)
+        && isStringMax(request.resource.data.path, 500)
+        && isStringMax(request.resource.data.thumbPath, 500)
 
         && (
           request.resource.data.originalPath == null
-          || request.resource.data.originalPath is string
+          || isStringMax(request.resource.data.originalPath, 500)
         )
 
-        && request.resource.data.user is string
-        && request.resource.data.userId is string
+        && isStringBetween(request.resource.data.user, 1, 80)
+        && isStringBetween(request.resource.data.userId, 1, 160)
         && isValidOptionalUploaderUid()
 
         && request.resource.data.created is number
@@ -410,10 +427,8 @@ function canCreateEvent() {
           "created"
         ])
 
-        && request.resource.data.name is string
-        && request.resource.data.text is string
-        && request.resource.data.text.size() >= 1
-        && request.resource.data.text.size() <= 1000
+        && isStringBetween(request.resource.data.name, 1, 80)
+        && isStringBetween(request.resource.data.text, 1, 1000)
         && request.resource.data.created is number;
     }
 
@@ -523,7 +538,8 @@ match /users/{userId} {
 
           allow update: if false;
 
-          allow delete: if false;
+          allow delete: if
+            isSuperAdmin();
         }
       }
 
@@ -540,7 +556,8 @@ match /users/{userId} {
 
         allow update: if false;
 
-        allow delete: if false;
+        allow delete: if
+          isSuperAdmin();
       }
 
       // =====================
@@ -568,7 +585,7 @@ match /users/{userId} {
             "active",
             "created"
           ])
-          && request.resource.data.email is string
+          && isStringMax(request.resource.data.email, 254)
           && request.resource.data.role == "moderator"
           && request.resource.data.active is bool
           && request.resource.data.created is number;
@@ -593,12 +610,13 @@ match /users/{userId} {
             "name",
             "created"
           ])
-          && request.resource.data.name is string
+          && isStringBetween(request.resource.data.name, 1, 80)
           && request.resource.data.created is number;
 
         allow update: if false;
 
-        allow delete: if false;
+        allow delete: if
+          isSuperAdmin();
       }
     }
   }

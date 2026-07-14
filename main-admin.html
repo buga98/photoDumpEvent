@@ -47,7 +47,7 @@
     <p class="subtitle">Odaberi tip eventa, upiši naslov i dodaj točno 6 slika za bubble prikaz.</p>
 
     <label>Naslov eventa</label>
-    <input id="eventTitle" type="text" placeholder="npr. Rođendan Ivan/Sveto krštenje Lucija/Mirko & Marica">
+    <input id="eventTitle" type="text" maxlength="120" placeholder="npr. Rođendan Ivan/Sveto krštenje Lucija/Mirko & Marica">
     <label>Tip eventa</label>
     <select id="eventType">
       <option value="svadba">Vjenčanje</option>
@@ -73,10 +73,10 @@
 </p>
 
 <label>Moderator email</label>
-<input id="moderatorEmail" type="email" placeholder="npr. moderator@email.com" autocomplete="off">
+<input id="moderatorEmail" type="email" maxlength="254" placeholder="npr. moderator@email.com" autocomplete="off">
 
 <label>Moderator lozinka</label>
-<input id="moderatorPassword" type="password" placeholder="minimalno 6 znakova" autocomplete="new-password">
+<input id="moderatorPassword" type="password" minlength="6" maxlength="128" placeholder="minimalno 6 znakova" autocomplete="new-password">
         <label class="file-box">
       <span id="fileLabel">Dodaj 6 slika za bubble</span>
       <input type="file" id="bubbleImages" multiple accept="image/*">
@@ -89,39 +89,39 @@
 
 <label>Naslov (index)</label>
 <div class="input-row">
-  <input id="text_index_title" type="text">
+  <input id="text_index_title" type="text" maxlength="120">
   <button onclick="fillDefault('index_title')">⬅️</button>
 </div>
 
 <label>Tekst (index)</label>
 <div class="input-row">
-  <textarea id="text_index_subtitle" rows="6"></textarea>
+  <textarea id="text_index_subtitle" rows="6" maxlength="1000"></textarea>
   <button onclick="fillDefault('index_subtitle')">⬅️</button>
 </div>
 
 
 <label>Naslov (upload)</label>
 <div class="input-row">
-  <input id="text_upload_title" type="text">
+  <input id="text_upload_title" type="text" maxlength="120">
   <button onclick="fillDefault('upload_title')">⬅️</button>
 </div>
 
 <label>Tekst (upload)</label>
 <div class="input-row">
-  <input id="text_upload_subtitle" type="text">
+  <input id="text_upload_subtitle" type="text" maxlength="500">
   <button onclick="fillDefault('upload_subtitle')">⬅️</button>
 </div>
 
 
 <label>Naslov (profil)</label>
 <div class="input-row">
-  <input id="text_profile_title" type="text">
+  <input id="text_profile_title" type="text" maxlength="120">
   <button onclick="fillDefault('profile_title')">⬅️</button>
 </div>
 
 <label>Tekst (profil)</label>
 <div class="input-row">
-  <input id="text_profile_subtitle" type="text">
+  <input id="text_profile_subtitle" type="text" maxlength="500">
   <button onclick="fillDefault('profile_subtitle')">⬅️</button>
 </div>
 <hr style="margin:25px 0; opacity:.2;">

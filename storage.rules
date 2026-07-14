@@ -39,6 +39,22 @@ service firebase.storage {
         && eventData(eventId).ownerId == request.auth.uid;
     }
 
+    function isEventModerator(eventId) {
+      return isApproved()
+        && firestore.exists(
+          /databases/(default)/documents/events/$(eventId)/moderators/$(request.auth.uid)
+        )
+        && firestore.get(
+          /databases/(default)/documents/events/$(eventId)/moderators/$(request.auth.uid)
+        ).data.active == true;
+    }
+
+    function canReadOriginals(eventId) {
+      return isSuperAdmin()
+        || isEventOwner(eventId)
+        || isEventModerator(eventId);
+    }
+
     function eventIsActive(eventId) {
       return eventData(eventId).active == true
         && eventData(eventId).status == "active"
@@ -120,7 +136,10 @@ service firebase.storage {
     // ==============================
 
     match /events/{eventId}/originals/{file} {
-      allow read: if true;
+      // Originali više nisu javni.
+      // Čitati ih mogu samo superadmin, owner eventa ili dodijeljeni moderator.
+      allow read: if
+        canReadOriginals(eventId);
 
       allow create: if
         eventIsActive(eventId)

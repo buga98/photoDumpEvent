@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  writeBatch,
   orderBy,
   query,
   where
@@ -17,6 +18,14 @@ import {
   onAuthStateChanged
 }
 from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+import {
+  getStorage,
+  ref,
+  list,
+  deleteObject,
+  getBlob
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBjETOqGf9zNxWO7DB7QokoHu_duiqM8Jg",
@@ -29,6 +38,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const auth = getAuth(app);
 
 let currentEventId = null;
@@ -398,6 +408,8 @@ function createEventCard(event) {
 
 async function openEditor(eventId) {
 
+  clearMaintenanceStatus();
+
   currentEventId = eventId;
 
   const snap =
@@ -552,24 +564,24 @@ document.getElementById("saveBtn").onclick = async () => {
 
   const payload = {
 
-    title: getValue("edit_title"),
-    type: getValue("edit_type"),
-    status: getValue("edit_status"),
+    title: sanitizeSingleLine(getValue("edit_title"), 120),
+    type: sanitizeSingleLine(getValue("edit_type"), 30),
+    status: sanitizeSingleLine(getValue("edit_status"), 30),
 
     texts: {
       index: {
-        title: getValue("edit_index_title"),
-        subtitle: getValue("edit_index_subtitle")
+        title: sanitizeSingleLine(getValue("edit_index_title"), 120),
+        subtitle: sanitizeLongText(getValue("edit_index_subtitle"), 1000)
       },
 
       upload: {
-        title: getValue("edit_upload_title"),
-        subtitle: getValue("edit_upload_subtitle")
+        title: sanitizeSingleLine(getValue("edit_upload_title"), 120),
+        subtitle: sanitizeLongText(getValue("edit_upload_subtitle"), 500)
       },
 
       profile: {
-        title: getValue("edit_profile_title"),
-        subtitle: getValue("edit_profile_subtitle")
+        title: sanitizeSingleLine(getValue("edit_profile_title"), 120),
+        subtitle: sanitizeLongText(getValue("edit_profile_subtitle"), 500)
       }
     }
   };
@@ -714,6 +726,544 @@ document.getElementById("cleanedEventBtn")?.addEventListener("click", async () =
   await loadEvents();
   await openEditor(currentEventId);
 });
+
+function setMaintenanceStatus(message, type = "") {
+
+  const el =
+    document.getElementById("eventMaintenanceStatus");
+
+  if (!el) return;
+
+  el.classList.remove(
+    "hidden",
+    "success",
+    "error",
+    "warning"
+  );
+
+  if (type) {
+    el.classList.add(type);
+  }
+
+  el.innerText = message || "";
+}
+
+function clearMaintenanceStatus() {
+  const el =
+    document.getElementById("eventMaintenanceStatus");
+
+  if (!el) return;
+
+  el.classList.add("hidden");
+  el.classList.remove("success", "error", "warning");
+  el.innerText = "";
+}
+
+function sanitizeSingleLine(value, maxLength = 120) {
+  return String(value || "")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function sanitizeLongText(value, maxLength = 1000) {
+  return String(value || "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function safeDownloadName(value, fallback = "event") {
+  return String(value || fallback)
+    .toLowerCase()
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/[\/?%*:|"<>\\]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90) || fallback;
+}
+
+function normalizeForJson(value) {
+  if (value == null) return value;
+
+  if (
+    typeof value === "object" &&
+    typeof value.toDate === "function"
+  ) {
+    const date = value.toDate();
+    return {
+      _type: "Timestamp",
+      iso: date.toISOString(),
+      millis: date.getTime()
+    };
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(normalizeForJson);
+  }
+
+  if (typeof value === "object") {
+    const out = {};
+
+    for (const [key, childValue] of Object.entries(value)) {
+      out[key] = normalizeForJson(childValue);
+    }
+
+    return out;
+  }
+
+  return value;
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+async function getDocsArray(colRef) {
+  const snapshot = await getDocs(colRef);
+
+  return snapshot.docs.map((docSnap) => ({
+    id: docSnap.id,
+    data: normalizeForJson(docSnap.data())
+  }));
+}
+
+async function buildEventBackup(eventId) {
+  const eventSnap = await getDoc(doc(db, "events", eventId));
+
+  if (!eventSnap.exists()) {
+    throw new Error("Event ne postoji.");
+  }
+
+  const photosSnap = await getDocs(
+    collection(db, "events", eventId, "photos")
+  );
+
+  const photos = [];
+
+  for (const photoSnap of photosSnap.docs) {
+    const likes = await getDocsArray(
+      collection(
+        db,
+        "events",
+        eventId,
+        "photos",
+        photoSnap.id,
+        "likes"
+      )
+    );
+
+    photos.push({
+      id: photoSnap.id,
+      data: normalizeForJson(photoSnap.data()),
+      likes
+    });
+  }
+
+  const [dedications, moderators, eventUsers] = await Promise.all([
+    getDocsArray(collection(db, "events", eventId, "dedications")),
+    getDocsArray(collection(db, "events", eventId, "moderators")),
+    getDocsArray(collection(db, "events", eventId, "users"))
+  ]);
+
+  return {
+    meta: {
+      exportedAt: new Date().toISOString(),
+      exportedBy: currentUser?.email || currentUser?.uid || "unknown",
+      eventId,
+      schema: "photodump-event-backup-v1"
+    },
+    event: {
+      id: eventSnap.id,
+      data: normalizeForJson(eventSnap.data())
+    },
+    photos,
+    dedications,
+    moderators,
+    eventUsers
+  };
+}
+
+async function exportCurrentEventBackup() {
+  if (!currentEventId || currentRole !== "superadmin") return;
+
+  try {
+    setMaintenanceStatus("Pripremam JSON backup eventa...");
+
+    const backup = await buildEventBackup(currentEventId);
+    const name = safeDownloadName(
+      backup.event?.data?.title || currentEventId,
+      currentEventId
+    );
+
+    const blob = new Blob(
+      [JSON.stringify(backup, null, 2)],
+      { type: "application/json;charset=utf-8" }
+    );
+
+    downloadBlob(
+      blob,
+      `${name}-${currentEventId}-backup.json`
+    );
+
+    setMaintenanceStatus("JSON backup preuzet ✅", "success");
+
+  } catch (err) {
+    console.error("Backup export error:", err);
+    setMaintenanceStatus("Greška kod backup exporta.", "error");
+  }
+}
+
+function loadJSZip() {
+  if (window.JSZip) {
+    return Promise.resolve(window.JSZip);
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+    script.async = true;
+    script.onload = () => resolve(window.JSZip);
+    script.onerror = () => reject(new Error("JSZip se nije učitao."));
+    document.head.appendChild(script);
+  });
+}
+
+function fileExtensionFromPath(path) {
+  const match = String(path || "").match(/\.[a-z0-9]{2,6}(?=($|\?))/i);
+  return match ? match[0].toLowerCase() : ".jpg";
+}
+
+async function addStoragePathToZip(zip, storagePath, zipPath) {
+  if (!storagePath) return false;
+
+  const blob = await getBlob(ref(storage, storagePath));
+  zip.file(zipPath, blob);
+
+  return true;
+}
+
+async function exportCurrentEventMediaZip() {
+  if (!currentEventId || currentRole !== "superadmin") return;
+
+  if (!confirm("Export ZIP može trajati dulje i zauzeti dosta memorije ako event ima puno fotografija. Nastaviti?")) {
+    return;
+  }
+
+  try {
+    setMaintenanceStatus("Učitavam backup i JSZip...");
+
+    const [JSZip, backup] = await Promise.all([
+      loadJSZip(),
+      buildEventBackup(currentEventId)
+    ]);
+
+    const zip = new JSZip();
+    const name = safeDownloadName(
+      backup.event?.data?.title || currentEventId,
+      currentEventId
+    );
+
+    zip.file(
+      "event-backup.json",
+      JSON.stringify(backup, null, 2)
+    );
+
+    const manifest = [];
+
+    for (let i = 0; i < backup.photos.length; i++) {
+      const photo = backup.photos[i];
+      const data = photo.data || {};
+      const base = String(i + 1).padStart(4, "0") + "_" + photo.id;
+
+      setMaintenanceStatus(
+        `Dodajem fotografije u ZIP... ${i + 1}/${backup.photos.length}`
+      );
+
+      manifest.push({
+        id: photo.id,
+        path: data.path || "",
+        thumbPath: data.thumbPath || "",
+        originalPath: data.originalPath || "",
+        user: data.user || "",
+        created: data.created || ""
+      });
+
+      try {
+        await addStoragePathToZip(
+          zip,
+          data.path,
+          `photos/${base}${fileExtensionFromPath(data.path)}`
+        );
+      } catch (err) {
+        console.warn("Photo ZIP skip:", data.path, err);
+      }
+
+      try {
+        await addStoragePathToZip(
+          zip,
+          data.thumbPath,
+          `thumbs/${base}${fileExtensionFromPath(data.thumbPath)}`
+        );
+      } catch (err) {
+        console.warn("Thumb ZIP skip:", data.thumbPath, err);
+      }
+
+      if (data.originalPath) {
+        try {
+          await addStoragePathToZip(
+            zip,
+            data.originalPath,
+            `originals/${base}${fileExtensionFromPath(data.originalPath)}`
+          );
+        } catch (err) {
+          console.warn("Original ZIP skip:", data.originalPath, err);
+        }
+      }
+    }
+
+    zip.file(
+      "media-manifest.json",
+      JSON.stringify(manifest, null, 2)
+    );
+
+    setMaintenanceStatus("Pakiram ZIP... Ovo može potrajati.");
+
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    downloadBlob(
+      blob,
+      `${name}-${currentEventId}-media.zip`
+    );
+
+    setMaintenanceStatus("ZIP export preuzet ✅", "success");
+
+  } catch (err) {
+    console.error("Media ZIP export error:", err);
+    setMaintenanceStatus("Greška kod ZIP exporta. Probaj JSON backup ili manji event.", "error");
+  }
+}
+
+async function commitAndResetBatch(batchState) {
+  if (!batchState.count) return;
+
+  await batchState.batch.commit();
+  batchState.batch = writeBatch(db);
+  batchState.count = 0;
+}
+
+function queueDelete(batchState, refToDelete) {
+  batchState.batch.delete(refToDelete);
+  batchState.count += 1;
+}
+
+async function deleteCollectionWithBatch(colRef, label, batchState) {
+  const snapshot = await getDocs(colRef);
+  let deleted = 0;
+
+  for (const docSnap of snapshot.docs) {
+    queueDelete(batchState, docSnap.ref);
+    deleted += 1;
+
+    if (batchState.count >= 450) {
+      setMaintenanceStatus(`Brišem Firestore: ${label}...`);
+      await commitAndResetBatch(batchState);
+    }
+  }
+
+  return deleted;
+}
+
+async function deleteEventFirestoreData(eventId) {
+  const batchState = {
+    batch: writeBatch(db),
+    count: 0
+  };
+
+  const photosSnap = await getDocs(
+    collection(db, "events", eventId, "photos")
+  );
+
+  let photoCount = 0;
+  let likeCount = 0;
+
+  for (const photoSnap of photosSnap.docs) {
+    likeCount += await deleteCollectionWithBatch(
+      collection(db, "events", eventId, "photos", photoSnap.id, "likes"),
+      "likes",
+      batchState
+    );
+
+    queueDelete(batchState, photoSnap.ref);
+    photoCount += 1;
+
+    if (batchState.count >= 450) {
+      setMaintenanceStatus(`Brišem Firestore fotografije... ${photoCount}`);
+      await commitAndResetBatch(batchState);
+    }
+  }
+
+  const dedicationCount = await deleteCollectionWithBatch(
+    collection(db, "events", eventId, "dedications"),
+    "dedications",
+    batchState
+  );
+
+  const moderatorCount = await deleteCollectionWithBatch(
+    collection(db, "events", eventId, "moderators"),
+    "moderators",
+    batchState
+  );
+
+  const eventUserCount = await deleteCollectionWithBatch(
+    collection(db, "events", eventId, "users"),
+    "event users",
+    batchState
+  );
+
+  queueDelete(batchState, doc(db, "events", eventId));
+  await commitAndResetBatch(batchState);
+
+  return {
+    photos: photoCount,
+    likes: likeCount,
+    dedications: dedicationCount,
+    moderators: moderatorCount,
+    eventUsers: eventUserCount
+  };
+}
+
+async function deleteStorageFolder(folderPath) {
+  let pageToken = undefined;
+  let deleted = 0;
+
+  do {
+    const result = await list(
+      ref(storage, folderPath),
+      {
+        maxResults: 1000,
+        pageToken
+      }
+    );
+
+    for (const item of result.items) {
+      try {
+        await deleteObject(item);
+        deleted += 1;
+      } catch (err) {
+        if (err?.code !== "storage/object-not-found") {
+          throw err;
+        }
+      }
+    }
+
+    for (const prefix of result.prefixes) {
+      deleted += await deleteStorageFolder(prefix.fullPath);
+    }
+
+    pageToken = result.nextPageToken;
+  } while (pageToken);
+
+  return deleted;
+}
+
+async function deleteCurrentEventCompletely() {
+  if (!currentEventId || currentRole !== "superadmin") return;
+
+  const eventTitle = currentEventData?.title || currentEventId;
+
+  if (!confirm(`Trajno obrisati cijeli event "${eventTitle}"? Ovo briše Firestore podatke i Storage slike.`)) {
+    return;
+  }
+
+  const expected = `DELETE ${currentEventId}`;
+  const typed = prompt(
+    `Za potvrdu upiši točno:\n${expected}`
+  );
+
+  if (typed !== expected) {
+    setMaintenanceStatus("Brisanje otkazano — potvrda nije bila točna.", "warning");
+    return;
+  }
+
+  try {
+    setMaintenanceStatus("Prije brisanja pripremam JSON backup...");
+    const backup = await buildEventBackup(currentEventId);
+    const backupName = safeDownloadName(
+      backup.event?.data?.title || currentEventId,
+      currentEventId
+    );
+
+    downloadBlob(
+      new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: "application/json;charset=utf-8" }
+      ),
+      `${backupName}-${currentEventId}-backup-before-delete.json`
+    );
+
+    setMaintenanceStatus("Brišem Storage datoteke...");
+
+    let storageDeleted = 0;
+
+    for (const folder of [
+      "bubbles",
+      "photos",
+      "thumbs",
+      "originals"
+    ]) {
+      setMaintenanceStatus(`Brišem Storage folder: ${folder}...`);
+      storageDeleted += await deleteStorageFolder(
+        `events/${currentEventId}/${folder}`
+      );
+    }
+
+    setMaintenanceStatus("Brišem Firestore podatke...");
+    const firestoreDeleted = await deleteEventFirestoreData(currentEventId);
+
+    setMaintenanceStatus(
+      `Event trajno obrisan ✅\nStorage datoteka: ${storageDeleted}\nFotografija: ${firestoreDeleted.photos}\nLajkova: ${firestoreDeleted.likes}\nPosveta: ${firestoreDeleted.dedications}`,
+      "success"
+    );
+
+    closeEditorModal();
+    await loadEvents();
+
+  } catch (err) {
+    console.error("Full event delete error:", err);
+    setMaintenanceStatus(
+      "Greška kod brisanja eventa. Event možda nije potpuno obrisan — provjeri konzolu/Firebase prije ponovnog pokušaja.",
+      "error"
+    );
+  }
+}
+
+document
+  .getElementById("backupEventBtn")
+  ?.addEventListener("click", exportCurrentEventBackup);
+
+document
+  .getElementById("exportMediaZipBtn")
+  ?.addEventListener("click", exportCurrentEventMediaZip);
+
+document
+  .getElementById("deleteFullEventBtn")
+  ?.addEventListener("click", deleteCurrentEventCompletely);
+
 
 function setRoleBadge() {
 
