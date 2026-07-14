@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>PhotoDump</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/install-help.css">
+   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+   <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#e91e63">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<style>
+  body {
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+  body.loaded {
+    opacity: 1;
+  }
+</style>
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+<body data-install-auto="event" data-pde-page="app">
+<div class="topbar-wrap">
+
+  <button type="button" class="pde-app-menu-button" id="pdeAppMenuButton" aria-label="Otvori izbornik" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="topbar" id="eventTitle" data-i18n-ignore></div>
+
+  <span class="pde-app-menu-spacer" aria-hidden="true"></span>
+  <button id="secretAdminBtn" hidden aria-hidden="true" tabindex="-1"></button>
+
+</div>
+
+<div class="app">
+
+  
+  <div id="homeTab" class="screen active">
+<div class="feed-header glass">
+
+<h2 id="homeTitle" data-i18n-ignore>Galerija uspomena 🤍</h2>
+<p id="homeSubtitle" data-i18n-ignore>Svaka fotografija postaje dio uspomena</p>
+
+  <div class="live-stats">
+    <div>📸 <span id="livePhotoCount">0</span></div>
+    <div>💌 <span id="liveDedicationCount">0</span></div>
+    <div class="live-counter">
+  ❤️ <span id="liveLikesCount">0</span>
+</div>
+  </div>
+</div>
+
+<div class="gallery-toolbar glass" aria-label="Postavke galerije">
+  <div class="gallery-sort-row" role="group" aria-label="Sortiranje fotografija">
+    <button type="button" class="gallery-sort-btn active" data-feed-sort="newest" data-i18n="Najnovije">Najnovije</button>
+    <button type="button" class="gallery-sort-btn" data-feed-sort="popular" data-i18n="Najpopularnije">Najpopularnije</button>
+    <button type="button" class="gallery-sort-btn" data-feed-sort="oldest" data-i18n="Najstarije">Najstarije</button>
+  </div>
+
+  <div class="gallery-view-row" role="group" aria-label="Prikaz galerije">
+    <div class="gallery-view-actions">
+      <button type="button" class="gallery-view-btn" data-feed-view="list" aria-label="Feed prikaz" title="Feed prikaz">
+        <span class="view-icon view-icon-list" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+
+      <button type="button" class="gallery-view-btn active" data-feed-view="grid" aria-label="Grid prikaz" title="Grid prikaz">
+        <span class="view-icon view-icon-grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+    <div id="feed" class="feed grid"></div>
+  </div>
+
+  
+<div id="uploadTab" class="screen">
+
+  
+  <div class="upload-header glass">
+
+<h2 id="uploadTitle" data-i18n-ignore>Podijeli trenutak 📸</h2>
+<p id="uploadSubtitle" data-i18n-ignore>Dodaj fotografiju i ostavi uspomenu</p>
+  </div>
+
+  
+<div class="upload-actions">
+
+  <label class="upload-card">
+    <img src="kamera.png" class="upload-img">
+    <div class="upload-text">Uhvati trenutak</div>
+    <input type="file" accept="image/*" capture="environment" onchange="uploadFile(this.files); this.value='';">
+  </label>
+
+  <label class="upload-card">
+    <img src="galerija.png" class="upload-img">
+    <div class="upload-text">Odaberi slike</div>
+    <input type="file" accept="image/*" multiple onchange="uploadFile(this.files); this.value='';">
+  </label>
+
+</div>
+<p class="upload-limit-note">Najviše 15 fotografija po odabiru.</p>
+
+  
+<button class="btn-primary dedication-open-btn" onclick="openDedicationComposer()">
+  💌 Napiši posvetu
+</button>
+
+<p class="dedication-helper">
+  Posvetu vide mladenci ili organizator eventa.
+</p>
+
+  </div>
+  <div id="profileTab" class="screen">
+    <div class="profile-header glass">
+
+
+<h2>
+  <span id="welcome" data-i18n-ignore></span> 👤
+</h2>
+
+<p id="profileSubtitle" data-i18n-ignore class="profile-sub">
+  Ovdje su tvoje fotografije
+</p>
+
+</div>
+    <div id="gallery"></div>
+  </div>
+
+</div>
+<div id="deleteModal" class="modal">
+  <div class="delete-box">
+
+    <h3>Želite li obrisati sliku?</h3>
+
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="confirmDelete()">Da, obriši</button>
+      <button class="btn-secondary" onclick="closeDelete()">Ne</button>      
+    </div>
+
+  </div>
+</div>
+<div id="dedicationComposerModal" class="modal">
+  <div class="dedication-modal-box">
+
+    <div class="dedication-modal-header">
+      <div>
+        <h3>Napiši posvetu 💌</h3>
+        <p>Posvete vide mladenci ili organizator eventa.</p>
+      </div>
+
+      <button
+        type="button"
+        class="modal-x-btn"
+        onclick="closeDedicationComposer()"
+      >
+        ×
+      </button>
+    </div>
+
+    <textarea
+      id="dedicationText"
+      placeholder="Napiši lijepu poruku, čestitku ili uspomenu..."
+    ></textarea>
+
+    <div class="dedication-modal-actions">
+      <button class="btn-primary" onclick="saveDedication()">
+        Pošalji posvetu ✉
+      </button>
+
+      <button class="btn-secondary" onclick="closeDedicationComposer()">
+        Odustani
+      </button>
+    </div>
+
+  </div>
+</div>
+<div class="navbar">
+  <div class="nav-item active" onclick="switchScreen('home')">
+    <img src="home.png">
+  </div>
+
+  <div class="nav-item" onclick="switchScreen('upload')">
+    <img src="add.png">
+  </div>
+
+  <div class="nav-item" onclick="switchScreen('profile')">
+    <img src="profile.png">
+  </div>
+</div>
+
+<script>
+(function bootstrapPhotoDumpApp() {
+  const params = new URLSearchParams(window.location.search);
+  const storedEventIdBeforeOpen = localStorage.getItem("eventId");
+  const eventId = params.get("event") || storedEventIdBeforeOpen;
+
+  if (!eventId) {
+    window.location.replace("/");
+    return;
+  }
+
+  const savedName =
+    localStorage.getItem("name_" + eventId) ||
+    (storedEventIdBeforeOpen === eventId
+      ? localStorage.getItem("name")
+      : "");
+  const savedUserId =
+    localStorage.getItem("userId_" + eventId) ||
+    (storedEventIdBeforeOpen === eventId
+      ? localStorage.getItem("userId")
+      : "");
+
+  localStorage.setItem("eventId", eventId);
+
+  if (!savedName || !savedUserId) {
+    window.location.replace(
+      "/event.html?event=" + encodeURIComponent(eventId)
+    );
+    return;
+  }
+
+  // Keep compatibility with the existing application code.
+  localStorage.setItem("name", savedName);
+  localStorage.setItem("userId", savedUserId);
+  localStorage.setItem("name_" + eventId, savedName);
+  localStorage.setItem("userId_" + eventId, savedUserId);
+
+  const moduleScript = document.createElement("script");
+  moduleScript.type = "module";
+  moduleScript.src = "/script.js";
+  document.body.appendChild(moduleScript);
+})();
+</script>
+<script src="/install-help.js" defer></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(console.error);
+  });
+}
+</script>
+<div id="uploadOverlay" class="upload-overlay">
+  <div class="upload-overlay-box">
+
+    <div class="upload-spinner"></div>
+
+    <h3>Fotografije se učitavaju</h3>
+
+    <p id="uploadOverlayText">
+      Pripremam upload...
+    </p>
+
+    <div class="upload-progress-shell">
+      <div id="uploadOverlayProgress"></div>
+    </div>
+
+    <small>
+      Molimo ne zatvaraj aplikaciju dok upload traje.
+    </small>
+
+  </div>
+</div>
+<div id="toast"></div>
+
+</body>
+</html>

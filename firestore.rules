@@ -1,0 +1,409 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================
+    // HELPERS
+    // =========================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+function userDoc() {
+  return get(
+    /databases/$(database)/documents/users/$(request.auth.uid)
+  );
+}
+
+function currentUser() {
+  return userDoc().data;
+}
+
+function userDocExists() {
+  return signedIn()
+    && exists(
+      /databases/$(database)/documents/users/$(request.auth.uid)
+    );
+}
+
+function isApproved() {
+  return userDocExists()
+    && currentUser().approved == true
+    && currentUser().disabled != true;
+}
+
+function isSuperAdmin() {
+  return userDocExists()
+    && currentUser().approved == true
+    && currentUser().disabled != true
+    && currentUser().role == "superadmin";
+}
+
+    function isEventOwner(eventId) {
+      return isApproved()
+        && get(
+          /databases/$(database)/documents/events/$(eventId)
+        ).data.ownerId == request.auth.uid;
+    }
+
+    function eventData(eventId) {
+      return get(
+        /databases/$(database)/documents/events/$(eventId)
+      ).data;
+    }
+
+    function eventIsActive(eventId) {
+      return eventData(eventId).active == true
+        && eventData(eventId).status == "active"
+        && eventData(eventId).expiresAt is number
+        && eventData(eventId).expiresAt > request.time.toMillis();
+    }
+
+    function eventHasPhotoSpace(eventId) {
+      return eventData(eventId).photoCount is number
+        && eventData(eventId).uploadLimit is number
+        && eventData(eventId).photoCount < eventData(eventId).uploadLimit;
+    }
+
+    function isValidEventType() {
+      return request.resource.data.type in [
+        "svadba",
+        "rodendan",
+        "krstenje",
+        "pricest",
+        "party",
+        "default"
+      ];
+    }
+
+    function isValidPlanConfig() {
+      return
+        (
+          request.resource.data.plan == "basic"
+          && request.resource.data.uploadLimit == 1000
+          && request.resource.data.allowOriginals == false
+        )
+        ||
+        (
+          request.resource.data.plan == "standard"
+          && request.resource.data.uploadLimit == 1200
+          && request.resource.data.allowOriginals == true
+        )
+        ||
+        (
+          request.resource.data.plan == "premium"
+          && request.resource.data.uploadLimit == 1500
+          && request.resource.data.allowOriginals == true
+        );
+    }
+
+    function isValidEventCreate() {
+      return request.resource.data.keys().hasOnly([
+          "title",
+          "type",
+          "plan",
+
+          "ownerId",
+          "ownerEmail",
+          "ownerName",
+
+          "bubbles",
+          "texts",
+
+          "active",
+          "status",
+
+          "allowOriginals",
+          "uploadLimit",
+
+          "photoCount",
+          "dedicationCount",
+          "likeCount",
+
+          "expiresAt",
+          "created"
+        ])
+
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 2
+
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerEmail == request.auth.token.email
+        && request.resource.data.ownerName is string
+
+        && isValidEventType()
+        && isValidPlanConfig()
+
+        && request.resource.data.bubbles is list
+        && request.resource.data.bubbles.size() == 6
+
+        && request.resource.data.texts is map
+
+        && request.resource.data.active == true
+        && request.resource.data.status == "active"
+
+        && request.resource.data.photoCount == 0
+        && request.resource.data.dedicationCount == 0
+        && request.resource.data.likeCount == 0
+
+        && request.resource.data.expiresAt is number
+        && request.resource.data.created is number
+
+        && request.resource.data.expiresAt > request.resource.data.created;
+    }
+
+    function isOnlyCounterUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "photoCount",
+          "dedicationCount",
+          "likeCount"
+        ])
+
+        && request.resource.data.photoCount is number
+        && request.resource.data.dedicationCount is number
+        && request.resource.data.likeCount is number
+
+        && request.resource.data.photoCount >= 0
+        && request.resource.data.dedicationCount >= 0
+        && request.resource.data.likeCount >= 0
+
+        && request.resource.data.photoCount <= resource.data.uploadLimit;
+    }
+
+    function isValidUserCreate(userId) {
+      return signedIn()
+        && request.auth.uid == userId
+
+        && request.resource.data.keys().hasOnly([
+          "firstName",
+          "lastName",
+          "name",
+          "email",
+          "role",
+          "approved",
+          "disabled",
+          "created"
+        ])
+
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string
+        && request.resource.data.name is string
+
+        && request.resource.data.email == request.auth.token.email
+
+        && request.resource.data.role == "organizer"
+        && request.resource.data.approved == false
+        && request.resource.data.disabled == false
+
+        && request.resource.data.created is number;
+    }
+
+    function isValidPhotoCreate(eventId) {
+      return eventIsActive(eventId)
+        && eventHasPhotoSpace(eventId)
+
+        && request.resource.data.keys().hasOnly([
+          "imageUrl",
+          "thumbUrl",
+          "path",
+          "thumbPath",
+          "originalPath",
+          "user",
+          "userId",
+          "created",
+          "likes",
+          "visible"
+        ])
+
+        && request.resource.data.imageUrl is string
+        && request.resource.data.thumbUrl is string
+        && request.resource.data.path is string
+        && request.resource.data.thumbPath is string
+
+        && (
+          request.resource.data.originalPath == null
+          || request.resource.data.originalPath is string
+        )
+
+        && request.resource.data.user is string
+        && request.resource.data.userId is string
+
+        && request.resource.data.created is number
+        && request.resource.data.likes == 0
+        && request.resource.data.visible == true;
+    }
+
+    function photoChangedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function isSafePhotoUpdate() {
+      return photoChangedKeys().hasOnly([
+          "visible",
+          "likes"
+        ])
+
+        && (
+          !photoChangedKeys().hasAny(["visible"])
+          || request.resource.data.visible is bool
+        )
+
+        && (
+          !photoChangedKeys().hasAny(["likes"])
+          || (
+            request.resource.data.likes is number
+            && request.resource.data.likes >= resource.data.likes
+          )
+        );
+    }
+
+    function isValidDedicationCreate(eventId) {
+      return eventIsActive(eventId)
+
+        && request.resource.data.keys().hasOnly([
+          "name",
+          "text",
+          "created"
+        ])
+
+        && request.resource.data.name is string
+        && request.resource.data.text is string
+        && request.resource.data.text.size() >= 1
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.created is number;
+    }
+
+    function isValidLikeCreate(eventId) {
+      return eventIsActive(eventId)
+
+        && request.resource.data.keys().hasOnly([
+          "created"
+        ])
+
+        && request.resource.data.created is number;
+    }
+
+    // =========================
+    // USERS
+    // =========================
+
+match /users/{userId} {
+
+  allow get: if
+    signedIn()
+    && (
+      request.auth.uid == userId
+      || isSuperAdmin()
+    );
+
+  allow list: if
+    isSuperAdmin();
+
+  allow create: if
+    isValidUserCreate(userId);
+
+  allow update: if
+    isSuperAdmin();
+
+  allow delete: if false;
+}
+
+    // =========================
+    // EVENTS
+    // =========================
+
+    match /events/{eventId} {
+
+      allow read: if true;
+
+      allow create: if
+        isApproved()
+        && isValidEventCreate();
+
+      allow update: if
+        isSuperAdmin()
+        || isOnlyCounterUpdate();
+
+      allow delete: if
+        isSuperAdmin();
+
+      // =====================
+      // PHOTOS
+      // =====================
+
+      match /photos/{photoId} {
+
+        allow read: if true;
+
+        allow create: if
+          isValidPhotoCreate(eventId);
+
+        allow update: if
+          isSafePhotoUpdate()
+          || isSuperAdmin();
+
+        allow delete: if
+          isSuperAdmin()
+          || isEventOwner(eventId);
+
+        // =====================
+        // LIKES
+        // =====================
+
+        match /likes/{likeId} {
+
+          allow read: if true;
+
+          allow create: if
+            isValidLikeCreate(eventId);
+
+          allow update: if false;
+
+          allow delete: if false;
+        }
+      }
+
+      // =====================
+      // DEDICATIONS
+      // =====================
+
+      match /dedications/{id} {
+
+        allow read: if true;
+
+        allow create: if
+          isValidDedicationCreate(eventId);
+
+        allow update: if false;
+
+        allow delete: if false;
+      }
+
+      // =====================
+      // EVENT USERS
+      // ako kasnije koristiš createUser()
+      // =====================
+
+      match /users/{userId} {
+
+        allow read: if
+          isSuperAdmin()
+          || isEventOwner(eventId);
+
+        allow create: if
+          request.resource.data.keys().hasOnly([
+            "name",
+            "created"
+          ])
+          && request.resource.data.name is string
+          && request.resource.data.created is number;
+
+        allow update: if false;
+
+        allow delete: if false;
+      }
+    }
+  }
+}

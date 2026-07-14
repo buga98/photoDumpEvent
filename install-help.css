@@ -1,0 +1,295 @@
+/* PhotoDumpEvent install helper — isolated styles */
+.pde-install-trigger{
+  border:0;
+  font:inherit;
+  cursor:pointer;
+}
+
+.install-header-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:0 15px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:999px;
+  color:#e7edf6;
+  background:rgba(255,255,255,.055);
+  font-size:12px;
+  font-weight:800;
+  transition:transform .2s ease, background .2s ease, border-color .2s ease;
+}
+.install-header-btn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.09);
+  border-color:rgba(255,255,255,.18);
+}
+.install-header-btn svg,
+.mobile-install-btn svg{
+  width:17px;
+  height:17px;
+  flex:0 0 auto;
+}
+
+.mobile-install-btn{
+  width:100%;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  margin:0 0 10px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:17px;
+  color:#eef4fb;
+  background:rgba(255,255,255,.055);
+  font-size:14px;
+  font-weight:800;
+}
+
+.install-corner-btn{
+  grid-column:1;
+  width:40px;
+  height:40px;
+  min-width:40px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  justify-self:start;
+  border:1px solid var(--accent-soft, rgba(180,138,67,.18));
+  border-radius:50%;
+  color:var(--title, #b48a43);
+  background:var(--bg-card, rgba(255,255,255,.8));
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.06),
+    0 0 16px var(--accent-soft, rgba(180,138,67,.12)),
+    inset 0 1px 0 rgba(255,255,255,.5);
+  z-index:3;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.install-corner-btn:active{transform:scale(.94)}
+.install-corner-btn svg{width:19px;height:19px;display:block}
+.install-topbar-spacer{grid-column:3;width:40px;height:40px}
+
+.pde-install-modal{
+  --pde-gold:#d4a85d;
+  --pde-gold-soft:#f2dcc0;
+  --pde-bg:#0a1220;
+  --pde-card:#111c2d;
+  --pde-text:#f7f1e9;
+  --pde-muted:#b8a99a;
+  position:fixed;
+  inset:0;
+  z-index:250000;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .22s ease, visibility .22s ease;
+}
+.pde-install-modal.is-open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.pde-install-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(2,7,14,.72);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.pde-install-dialog{
+  position:relative;
+  z-index:1;
+  width:min(920px,100%);
+  max-height:min(92vh,820px);
+  overflow:auto;
+  padding:34px 30px 28px;
+  border:1px solid rgba(212,168,93,.28);
+  border-radius:32px;
+  color:var(--pde-text);
+  background:
+    radial-gradient(circle at 92% 2%,rgba(212,168,93,.13),transparent 27%),
+    radial-gradient(circle at 4% 100%,rgba(87,137,255,.11),transparent 30%),
+    linear-gradient(145deg,rgba(16,28,46,.98),rgba(7,13,24,.98));
+  box-shadow:0 38px 110px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.08);
+  transform:translateY(18px) scale(.985);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1);
+  font-family:'Poppins','Manrope',sans-serif;
+}
+.pde-install-modal.is-open .pde-install-dialog{transform:none}
+.pde-install-close{
+  position:absolute;
+  top:18px;
+  right:18px;
+  width:43px;
+  height:43px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(212,168,93,.3);
+  border-radius:50%;
+  color:#f1d6ad;
+  background:rgba(255,255,255,.045);
+  font-size:27px;
+  line-height:1;
+  cursor:pointer;
+}
+.pde-install-heading{padding-right:56px}
+.pde-install-kicker{
+  display:block;
+  margin-bottom:12px;
+  color:#d8b985;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.pde-install-heading h2{
+  margin:0;
+  max-width:720px;
+  color:#fff8ee;
+  font-family:'Playfair Display',serif;
+  font-size:clamp(34px,5vw,57px);
+  line-height:.98;
+  letter-spacing:-.035em;
+}
+.pde-install-heading p{
+  max-width:740px;
+  margin:18px 0 0;
+  color:#c4b8ab;
+  font-size:16px;
+  line-height:1.7;
+}
+.pde-install-platforms{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin-top:26px;
+}
+.pde-install-card{
+  min-width:0;
+  padding:24px;
+  border:1px solid rgba(212,168,93,.19);
+  border-radius:24px;
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.pde-install-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:25px;
+  padding:0 10px;
+  border-radius:999px;
+  color:#e5cda8;
+  background:rgba(212,168,93,.13);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.pde-install-card h3{
+  margin:15px 0 12px;
+  color:#fff5e8;
+  font-family:'Playfair Display',serif;
+  font-size:28px;
+  line-height:1.1;
+}
+.pde-install-card ol{
+  margin:0;
+  padding-left:22px;
+  color:#c9bdb1;
+  font-size:14px;
+  line-height:1.55;
+}
+.pde-install-card li+li{margin-top:8px}
+.pde-install-card strong{color:#f4dcc0}
+.pde-install-native-btn{
+  width:100%;
+  min-height:49px;
+  margin:18px 0 14px;
+  border:0;
+  border-radius:16px;
+  color:#0a111c;
+  background:linear-gradient(135deg,#f1d39f,#d4a85d 58%,#9cc8ff);
+  box-shadow:0 14px 34px rgba(212,168,93,.16);
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+.pde-install-native-btn[hidden]{display:none!important}
+.pde-install-browser-note{
+  margin:0 0 13px;
+  padding:11px 12px;
+  border:1px solid rgba(255,190,92,.2);
+  border-radius:14px;
+  color:#e8ccb0;
+  background:rgba(255,173,65,.075);
+  font-size:12px;
+  line-height:1.5;
+}
+.pde-install-footer{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin-top:18px;
+  padding:15px 17px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  color:#aa9f95;
+  background:rgba(255,255,255,.035);
+  font-size:12px;
+  line-height:1.5;
+}
+.pde-install-footer svg{width:21px;height:21px;flex:0 0 auto;color:#d4a85d}
+.pde-install-success{
+  display:none;
+  margin-top:24px;
+  padding:22px;
+  border:1px solid rgba(96,226,169,.2);
+  border-radius:22px;
+  background:rgba(40,184,126,.08);
+  text-align:center;
+}
+.pde-install-success b{display:block;color:#baf4d7;font-size:18px}
+.pde-install-success span{display:block;margin-top:6px;color:#a9c9bb;font-size:13px}
+.pde-install-modal.is-installed .pde-install-platforms,
+.pde-install-modal.is-installed .pde-install-footer{display:none}
+.pde-install-modal.is-installed .pde-install-success{display:block}
+.pde-platform-ios .pde-android-card{display:none}
+.pde-platform-android .pde-ios-card{display:none}
+.pde-install-lock{overflow:hidden!important}
+
+@media(max-width:700px){
+  .pde-install-modal{padding:8px;align-items:end}
+  .pde-install-dialog{
+    width:100%;
+    max-height:94svh;
+    padding:28px 18px 20px;
+    border-radius:28px 28px 20px 20px;
+  }
+  .pde-install-close{top:14px;right:14px;width:40px;height:40px}
+  .pde-install-heading{padding-right:45px}
+  .pde-install-heading h2{font-size:36px}
+  .pde-install-heading p{font-size:14px;line-height:1.6}
+  .pde-install-platforms{grid-template-columns:1fr;margin-top:20px}
+  .pde-install-card{padding:21px 18px}
+  .pde-install-card h3{font-size:25px}
+  .pde-install-card ol{font-size:14px}
+}
+@media(max-width:420px){
+  .install-corner-btn{width:36px;height:36px;min-width:36px}
+  .install-corner-btn svg{width:17px;height:17px}
+  .install-topbar-spacer{width:36px;height:36px}
+}
+@media(prefers-reduced-motion:reduce){
+  .pde-install-modal,.pde-install-dialog{transition:none!important}
+}
+
+/* Production fix: optically centered SVG close icon. */
+.pde-install-close{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;line-height:0!important}
+.pde-install-close svg{width:19px;height:19px;display:block;pointer-events:none}

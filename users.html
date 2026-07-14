@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Korisnici</title>
+
+  <link rel="stylesheet" href="pregled_event.css">
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="topbar users-topbar">
+
+    <div>
+      <h1>👥 Korisnici</h1>
+      <p class="topbar-subtitle">
+        Upravljanje organizatorima i pristupima
+      </p>
+    </div>
+
+    <a href="/main-admin.html" class="back-btn">
+      ← Nazad
+    </a>
+
+  </div>
+
+  <div class="users-toolbar">
+
+    <input
+      type="search"
+      id="userSearch"
+      placeholder="Pretraži po imenu ili emailu..."
+      autocomplete="off"
+    >
+
+    <div class="users-filters">
+      <button class="filter-btn active" data-filter="all">
+        Svi
+      </button>
+
+      <button class="filter-btn" data-filter="pending">
+        Čekaju
+      </button>
+
+      <button class="filter-btn" data-filter="approved">
+        Odobreni
+      </button>
+
+      <button class="filter-btn" data-filter="disabled">
+        Deaktivirani
+      </button>
+    </div>
+
+  </div>
+
+  <div class="users-summary">
+
+    <div>
+      <span id="countAll">0</span>
+      <small>Svi</small>
+    </div>
+
+    <div>
+      <span id="countPending">0</span>
+      <small>Čekaju</small>
+    </div>
+
+    <div>
+      <span id="countApproved">0</span>
+      <small>Odobreni</small>
+    </div>
+
+    <div>
+      <span id="countDisabled">0</span>
+      <small>Deaktivirani</small>
+    </div>
+
+  </div>
+
+  <div id="usersList" class="events-list users-list">
+
+    <div class="loading">
+      Učitavanje korisnika...
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module" src="users.js"></script>
+
+</body>
+</html>

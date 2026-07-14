@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <title>PhotoDump Demo</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="demo.css">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+
+<body class="theme-svadba demo-mode">
+
+  
+  <section id="demoLanding" class="demo-landing">
+
+    <div class="floating-container" id="demoBubbles"></div>
+
+    <div class="topbar">
+      💍 PhotoDump Demo 💍
+    </div>
+
+    <div class="center-wrapper">
+
+      <div class="glass-card demo-intro-card">
+
+        <div class="demo-badge">
+          DEMO MODE
+        </div>
+
+        <h1>
+          Isprobaj PhotoDump galeriju ✨
+        </h1>
+
+        <p class="subtitle">
+          Ovo je interaktivni demo prikaz aplikacije za evente.
+          Možeš klikati kroz galeriju, upload, profil i posvete.
+        </p>
+
+        <input
+          type="text"
+          id="demoName"
+          placeholder="Tvoje ime i prezime"
+          autocomplete="name"
+        >
+
+        <button onclick="enterDemoApp()">
+          Uđi u demo galeriju 📸
+        </button>
+
+        <p class="demo-small">
+          Demo koristi fiksne fotografije i služi samo za prikaz funkcionalnosti.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  
+  <section id="demoApp" class="demo-app hidden">
+
+    <div class="topbar-wrap">
+
+      <div class="topbar" id="eventTitle">
+        💍 Ivan & Marija — Demo 💍
+      </div>
+
+      <button id="secretAdminBtn" onclick="demoToast('U pravoj aplikaciji ovdje se otvara moderator panel uz lozinku.')">
+        ⚙️
+      </button>
+
+    </div>
+
+    <div class="app">
+
+      
+      <div id="homeTab" class="screen active">
+
+        <div class="feed-header glass">
+          <div class="demo-badge inline">
+            DEMO
+          </div>
+
+          <h2 id="homeTitle">
+            Galerija uspomena 🤍
+          </h2>
+
+          <p id="homeSubtitle">
+            Ovako gosti u stvarnom vremenu vide fotografije s eventa.
+          </p>
+
+          <div class="live-stats">
+            <div>📸 <span id="livePhotoCount">15</span></div>
+            <div>💌 <span id="liveDedicationCount">4</span></div>
+            <div>❤️ <span id="liveLikesCount">37</span></div>
+          </div>
+        </div>
+
+        <br>
+
+        <div id="feed" class="feed grid"></div>
+
+      </div>
+
+      
+      <div id="uploadTab" class="screen">
+
+        <div class="upload-header glass">
+          <div class="demo-badge inline">
+            DEMO
+          </div>
+
+          <h2>
+            Podijeli trenutak 📸
+          </h2>
+
+          <p>
+            U pravoj aplikaciji gosti ovdje dodaju fotografije iz kamere ili galerije.
+          </p>
+        </div>
+
+        <div class="upload-actions">
+
+          <label class="upload-card" onclick="demoUploadMessage('camera')">
+            <img src="kamera.png" class="upload-img">
+            <div class="upload-text">Uhvati trenutak</div>
+          </label>
+
+          <label class="upload-card" onclick="demoUploadMessage('gallery')">
+            <img src="galerija.png" class="upload-img">
+            <div class="upload-text">Odaberi slike</div>
+          </label>
+
+        </div>
+
+        <div class="demo-info-card">
+          <h3>Kako upload radi?</h3>
+
+          <p>
+            U stvarnoj aplikaciji gost odabere fotografije, aplikacija ih automatski pripremi i objavi u galeriji eventa.
+          </p>
+
+          <ul>
+            <li>📸 upload iz kamere</li>
+            <li>🖼️ upload više slika iz galerije</li>
+            <li>⚡ slike se prikazuju gostima u realnom vremenu</li>
+            <li>🛡️ moderator može sakriti neprimjeren sadržaj</li>
+          </ul>
+        </div>
+
+        <div class="dedication-card-modern">
+          <textarea
+            id="dedicationText"
+            placeholder="Napiši posvetu mladencima..."
+          ></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="demoDedication()">
+          💌 Dodaj posvetu
+        </button>
+
+      </div>
+
+      
+      <div id="profileTab" class="screen">
+
+        <div class="profile-header glass">
+          <div class="demo-badge inline">
+            DEMO
+          </div>
+
+          <h2>
+            <span id="welcome">Dobrodošao/la</span> 👤
+          </h2>
+
+          <p class="profile-sub">
+            Ovdje gost vidi fotografije koje je sam dodao.
+          </p>
+        </div>
+
+        <div class="demo-info-card">
+          <h3>Tvoj profil</h3>
+
+          <p>
+            U pravoj aplikaciji ovdje se prikazuju samo fotografije koje je taj gost objavio na eventu, te ih može izbrisati.
+          </p>
+        </div>
+
+        <div id="gallery"></div>
+
+      </div>
+
+    </div>
+
+    
+    <div class="navbar">
+
+      <div class="nav-item active" onclick="switchDemoScreen('home')">
+        <img src="home.png">
+      </div>
+
+      <div class="nav-item" onclick="switchDemoScreen('upload')">
+        <img src="add.png">
+      </div>
+
+      <div class="nav-item" onclick="switchDemoScreen('profile')">
+        <img src="profile.png">
+      </div>
+
+    </div>
+
+  </section>
+
+  
+  <div id="demoImageModal" class="modal">
+    <div class="demo-image-modal-box">
+      <button class="demo-modal-close" onclick="closeDemoImage()">×</button>
+      <img id="demoModalImage" alt="Demo fotografija">
+      <p id="demoModalCaption"></p>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="demo.js"></script>
+
+</body>
+</html>

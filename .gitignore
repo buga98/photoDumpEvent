@@ -1,0 +1,7 @@
+PS C:\xampp\htdocs\photoDumpEvent> git status
+>> git add firebase.json firestore.rules storage.rules firestore.indexes.json .firebaserc
+>> git commit -m "Add Firebase rules to source control"
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+PS C:\xampp\htdocs\photoDumpEvent> 

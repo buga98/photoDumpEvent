@@ -1,0 +1,130 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ==============================
+    // HELPERS
+    // ==============================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userData() {
+      return firestore.get(
+        /databases/(default)/documents/users/$(request.auth.uid)
+      ).data;
+    }
+
+    function isApproved() {
+      return signedIn()
+        && userData().approved == true
+        && userData().disabled != true;
+    }
+
+    function isSuperAdmin() {
+      return isApproved()
+        && userData().role == "superadmin";
+    }
+
+    function eventData(eventId) {
+      return firestore.get(
+        /databases/(default)/documents/events/$(eventId)
+      ).data;
+    }
+
+    function isEventOwner(eventId) {
+      return isApproved()
+        && eventData(eventId).ownerId == request.auth.uid;
+    }
+
+    function eventIsActive(eventId) {
+      return eventData(eventId).active == true
+        && eventData(eventId).status == "active"
+        && eventData(eventId).expiresAt is number
+        && eventData(eventId).expiresAt > request.time.toMillis();
+    }
+
+    function isImage(maxSize) {
+      return request.resource != null
+        && request.resource.size < maxSize
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // ==============================
+    // 🫧 BUBBLES
+    // uploada ih main-admin kod kreiranja eventa
+    // ==============================
+
+    match /events/{eventId}/bubbles/{file} {
+      allow read: if true;
+
+      allow create: if
+        isApproved()
+        && isImage(5 * 1024 * 1024);
+
+      allow update: if false;
+
+      allow delete: if
+        isSuperAdmin();
+    }
+
+    // ==============================
+    // 📸 COMPRESSED PHOTOS
+    // gosti uploadaju bez Firebase Auth-a
+    // ==============================
+
+    match /events/{eventId}/photos/{file} {
+
+      allow read: if true;
+
+      allow create: if
+        eventIsActive(eventId)
+        && isImage(10 * 1024 * 1024);
+
+      allow update: if false;
+
+      // trenutno ostavljeno otvoreno jer app briše storage iz klijenta
+      allow delete: if true;
+    }
+
+    // ==============================
+    // 🧊 THUMBS
+    // ==============================
+
+    match /events/{eventId}/thumbs/{file} {
+
+      allow read: if true;
+
+      allow create: if
+        eventIsActive(eventId)
+        && isImage(5 * 1024 * 1024);
+
+      allow update: if false;
+
+      // trenutno ostavljeno otvoreno jer app briše storage iz klijenta
+      allow delete: if true;
+    }
+
+    // ==============================
+    // 💎 ORIGINALS
+    // samo Standard/Premium
+    // ==============================
+
+    match /events/{eventId}/originals/{file} {
+
+      allow read: if true;
+
+      allow create: if
+        eventIsActive(eventId)
+        && eventData(eventId).allowOriginals == true
+        && isImage(25 * 1024 * 1024);
+
+      allow update: if false;
+
+      // trenutno ostavljeno otvoreno jer app briše storage iz klijenta
+      allow delete: if true;
+    }
+  }
+}

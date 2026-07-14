@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PhotoDumpEvent — QR galerija za vjenčanja i evente</title>
+  <meta name="description" content="PhotoDumpEvent je QR galerija za vjenčanja, krštenja, rođendane i partye. Gosti bez instalacije dodaju fotografije, lajkaju trenutke i ostavljaju posvete.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="PhotoDumpEvent">
+  <link rel="canonical" href="https://photodumpeventi.com/">
+
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050911">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+
+  <meta property="og:title" content="PhotoDumpEvent — QR galerija za evente">
+  <meta property="og:description" content="Gosti skeniraju QR kod, dodaju fotografije i ostavljaju posvete. Sve uspomene s eventa na jednom mjestu.">
+  <meta property="og:image" content="https://photodumpeventi.com/og-image.png">
+  <meta property="og:url" content="https://photodumpeventi.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PhotoDumpEvent">
+  <meta property="og:locale" content="hr_HR">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PhotoDumpEvent — QR galerija za evente">
+  <meta name="twitter:description" content="QR galerija za vjenčanja, krštenja, rođendane i partye. Bez instalacije aplikacije.">
+  <meta name="twitter:image" content="https://photodumpeventi.com/og-image.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/install-help.css">
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const eventParam = params.get("event");
+
+    if (eventParam) {
+      localStorage.setItem("eventId", eventParam);
+
+      if (eventParam.toLowerCase() === "demo") {
+        window.location.replace("/demo.html?event=demo");
+      } else {
+        window.location.replace(
+          "/event.html?event=" + encodeURIComponent(eventParam)
+        );
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+
+<body data-pde-page="index">
+  <div class="page-noise" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <header class="site-header" id="siteHeader">
+    <a href="/" class="logo" aria-label="PhotoDumpEvent početna">
+      <span class="logo-icon"><img src="/icon.png" alt=""></span>
+      <strong>PhotoDumpEvent</strong>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Glavna navigacija">
+      <a href="#prica">Kako radi</a>
+      <a href="#mogucnosti">Mogućnosti</a>
+      <a href="#paketi">Paketi</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+
+    <div class="desktop-actions">
+      <button type="button" class="pde-install-trigger install-header-btn" data-install-open>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M10 5h4M10.5 18.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 8v6m0 0-2.3-2.3M12 14l2.3-2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Instaliraj</span>
+      </button>
+      <a href="/login.html" class="header-login">Organizatori</a>
+      <a href="/demo.html" class="header-cta">Isprobaj demo <span>↗</span></a>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Otvori izbornik" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+  <aside class="mobile-menu" id="mobileMenu" aria-label="Mobilni izbornik">
+    <div class="mobile-menu-top">
+      <div class="mobile-menu-title">Izbornik</div>
+      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Zatvori izbornik">✕</button>
+    </div>
+    <nav class="mobile-nav">
+      <a href="#prica">Kako radi</a>
+      <a href="#mogucnosti">Mogućnosti</a>
+      <a href="#paketi">Paketi</a>
+      <a href="#kontakt">Kontakt</a>
+      <a href="/login.html">Prijava organizatora</a>
+    </nav>
+    <button type="button" class="pde-install-trigger mobile-install-btn" data-install-open>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M10 5h4M10.5 18.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 8v6m0 0-2.3-2.3M12 14l2.3-2.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Instaliraj aplikaciju</span>
+    </button>
+    <a href="/demo.html" class="btn btn-primary btn-full">Isprobaj demo</a>
+  </aside>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="hero-aurora hero-aurora-a" aria-hidden="true"></div>
+      <div class="hero-aurora hero-aurora-b" aria-hidden="true"></div>
+      <div class="hero-grid" aria-hidden="true"></div>
+
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Digitalna galerija koja raste tijekom eventa</div>
+        <h1>
+          Jedan QR kod.<br>
+          <em>Stotine pogleda.</em><br>
+          Jedna uspomena.
+        </h1>
+        <p class="hero-text">
+          Gosti skeniraju, fotografiraju i dijele trenutke bez instalacije aplikacije.
+          Ti dobivaš jednu živu galeriju, posvete, slideshow i sve uspomene na jednom mjestu.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#prica" class="btn btn-primary">Doživi kako radi <span>↓</span></a>
+          <a href="/demo.html" class="btn btn-ghost">Otvori demo <span>↗</span></a>
+        </div>
+
+        <div class="hero-proof-row" aria-label="Glavne prednosti">
+          <span>Bez instalacije</span>
+          <span>QR pristup</span>
+          <span>Android + iPhone</span>
+        </div>
+
+        <div class="event-jump" id="demo">
+          <div class="event-jump-copy">
+            <strong>Već imaš event?</strong>
+            <small>Upiši ID ili zalijepi cijeli link.</small>
+          </div>
+          <div class="event-jump-row">
+            <input type="text" id="eventCode" placeholder="Event ID ili link" autocomplete="off">
+            <button type="button" onclick="openEventFromInput()">Otvori event</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-label="Animirani prikaz PhotoDumpEvent aplikacije">
+        <div class="hero-orbit orbit-one"></div>
+        <div class="hero-orbit orbit-two"></div>
+
+        <div class="hero-photo hero-photo-a"><img src="assets/demo/2.png" alt=""></div>
+        <div class="hero-photo hero-photo-b"><img src="assets/demo/5.png" alt=""></div>
+        <div class="hero-photo hero-photo-c"><img src="assets/demo/7.png" alt=""></div>
+
+        <div class="hero-phone-shell">
+          <div class="hero-phone-glow"></div>
+          <div class="phone-frame hero-phone">
+            <div class="phone-island"></div>
+            <div class="phone-screen hero-screen">
+              <div class="hero-screen-header">
+                <span>21:47</span><span>● ● ●</span>
+              </div>
+              <div class="hero-screen-event">💍 Ivan & Marija</div>
+              <div class="hero-screen-title">Galerija uspomena</div>
+              <div class="hero-screen-stats"><span>127 fotki</span><span>342 srca</span></div>
+              <div class="hero-screen-grid">
+                <img src="assets/demo/1.png" alt="">
+                <img src="assets/demo/2.png" alt="">
+                <img src="assets/demo/3.png" alt="">
+                <img src="assets/demo/4.png" alt="">
+                <img src="assets/demo/5.png" alt="">
+                <img src="assets/demo/6.png" alt="">
+              </div>
+              <div class="hero-screen-nav"><span>⌂</span><span class="nav-plus">＋</span><span>♡</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-float-card hero-float-upload"><b>Nova fotografija</b><span>upravo dodano</span></div>
+        <div class="hero-float-card hero-float-heart"><b>+24</b><span>nova srca</span></div>
+      </div>
+
+      <a class="scroll-cue" href="#prica" aria-label="Nastavi skrolati">
+        <span>Scrollaj priču</span>
+        <i></i>
+      </a>
+    </section>
+
+    <section class="story-intro section-shell" id="prica">
+      <p class="section-kicker reveal">Od praznog eventa do galerije pune života</p>
+      <h2 class="display-title reveal">Ne objašnjavamo proizvod.<br><em>Pokazujemo kako nastaje.</em></h2>
+    </section>
+
+    <section class="story" id="kako-radi">
+      <div class="story-layout">
+        <div class="story-copy-column">
+          <article class="story-step" data-scene="0">
+            <span class="story-index">01</span>
+            <p class="story-kicker">Prije prvog gosta</p>
+            <h3>Event još nije počeo. Uspomene samo što nisu stigle.</h3>
+            <p>Dobivaš vlastiti link i QR kod, prilagođen naziv, boje i tekstove eventa.</p>
+          </article>
+
+          <article class="story-step" data-scene="1">
+            <span class="story-index">02</span>
+            <p class="story-kicker">Jedan pokret kamerom</p>
+            <h3>Postavi QR kod na stol. Ostalo rade gosti.</h3>
+            <p>Skeniranje otvara event direktno u pregledniku. Nema trgovine aplikacija, registracije ni lozinki.</p>
+          </article>
+
+          <article class="story-step" data-scene="2">
+            <span class="story-index">03</span>
+            <p class="story-kicker">Ulazak u nekoliko sekundi</p>
+            <h3>Gost upiše ime i odmah je unutra.</h3>
+            <p>Sučelje je jasno i ljudima koji aplikaciju vide prvi put. Jedan unos, jedan dodir, gotovo.</p>
+          </article>
+
+          <article class="story-step" data-scene="3">
+            <span class="story-index">04</span>
+            <p class="story-kicker">Trenutak nastaje</p>
+            <h3>Fotograf vidi ceremoniju. Gosti vide sve ostalo.</h3>
+            <p>Kamera ili galerija. Fotografija se pripremi, prenese i pojavi u zajedničkom feedu.</p>
+          </article>
+
+          <article class="story-step" data-scene="4">
+            <span class="story-index">05</span>
+            <p class="story-kicker">Galerija živi</p>
+            <h3>Svaki gost vidi drugi trenutak. PhotoDump ih spaja u jednu priču.</h3>
+            <p>Fotografije stižu tijekom eventa, brojači rastu, a galerija se puni pred očima svih gostiju.</p>
+          </article>
+
+          <article class="story-step" data-scene="5">
+            <span class="story-index">06</span>
+            <p class="story-kicker">Reakcije i posvete</p>
+            <h3>Nisu spremljene samo fotografije. Spremljene su i riječi.</h3>
+            <p>Lajkovi, poruke i posvete čuvaju atmosferu večeri, ne samo kadar.</p>
+          </article>
+
+          <article class="story-step" data-scene="6">
+            <span class="story-index">07</span>
+            <p class="story-kicker">Kontrola bez prekidanja zabave</p>
+            <h3>Vi slavite. Sadržaj je i dalje pod kontrolom.</h3>
+            <p>Moderator jednim dodirom skriva fotografiju koja ne pripada javnoj galeriji.</p>
+          </article>
+
+          <article class="story-step" data-scene="7">
+            <span class="story-index">08</span>
+            <p class="story-kicker">Veliko finale</p>
+            <h3>Dok event još traje, uspomene se već prikazuju.</h3>
+            <p>Slideshow pretvara fotografije gostiju u živu kulisu na televizoru, projektoru ili velikom ekranu.</p>
+          </article>
+        </div>
+
+        <div class="story-stage-column">
+          <div class="story-stage" id="storyStage" data-scene="0">
+            <div class="stage-ambient stage-ambient-one"></div>
+            <div class="stage-ambient stage-ambient-two"></div>
+            <div class="stage-number" id="stageNumber">01</div>
+
+            <div class="stage-progress" aria-hidden="true">
+              <span class="stage-progress-line"><i id="storyProgress"></i></span>
+              <div class="stage-progress-dots">
+                <button data-go-scene="0" aria-label="Scena 1"></button>
+                <button data-go-scene="1" aria-label="Scena 2"></button>
+                <button data-go-scene="2" aria-label="Scena 3"></button>
+                <button data-go-scene="3" aria-label="Scena 4"></button>
+                <button data-go-scene="4" aria-label="Scena 5"></button>
+                <button data-go-scene="5" aria-label="Scena 6"></button>
+                <button data-go-scene="6" aria-label="Scena 7"></button>
+                <button data-go-scene="7" aria-label="Scena 8"></button>
+              </div>
+            </div>
+
+            <div class="stage-qr-card">
+              <span class="qr-label">Skeniraj za ulaz</span>
+              <div class="stage-qr-box"><img src="assets/qr-photodumpeventi-demo.png" alt="QR kod za demo"></div>
+              <strong>Ivan & Marija</strong>
+              <small>12. 09. 2026.</small>
+              <div class="scan-line"></div>
+            </div>
+
+            <div class="phone-frame story-phone">
+              <div class="phone-island"></div>
+              <div class="phone-screen">
+                <div class="phone-status"><span>21:47</span><span>● ● ●</span></div>
+
+                <div class="story-screen screen-empty">
+                  <div class="empty-mark">✦</div>
+                  <span>PhotoDumpEvent</span>
+                  <h4>Ivan & Marija</h4>
+                  <p>Galerija čeka prve uspomene.</p>
+                </div>
+
+                <div class="story-screen screen-welcome">
+                  <div class="welcome-glow"></div>
+                  <span class="screen-badge">Dobrodošli</span>
+                  <h4>Ivan & Marija</h4>
+                  <p>Podijelite trenutke koje ćemo pamtiti cijeli život.</p>
+                  <div class="screen-fake-button">Uđi u event</div>
+                </div>
+
+                <div class="story-screen screen-entry">
+                  <span class="screen-badge">Još samo jedan korak</span>
+                  <h4>Kako se zoveš?</h4>
+                  <div class="fake-input"><span class="typed-name">Ivana Horvat</span><i></i></div>
+                  <div class="screen-fake-button">Uđi u galeriju</div>
+                  <small>Bez registracije i instalacije.</small>
+                </div>
+
+                <div class="story-screen screen-camera">
+                  <img class="camera-photo" src="assets/demo/7.png" alt="Fotografija s eventa">
+                  <div class="camera-ui-top"><span>×</span><span>FLASH AUTO</span><span>•••</span></div>
+                  <div class="focus-frame"></div>
+                  <div class="camera-ui-bottom"><span>▧</span><button aria-label="Fotografiraj"></button><span>↻</span></div>
+                  <div class="camera-flash"></div>
+                  <div class="upload-pill"><span>✓</span> Fotografija dodana</div>
+                </div>
+
+                <div class="story-screen screen-gallery">
+                  <div class="gallery-head">
+                    <div><small>Galerija uspomena</small><strong>Ivan & Marija</strong></div>
+                    <span class="live-pill"><i></i> UŽIVO</span>
+                  </div>
+                  <div class="gallery-stats"><span><b id="photoCount">127</b> fotki</span><span><b>18</b> posveta</span><span><b>342</b> srca</span></div>
+                  <div class="gallery-grid">
+                    <figure><img src="assets/demo/1.png" alt=""><span>♥ 32</span></figure>
+                    <figure><img src="assets/demo/2.png" alt=""><span>♥ 18</span></figure>
+                    <figure><img src="assets/demo/3.png" alt=""><span>♥ 41</span></figure>
+                    <figure><img src="assets/demo/4.png" alt=""><span>♥ 26</span></figure>
+                    <figure class="moderated-photo"><img src="assets/demo/5.png" alt=""><span>♥ 12</span><i>Sakriveno</i></figure>
+                    <figure><img src="assets/demo/6.png" alt=""><span>♥ 54</span></figure>
+                  </div>
+                  <div class="gallery-nav"><span>⌂</span><span class="gallery-add">＋</span><span>♡</span></div>
+                </div>
+
+                <div class="story-screen screen-messages">
+                  <span class="screen-badge">Posvete gostiju</span>
+                  <h4>Riječi koje ostaju.</h4>
+                  <div class="message-stack">
+                    <div class="message-card"><b>Marija</b><p>Želimo vam cijeli život ovakvih osmijeha 🤍</p></div>
+                    <div class="message-card"><b>Ivan</b><p>Hvala na večeri koju ćemo dugo pamtiti!</p></div>
+                    <div class="message-card"><b>Petra</b><p>Najbolji party ove godine 🔥</p></div>
+                  </div>
+                </div>
+
+                <div class="story-screen screen-slideshow">
+                  <img src="assets/demo/2.png" alt="Slideshow fotografija">
+                  <div class="slideshow-shade"></div>
+                  <div class="slideshow-copy"><small>TRENUTNO NA EKRANU</small><strong>Ivan & Marija</strong><span>Fotografija gosta · 21:47</span></div>
+                  <div class="slideshow-progress"><i></i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="orbit-photo orbit-photo-a"><img src="assets/demo/1.png" alt=""></div>
+            <div class="orbit-photo orbit-photo-b"><img src="assets/demo/3.png" alt=""></div>
+            <div class="orbit-photo orbit-photo-c"><img src="assets/demo/5.png" alt=""></div>
+            <div class="orbit-photo orbit-photo-d"><img src="assets/demo/6.png" alt=""></div>
+
+            <div class="stage-like stage-like-a">♥ <b>+1</b></div>
+            <div class="stage-like stage-like-b">♥ <b>+12</b></div>
+            <div class="stage-like stage-like-c">♥ <b>+42</b></div>
+
+            <div class="moderation-toast"><span>✓</span><div><b>Fotografija skrivena</b><small>Više nije vidljiva u galeriji</small></div></div>
+
+            <div class="stage-cinema">
+              <div class="cinema-frame"><img src="assets/demo/2.png" alt="Prikaz slideshowa"></div>
+              <span class="cinema-caption">Slideshow uživo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="impact-section section-shell" id="mogucnosti">
+      <div class="impact-copy reveal">
+        <p class="section-kicker">Trenuci koje nitko nije planirao</p>
+        <h2 class="display-title">Najbolje fotografije često nastanu<br><em>kad nitko ne pozira.</em></h2>
+      </div>
+      <div class="impact-mosaic reveal">
+        <figure class="impact-photo impact-photo-1"><img src="assets/demo/1.png" alt="Fotografija s eventa"><figcaption>Fotografija gosta · 20:14</figcaption></figure>
+        <figure class="impact-photo impact-photo-2"><img src="assets/demo/2.png" alt="Fotografija s eventa"><figcaption>42 srca</figcaption></figure>
+        <figure class="impact-photo impact-photo-3"><img src="assets/demo/4.png" alt="Fotografija s eventa"><figcaption>Upravo dodano</figcaption></figure>
+        <figure class="impact-photo impact-photo-4"><img src="assets/demo/6.png" alt="Fotografija s eventa"><figcaption>Fotografija gosta · 23:48</figcaption></figure>
+        <div class="impact-center-copy"><span>Jedan event</span><strong>Stotine perspektiva</strong><small>Jedna zajednička galerija</small></div>
+      </div>
+    </section>
+
+    <section class="theme-lab section-shell" id="teme">
+      <div class="theme-lab-head reveal">
+        <div>
+          <p class="section-kicker">Jedna aplikacija. Svaki stil.</p>
+          <h2 class="display-title">Dizajn koji pripada<br><em>baš tom eventu.</em></h2>
+        </div>
+        <div class="theme-switcher" aria-label="Odaberi primjer teme">
+          <button class="theme-pill active" data-theme-demo="wedding">💍 Vjenčanje</button>
+          <button class="theme-pill" data-theme-demo="baptism">✨ Krštenje</button>
+          <button class="theme-pill" data-theme-demo="party">🎉 Party</button>
+        </div>
+      </div>
+
+      <div class="theme-preview reveal" id="themePreview" data-theme="wedding">
+        <div class="theme-preview-copy">
+          <span class="theme-label" id="themeLabel">Vjenčanje</span>
+          <h3 id="themeTitle">Elegantna galerija za trenutke koji se ne ponavljaju.</h3>
+          <p id="themeText">Boje, tekstovi i atmosfera prilagođeni su mladencima i stilu proslave.</p>
+          <a href="/demo.html" class="btn btn-primary">Isprobaj demo <span>↗</span></a>
+        </div>
+        <div class="theme-preview-phone">
+          <div class="phone-frame mini-device">
+            <div class="phone-island"></div>
+            <div class="phone-screen">
+              <div class="phone-status"><span>21:47</span><span>● ● ●</span></div>
+              <div class="theme-device-top" id="themeTop">💍 Ivan & Marija</div>
+              <div class="theme-device-title" id="themeDeviceTitle">Galerija uspomena 🤍</div>
+              <div class="theme-device-grid">
+                <img id="themeImg1" src="assets/demo/1.png" alt="">
+                <img id="themeImg2" src="assets/demo/2.png" alt="">
+                <img id="themeImg3" src="assets/demo/3.png" alt="">
+                <img id="themeImg4" src="assets/demo/4.png" alt="">
+                <img id="themeImg5" src="assets/demo/5.png" alt="">
+                <img id="themeImg6" src="assets/demo/6.png" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-section section-shell">
+      <div class="feature-intro reveal">
+        <p class="section-kicker">Sve što treba. Ništa što smeta.</p>
+        <h2 class="display-title">Gostima jednostavno.<br><em>Organizatoru moćno.</em></h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card reveal"><span>01</span><div class="feature-icon">⌁</div><h3>QR pristup</h3><p>Otvaranje eventa jednim skeniranjem, bez instalacije i registracije.</p></article>
+        <article class="feature-card reveal"><span>02</span><div class="feature-icon">＋</div><h3>Brzi upload</h3><p>Fotografiranje ili odabir više slika iz galerije, direktno s mobitela.</p></article>
+        <article class="feature-card reveal"><span>03</span><div class="feature-icon">♡</div><h3>Lajkovi i posvete</h3><p>Reakcije i poruke pretvaraju galeriju u živu zajedničku priču.</p></article>
+        <article class="feature-card reveal"><span>04</span><div class="feature-icon">▣</div><h3>Moderator panel</h3><p>Sakrivanje neprimjerenog sadržaja bez prekidanja eventa.</p></article>
+        <article class="feature-card reveal"><span>05</span><div class="feature-icon">▶</div><h3>Slideshow</h3><p>Fotografije gostiju prikazuju se na televizoru, projektoru ili LED ekranu.</p></article>
+        <article class="feature-card reveal"><span>06</span><div class="feature-icon">✦</div><h3>Custom dizajn</h3><p>Naziv, tekstovi, boje i atmosfera prilagođeni svakom događaju.</p></article>
+      </div>
+    </section>
+
+    <section class="pricing section-shell" id="paketi">
+      <div class="pricing-head reveal">
+        <p class="section-kicker">Paketi</p>
+        <h2 class="display-title">Od intimne proslave<br>do <em>velikog eventa.</em></h2>
+        <p>Paketi su prilagođeni veličini eventa i potrebama klijenta.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <article class="price-card reveal">
+          <div class="price-top"><span>Basic</span><strong>Na upit</strong></div>
+          <p>Za manje evente i jednostavno prikupljanje fotografija.</p>
+          <ul><li>Do 1000 fotografija</li><li>QR link</li><li>Galerija, upload i profil</li><li>Osnovna tema događaja</li></ul>
+          <a href="mailto:photodumpeventi@gmail.com?subject=Upit%20za%20Basic%20paket" class="price-link">Pošalji upit <span>↗</span></a>
+        </article>
+
+        <article class="price-card featured reveal">
+          <div class="featured-pill">Najbolji izbor</div>
+          <div class="price-top"><span>Standard</span><strong>Na upit</strong></div>
+          <p>Najbolji omjer mogućnosti i jednostavnosti za većinu evenata.</p>
+          <ul><li>Do 1500 fotografija</li><li>Originali uključeni</li><li>QR link</li><li>Moderator panel</li></ul>
+          <a href="mailto:photodumpeventi@gmail.com?subject=Upit%20za%20Standard%20paket" class="price-link">Pošalji upit <span>↗</span></a>
+        </article>
+
+        <article class="price-card reveal">
+          <div class="price-top"><span>Premium</span><strong>Na upit</strong></div>
+          <p>Za veće evente i dodatni premium dojam tijekom cijele večeri.</p>
+          <ul><li>Do 3000 fotografija</li><li>Originali uključeni</li><li>Custom QR kodovi</li><li>Slideshow prikaz</li></ul>
+          <a href="mailto:photodumpeventi@gmail.com?subject=Upit%20za%20Premium%20paket" class="price-link">Pošalji upit <span>↗</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="faq section-shell">
+      <div class="faq-head reveal">
+        <p class="section-kicker">Još samo nekoliko odgovora</p>
+        <h2 class="display-title">Jednostavno od prvog<br><em>do zadnjeg skena.</em></h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item reveal"><summary>Treba li gost instalirati aplikaciju?<span>＋</span></summary><p>Ne. Gost skenira QR kod i otvara event u pregledniku na Androidu ili iPhoneu.</p></details>
+        <details class="faq-item reveal"><summary>Tko može vidjeti fotografije?<span>＋</span></summary><p>Fotografije su dostupne preko event linka ili QR koda, a organizator može moderirati sadržaj.</p></details>
+        <details class="faq-item reveal"><summary>Mogu li dobiti sve fotografije nakon eventa?<span>＋</span></summary><p>Da. Fotografije se nakon eventa mogu pripremiti za preuzimanje prema dogovorenom paketu.</p></details>
+        <details class="faq-item reveal"><summary>Radi li na mobitelima?<span>＋</span></summary><p>Da. Aplikacija je prvenstveno izrađena za mobitel i radi na Androidu i iPhoneu.</p></details>
+      </div>
+    </section>
+
+    <section class="finale" id="kontakt">
+      <div class="finale-mosaic" aria-hidden="true">
+        <img src="assets/demo/1.png" alt=""><img src="assets/demo/2.png" alt=""><img src="assets/demo/3.png" alt="">
+        <img src="assets/demo/4.png" alt=""><img src="assets/demo/5.png" alt=""><img src="assets/demo/6.png" alt="">
+      </div>
+      <div class="finale-overlay"></div>
+      <div class="finale-content reveal">
+        <p class="section-kicker">Event traje jednu večer.</p>
+        <h2>Uspomene<br><em>ostaju.</em></h2>
+        <p>Isprobaj aplikaciju iz perspektive gosta ili se javi za termin i ponudu.</p>
+        <div class="finale-actions">
+          <a href="/demo.html" class="btn btn-light">Isprobaj demo <span>↗</span></a>
+          <a href="mailto:photodumpeventi@gmail.com" class="btn btn-glass">Zatraži ponudu</a>
+          <a href="/login.html" class="btn btn-text">Prijava organizatora</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="/" class="logo footer-logo"><span class="logo-icon"><img src="/icon.png" alt=""></span><strong>PhotoDumpEvent</strong></a>
+    <p>Digitalna galerija uspomena za vjenčanja i evente.</p>
+    <div class="footer-links"><a href="#prica">Kako radi</a><a href="#paketi">Paketi</a><a href="/demo.html">Demo</a><a href="/login.html">Organizatori</a><a href="#kontakt">Kontakt</a></div>
+    <small>© <span id="year"></span> PhotoDumpEvent</small>
+  </footer>
+
+  <script src="/install-help.js" defer></script>
+  <script src="/index.js" defer></script>
+</body>
+</html>

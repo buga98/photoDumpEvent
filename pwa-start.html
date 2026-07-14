@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoDump Event</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif;color:#fff;background:linear-gradient(135deg,#07111f,#111827)}
+    .card{width:100%;max-width:420px;padding:28px 24px;border-radius:28px;text-align:center;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14)}
+    img{width:72px;height:72px;object-fit:contain;margin:0 auto 18px}
+    h1{font-size:26px;margin-bottom:8px}p{opacity:.78;line-height:1.55;margin-bottom:18px}
+    input,button{width:100%;height:52px;border:0;border-radius:18px;font-size:15px}input{padding:0 16px;margin-bottom:10px}button{font-weight:800;color:#07111f;background:linear-gradient(135deg,#a5f3fc,#93c5fd,#c4b5fd)}
+  </style>
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+<body>
+  <div class="card">
+    <img src="/icon.png" alt="PhotoDump Event">
+    <h1>PhotoDump Event</h1>
+    <p id="statusText">Otvaram tvoj event...</p>
+    <div id="manualEntry" hidden>
+      <input id="eventInput" type="text" placeholder="Upiši event ID ili zalijepi event link">
+      <button id="openButton" type="button">Uđi u event</button>
+    </div>
+  </div>
+<script>
+(function () {
+  function extractEventId(value) {
+    const clean = String(value || "").trim();
+    if (!clean) return "";
+    try {
+      if (/^https?:/i.test(clean)) {
+        const url = new URL(clean);
+        return url.searchParams.get("event") || url.searchParams.get("code") || "";
+      }
+    } catch (_) {}
+    return clean;
+  }
+
+  function openKnownEvent(eventId) {
+    const storedEventIdBeforeOpen = localStorage.getItem("eventId");
+    const name =
+      localStorage.getItem("name_" + eventId) ||
+      (storedEventIdBeforeOpen === eventId ? localStorage.getItem("name") : "");
+    const userId =
+      localStorage.getItem("userId_" + eventId) ||
+      (storedEventIdBeforeOpen === eventId ? localStorage.getItem("userId") : "");
+    localStorage.setItem("eventId", eventId);
+    const target = name && userId ? "/app.html" : "/event.html";
+    window.location.replace(target + "?event=" + encodeURIComponent(eventId));
+  }
+
+  const urlEventId = new URLSearchParams(location.search).get("event");
+  const eventId = urlEventId || localStorage.getItem("eventId");
+
+  if (eventId) {
+    openKnownEvent(eventId);
+    return;
+  }
+
+  document.getElementById("statusText").textContent = "Odaberi event.";
+  document.getElementById("manualEntry").hidden = false;
+  document.getElementById("openButton").addEventListener("click", function () {
+    const id = extractEventId(document.getElementById("eventInput").value);
+    if (!id) {
+      alert("Upiši event ID ili zalijepi event link.");
+      return;
+    }
+    openKnownEvent(id);
+  });
+})();
+</script>
+</body>
+</html>

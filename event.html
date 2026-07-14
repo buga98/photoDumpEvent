@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+  <title>PhotoDump</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/install-help.css">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#e91e63">
+
+  <link rel="apple-touch-icon" href="icon.png">
+
+
+  <script>
+    const eventId =
+      new URLSearchParams(location.search).get("event") ||
+      localStorage.getItem("eventId");
+
+    if (eventId) {
+      const cached =
+        localStorage.getItem("eventData_" + eventId);
+
+      if (cached) {
+        try {
+          const event =
+            JSON.parse(cached);
+
+          if (event && event.type) {
+            document.documentElement.className =
+              "theme-" + event.type;
+          }
+        } catch (err) {
+          console.warn("Theme cache error:", err);
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/i18n.css">
+  <script src="/i18n.js"></script>
+</head>
+
+<body data-pde-page="event">
+
+  
+  <div class="floating-container"></div>
+
+  
+  <div class="topbar-wrap">
+    <button type="button" class="pde-app-menu-button" id="pdeAppMenuButton" aria-label="Otvori izbornik" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="topbar" id="eventTitle" data-i18n-ignore>
+      Učitavanje...
+    </div>
+
+    <span class="pde-app-menu-spacer" aria-hidden="true"></span>
+  </div>
+
+  
+  <div class="center-wrapper">
+
+    <div class="glass-card">
+
+      <h1 id="eventHeading" data-i18n-ignore>
+        Učitavanje...
+      </h1>
+
+      <p class="subtitle" id="eventSubtitle" data-i18n-ignore>
+        Učitavanje...
+      </p>
+
+      <input
+        type="text"
+        id="name"
+        placeholder="Tvoje ime i prezime"
+        autocomplete="name"
+      >
+
+      <button onclick="enterApp()">
+        Uđi u galeriju 📸
+      </button>
+
+    </div>
+
+  </div>
+
+  
+  <div id="adminModal" class="modal">
+
+    <div class="admin-modal-box">
+
+      <div class="modal-header">
+        <span>Admin pristup</span>
+
+        <span
+          class="close-btn"
+          onclick="closeAdminModal()"
+        >
+          ✖
+        </span>
+      </div>
+
+      <input
+        type="password"
+        id="adminPass"
+        placeholder="Unesi lozinku"
+        autocomplete="current-password"
+      >
+
+      <button
+        class="btn-primary"
+        onclick="checkAdmin()"
+      >
+        Ulaz
+      </button>
+
+    </div>
+
+  </div>
+
+  
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .catch(console.error);
+      });
+    }
+  </script>
+
+  
+  <script src="/install-help.js" defer></script>
+  <script type="module" src="event.js"></script>
+
+</body>
+</html>
