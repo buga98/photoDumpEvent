@@ -1,9 +1,10 @@
 (function initPhotoDumpTutorial() {
   "use strict";
 
-  const VERSION = 3;
+  const VERSION = 4;
   const READY_TIMEOUT_MS = 10000;
   const TARGET_PADDING = 8;
+  const STEP_CHANGE_DELAY_MS = 100;
 
   const COPY = {
     hr: {
@@ -12,51 +13,51 @@
       start: "Pokreni tutorijal",
       skip: "Preskoči",
       step: "Korak {current} od {total}",
-      tap: "Dodirni označeni gumb za nastavak.",
-      tapUpload: "Odaberi fotografije — nakon uploada nastavljamo automatski.",
       next: "Dalje",
       finish: "Gotovo",
       exit: "Završi tutorijal",
       uploadingTitle: "Fotografije se učitavaju",
       uploadingText: "Pričekaj trenutak. Čim učitavanje završi, tutorijal će se automatski nastaviti.",
-      uploadFailedTitle: "Pokušaj ponovno",
-      uploadFailedText: "Fotografija nije učitana. Ponovno odaberi sliku ili dodirni „Dalje” za nastavak tutorijala.",
+      uploadFailedTitle: "Učitavanje nije uspjelo",
+      uploadFailedText: "Možeš ponovno odabrati fotografiju ili nastaviti tutorijal gumbom „Dalje”.",
       done: "Sve jasno — spreman/na si! 🎉",
       steps: [
         {
           id: "add-photos",
           title: "Dodaj fotografije",
-          text: "Dodirni srednji gumb +. Ovdje otvaraš kameru i galeriju.",
+          text: "Srednji gumb + otvara kameru i galeriju. Možeš ga sada isprobati ili samo nastaviti gumbom „Dalje”.",
+          hint: "Isprobaj označeni gumb ili dodirni „Dalje”.",
           selector: ".navbar .nav-item:nth-child(2)",
           screen: "home",
-          requireTargetTap: true,
+          showPointer: true,
           advanceOnTap: true
         },
         {
           id: "choose-photos",
           title: "Kamera ili galerija",
-          text: "Lijevo možeš odmah snimiti fotografiju, a ovdje odabireš jednu ili više slika iz mobitela. Nakon učitavanja nastavljamo automatski.",
+          text: "Ovdje biraš jednu ili više fotografija iz mobitela. Fotografiju ne moraš sada odabrati — tutorijal možeš nastaviti gumbom „Dalje”.",
+          hint: "Odaberi fotografije ili nastavi bez uploada.",
           selector: ".upload-actions .upload-card:nth-child(2)",
           screen: "upload",
-          requireTargetTap: true,
+          showPointer: true,
           waitsForUpload: true
         },
         {
           id: "your-photos",
           title: "Tvoje fotografije",
-          text: "Nakon učitavanja dolaziš ovdje. Na ovom mjestu vidiš sve fotografije koje si ti dodao/la.",
-          selector: ".navbar .nav-item:nth-child(3)",
+          text: "Nakon uspješnog uploada dolaziš na ovaj ekran. Ovdje su na jednom mjestu sve fotografije koje si ti dodao/la.",
+          selector: "#profileTab .profile-header",
           screen: "profile",
-          requireTargetTap: true,
-          advanceOnTap: true
+          showPointer: false
         },
         {
           id: "gallery",
           title: "Galerija i lajkovi",
-          text: "Dodirni kućicu za povratak u zajedničku galeriju. Tamo pregledavaš fotografije gostiju i možeš ih lajkati.",
+          text: "Kućica te vraća u zajedničku galeriju. Tamo pregledavaš fotografije gostiju i možeš ih lajkati.",
+          hint: "Dodirni kućicu ili završi gumbom „Gotovo”.",
           selector: ".navbar .nav-item:nth-child(1)",
-          screen: "home",
-          requireTargetTap: true,
+          screen: "profile",
+          showPointer: true,
           advanceOnTap: true
         }
       ]
@@ -67,21 +68,53 @@
       start: "Start tutorial",
       skip: "Skip",
       step: "Step {current} of {total}",
-      tap: "Tap the highlighted button to continue.",
-      tapUpload: "Choose your photos — we will continue automatically after the upload.",
       next: "Next",
       finish: "Done",
       exit: "End tutorial",
       uploadingTitle: "Uploading your photos",
       uploadingText: "Please wait a moment. The tutorial will continue automatically when the upload is complete.",
-      uploadFailedTitle: "Please try again",
-      uploadFailedText: "The photo was not uploaded. Choose it again or tap “Next” to continue the tutorial.",
+      uploadFailedTitle: "Upload was not completed",
+      uploadFailedText: "Choose a photo again or continue the tutorial with the “Next” button.",
       done: "All set — you are ready! 🎉",
       steps: [
-        { id: "add-photos", title: "Add photos", text: "Tap the middle + button. This opens the camera and gallery.", selector: ".navbar .nav-item:nth-child(2)", screen: "home", requireTargetTap: true, advanceOnTap: true },
-        { id: "choose-photos", title: "Camera or gallery", text: "Take a new photo on the left, or choose one or more photos from your phone here. We will continue automatically after the upload.", selector: ".upload-actions .upload-card:nth-child(2)", screen: "upload", requireTargetTap: true, waitsForUpload: true },
-        { id: "your-photos", title: "Your photos", text: "After uploading, you arrive here. This is where you can see every photo you have added.", selector: ".navbar .nav-item:nth-child(3)", screen: "profile", requireTargetTap: true, advanceOnTap: true },
-        { id: "gallery", title: "Gallery and likes", text: "Tap the home icon to return to the shared gallery. There you can browse and like guests’ photos.", selector: ".navbar .nav-item:nth-child(1)", screen: "home", requireTargetTap: true, advanceOnTap: true }
+        {
+          id: "add-photos",
+          title: "Add photos",
+          text: "The middle + button opens the camera and gallery. Try it now, or simply continue with “Next”.",
+          hint: "Try the highlighted button or tap “Next”.",
+          selector: ".navbar .nav-item:nth-child(2)",
+          screen: "home",
+          showPointer: true,
+          advanceOnTap: true
+        },
+        {
+          id: "choose-photos",
+          title: "Camera or gallery",
+          text: "Choose one or more photos from your phone here. You do not have to select a photo now — continue with “Next” whenever you are ready.",
+          hint: "Choose photos or continue without uploading.",
+          selector: ".upload-actions .upload-card:nth-child(2)",
+          screen: "upload",
+          showPointer: true,
+          waitsForUpload: true
+        },
+        {
+          id: "your-photos",
+          title: "Your photos",
+          text: "After a successful upload, you arrive on this screen. This is where all photos you have added are kept together.",
+          selector: "#profileTab .profile-header",
+          screen: "profile",
+          showPointer: false
+        },
+        {
+          id: "gallery",
+          title: "Gallery and likes",
+          text: "The home icon returns you to the shared gallery, where you can browse and like guests’ photos.",
+          hint: "Tap Home or finish with “Done”.",
+          selector: ".navbar .nav-item:nth-child(1)",
+          screen: "profile",
+          showPointer: true,
+          advanceOnTap: true
+        }
       ]
     },
     de: {
@@ -90,21 +123,53 @@
       start: "Tutorial starten",
       skip: "Überspringen",
       step: "Schritt {current} von {total}",
-      tap: "Tippe zum Fortfahren auf die markierte Schaltfläche.",
-      tapUpload: "Wähle deine Fotos aus — nach dem Upload geht es automatisch weiter.",
       next: "Weiter",
       finish: "Fertig",
       exit: "Tutorial beenden",
       uploadingTitle: "Fotos werden hochgeladen",
       uploadingText: "Bitte warte einen Moment. Nach dem Upload wird das Tutorial automatisch fortgesetzt.",
-      uploadFailedTitle: "Bitte erneut versuchen",
-      uploadFailedText: "Das Foto wurde nicht hochgeladen. Wähle es erneut aus oder tippe auf „Weiter“.",
+      uploadFailedTitle: "Upload wurde nicht abgeschlossen",
+      uploadFailedText: "Wähle erneut ein Foto oder setze das Tutorial mit „Weiter” fort.",
       done: "Alles klar — du bist bereit! 🎉",
       steps: [
-        { id: "add-photos", title: "Fotos hinzufügen", text: "Tippe auf die mittlere + Schaltfläche. Hier öffnest du Kamera und Galerie.", selector: ".navbar .nav-item:nth-child(2)", screen: "home", requireTargetTap: true, advanceOnTap: true },
-        { id: "choose-photos", title: "Kamera oder Galerie", text: "Links kannst du sofort ein Foto aufnehmen; hier wählst du ein oder mehrere Bilder vom Handy aus. Nach dem Upload geht es automatisch weiter.", selector: ".upload-actions .upload-card:nth-child(2)", screen: "upload", requireTargetTap: true, waitsForUpload: true },
-        { id: "your-photos", title: "Deine Fotos", text: "Nach dem Upload kommst du hierher. An dieser Stelle findest du alle Fotos, die du hinzugefügt hast.", selector: ".navbar .nav-item:nth-child(3)", screen: "profile", requireTargetTap: true, advanceOnTap: true },
-        { id: "gallery", title: "Galerie und Likes", text: "Tippe auf das Haus, um zur gemeinsamen Galerie zurückzukehren. Dort kannst du Fotos ansehen und liken.", selector: ".navbar .nav-item:nth-child(1)", screen: "home", requireTargetTap: true, advanceOnTap: true }
+        {
+          id: "add-photos",
+          title: "Fotos hinzufügen",
+          text: "Die mittlere + Schaltfläche öffnet Kamera und Galerie. Probiere sie aus oder fahre einfach mit „Weiter” fort.",
+          hint: "Probiere die markierte Schaltfläche aus oder tippe auf „Weiter”.",
+          selector: ".navbar .nav-item:nth-child(2)",
+          screen: "home",
+          showPointer: true,
+          advanceOnTap: true
+        },
+        {
+          id: "choose-photos",
+          title: "Kamera oder Galerie",
+          text: "Hier wählst du ein oder mehrere Fotos vom Handy aus. Du musst jetzt kein Foto auswählen — mit „Weiter” kannst du das Tutorial fortsetzen.",
+          hint: "Fotos auswählen oder ohne Upload fortfahren.",
+          selector: ".upload-actions .upload-card:nth-child(2)",
+          screen: "upload",
+          showPointer: true,
+          waitsForUpload: true
+        },
+        {
+          id: "your-photos",
+          title: "Deine Fotos",
+          text: "Nach einem erfolgreichen Upload kommst du auf diesen Bildschirm. Hier findest du alle Fotos, die du hinzugefügt hast.",
+          selector: "#profileTab .profile-header",
+          screen: "profile",
+          showPointer: false
+        },
+        {
+          id: "gallery",
+          title: "Galerie und Likes",
+          text: "Das Haus bringt dich zurück zur gemeinsamen Galerie. Dort kannst du Fotos ansehen und liken.",
+          hint: "Tippe auf das Haus oder beende mit „Fertig”.",
+          selector: ".navbar .nav-item:nth-child(1)",
+          screen: "profile",
+          showPointer: true,
+          advanceOnTap: true
+        }
       ]
     }
   };
@@ -168,7 +233,7 @@
     offer.className = "pde-tutorial-offer";
     offer.setAttribute("aria-hidden", "true");
     offer.innerHTML = `
-      <div class="pde-tutorial-offer-card" role="dialog" aria-modal="true" aria-labelledby="pdeTutorialOfferTitle">
+      <section class="pde-tutorial-offer-card" role="dialog" aria-modal="true" aria-labelledby="pdeTutorialOfferTitle">
         <div class="pde-tutorial-offer-icon" aria-hidden="true">👋</div>
         <h2 id="pdeTutorialOfferTitle"></h2>
         <p data-tutorial-offer-text></p>
@@ -176,7 +241,7 @@
           <button type="button" class="pde-tutorial-primary" data-tutorial-start></button>
           <button type="button" class="pde-tutorial-secondary" data-tutorial-skip></button>
         </div>
-      </div>`;
+      </section>`;
 
     layer = document.createElement("div");
     layer.className = "pde-tutorial-layer";
@@ -187,7 +252,7 @@
       <div class="pde-tutorial-shade" data-shade="bottom"></div>
       <div class="pde-tutorial-shade" data-shade="left"></div>
       <div class="pde-tutorial-ring" aria-hidden="true"></div>
-      <div class="pde-tutorial-hand" aria-hidden="true">👆</div>
+      <div class="pde-tutorial-hand" aria-hidden="true">👇</div>
       <section class="pde-tutorial-coach" role="dialog" aria-live="polite" aria-labelledby="pdeTutorialTitle">
         <div class="pde-tutorial-coach-head">
           <span class="pde-tutorial-step"></span>
@@ -211,7 +276,7 @@
     offer.querySelector("[data-tutorial-start]").addEventListener("click", () => startTutorial({ force: true }));
     offer.querySelector("[data-tutorial-skip]").addEventListener("click", skipOffer);
     layer.querySelector("[data-tutorial-exit]").addEventListener("click", () => stopTutorial("skipped"));
-    layer.querySelector("[data-tutorial-next]").addEventListener("click", nextStep);
+    layer.querySelector("[data-tutorial-next]").addEventListener("click", handleNextButton);
 
     offer.addEventListener("click", (event) => {
       if (event.target === offer) skipOffer();
@@ -274,6 +339,21 @@
     shades.forEach((shade) => shade.classList.remove("is-visible"));
   }
 
+  function isScreenActive(screen) {
+    const ids = {
+      home: "homeTab",
+      upload: "uploadTab",
+      profile: "profileTab"
+    };
+    const element = document.getElementById(ids[screen]);
+    return Boolean(element?.classList.contains("active"));
+  }
+
+  function ensureScreen(screen) {
+    if (!screen || isScreenActive(screen)) return;
+    window.switchScreen?.(screen);
+  }
+
   function startTutorial(options = {}) {
     createUi();
     closeOffer();
@@ -287,11 +367,8 @@
     layer.classList.add("is-open");
     layer.setAttribute("aria-hidden", "false");
 
-    // Tutorijal uvijek počinje iz zajedničke galerije. Nakon toga više
-    // ne mijenja ekrane sam — korisnikov dodir na označeni gumb je radnja
-    // koja pokreće sljedeći korak.
-    window.switchScreen?.("home");
-    setTimeout(renderStep, 100);
+    ensureScreen("home");
+    setTimeout(renderStep, STEP_CHANGE_DELAY_MS);
   }
 
   function stopTutorial(status = "completed") {
@@ -316,17 +393,31 @@
     }
   }
 
-  function nextStep() {
-    if (!active || waitingForUpload) return;
+  function goToStep(index) {
+    if (!active) return;
 
-    const total = getCopy().steps.length;
-    if (stepIndex >= total - 1) {
+    const steps = getCopy().steps;
+    if (index >= steps.length) {
       stopTutorial("completed");
       return;
     }
 
-    stepIndex += 1;
-    renderStep();
+    stepIndex = index;
+    waitingForUpload = false;
+    ensureScreen(steps[index].screen);
+    setTimeout(renderStep, STEP_CHANGE_DELAY_MS);
+  }
+
+  function handleNextButton() {
+    if (!active || waitingForUpload) return;
+
+    const steps = getCopy().steps;
+    if (stepIndex >= steps.length - 1) {
+      stopTutorial("completed");
+      return;
+    }
+
+    goToStep(stepIndex + 1);
   }
 
   function setCoachCopy(step, options = {}) {
@@ -334,15 +425,17 @@
     const steps = copy.steps;
     const title = options.title || step.title;
     const text = options.text || step.text;
+    const hint = options.hint ?? step.hint ?? "";
 
     coach.querySelector(".pde-tutorial-step").textContent = copy.step
       .replace("{current}", String(stepIndex + 1))
       .replace("{total}", String(steps.length));
     coach.querySelector("#pdeTutorialTitle").textContent = title;
     coach.querySelector("[data-tutorial-step-text]").textContent = text;
-    coach.querySelector(".pde-tutorial-tap-hint").textContent = step.waitsForUpload ? copy.tapUpload : copy.tap;
+    coach.querySelector(".pde-tutorial-tap-hint").textContent = hint;
     coach.querySelector("[data-tutorial-exit]").textContent = copy.exit;
     coach.querySelector("[data-tutorial-next]").textContent = stepIndex === steps.length - 1 ? copy.finish : copy.next;
+    coach.classList.toggle("has-hint", Boolean(hint));
   }
 
   function renderStep() {
@@ -360,33 +453,34 @@
       return;
     }
 
-    coach.classList.remove("requires-tap", "is-waiting", "is-error");
+    ensureScreen(step.screen);
+    coach.classList.remove("is-waiting", "is-error");
     setCoachCopy(step);
 
-    // Ekran se više ne prebacuje automatski. Označeni navigacijski gumb
-    // mora biti stvarna korisnička radnja, a ne samo dekoracija.
     setTimeout(() => {
       if (!active || token !== renderToken) return;
 
       currentTarget = document.querySelector(step.selector);
       if (!currentTarget) {
         console.warn("Tutorial target not found:", step.selector);
-        nextStep();
+        goToStep(stepIndex + 1);
         return;
       }
 
       currentTarget.classList.add("pde-tutorial-highlight");
-      coach.classList.toggle("requires-tap", Boolean(step.requireTargetTap));
 
       if (step.advanceOnTap) {
         const expectedStepIndex = stepIndex;
         currentTargetHandler = () => {
-          // Najprije dopuštamo originalnom onclicku da promijeni ekran,
-          // a zatim potvrđujemo korak tutorijala.
           setTimeout(() => {
             if (!active || token !== renderToken || stepIndex !== expectedStepIndex) return;
-            nextStep();
-          }, 140);
+
+            if (expectedStepIndex >= getCopy().steps.length - 1) {
+              stopTutorial("completed");
+            } else {
+              goToStep(expectedStepIndex + 1);
+            }
+          }, 160);
         };
         currentTarget.addEventListener("click", currentTargetHandler, { once: true });
       }
@@ -412,10 +506,10 @@
 
     const targetRect = currentTarget.getBoundingClientRect();
     const coachRect = coach.getBoundingClientRect();
-    const overlap = targetRect.bottom + 22 - coachRect.top;
+    const overlap = targetRect.bottom + 18 - coachRect.top;
 
     if (overlap > 0 && targetRect.top > 90) {
-      window.scrollBy({ top: overlap + 32, behavior: "smooth" });
+      window.scrollBy({ top: overlap + 26, behavior: "smooth" });
     }
   }
 
@@ -426,11 +520,12 @@
     waitingForUpload = true;
     clearTarget();
     hideSpotlight();
-    coach.classList.remove("requires-tap", "is-error");
+    coach.classList.remove("is-error", "has-hint");
     coach.classList.add("is-waiting");
     setCoachCopy(step, {
       title: getCopy().uploadingTitle,
-      text: getCopy().uploadingText
+      text: getCopy().uploadingText,
+      hint: ""
     });
   }
 
@@ -442,7 +537,7 @@
     const uploadedCount = Number(event?.detail?.done || 0);
 
     if (uploadedCount > 0) {
-      nextStep();
+      goToStep(stepIndex + 1);
       return;
     }
 
@@ -450,7 +545,8 @@
     coach.classList.add("is-error");
     setCoachCopy(step, {
       title: getCopy().uploadFailedTitle,
-      text: getCopy().uploadFailedText
+      text: getCopy().uploadFailedText,
+      hint: step.hint
     });
 
     currentTarget = document.querySelector(step.selector);
@@ -465,15 +561,26 @@
   }
 
   function setRect(element, left, top, width, height) {
+    if (!element) return;
     element.style.left = `${Math.max(0, left)}px`;
     element.style.top = `${Math.max(0, top)}px`;
     element.style.width = `${Math.max(0, width)}px`;
     element.style.height = `${Math.max(0, height)}px`;
   }
 
+  function rectanglesOverlap(a, b, margin = 0) {
+    return !(
+      a.right + margin <= b.left ||
+      a.left >= b.right + margin ||
+      a.bottom + margin <= b.top ||
+      a.top >= b.bottom + margin
+    );
+  }
+
   function positionCoachMarks() {
     if (!active || !currentTarget || !ring || !hand) return;
 
+    const step = getCurrentStep();
     const rect = currentTarget.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
 
@@ -491,36 +598,66 @@
     setRect(shadeMap.bottom, 0, bottom, viewportWidth, viewportHeight - bottom);
     setRect(shadeMap.left, 0, top, left, height);
     setRect(shadeMap.right, right, top, viewportWidth - right, height);
-
     shades.forEach((shade) => shade.classList.add("is-visible"));
 
     setRect(ring, left, top, width, height);
     ring.classList.add("is-visible");
 
-    // Pokazivač se postavlja sa strane označenog elementa. Tako ostaje
-    // potpuno vidljiv i kod donje navigacije, gdje ga tekstualna kartica
-    // više ne može prekriti.
-    const handSize = 58;
-    const gap = 10;
-    const roomRight = viewportWidth - rect.right;
-    const roomLeft = rect.left;
-    let handLeft;
-    let handTop = Math.max(8, Math.min(viewportHeight - handSize - 8, rect.top + rect.height / 2 - handSize / 2));
-
-    if (roomRight >= handSize + gap) {
-      handLeft = rect.right + gap;
-      hand.textContent = "👈";
-    } else if (roomLeft >= handSize + gap) {
-      handLeft = rect.left - handSize - gap;
-      hand.textContent = "👉";
-    } else {
-      handLeft = Math.max(8, Math.min(viewportWidth - handSize - 8, rect.left + rect.width / 2 - handSize / 2));
-      handTop = Math.max(8, rect.top - handSize - gap);
-      hand.textContent = "👇";
+    if (!step?.showPointer) {
+      hand.classList.remove("is-visible");
+      return;
     }
 
-    hand.style.left = `${handLeft}px`;
-    hand.style.top = `${handTop}px`;
+    const handSize = 38;
+    const gap = 9;
+    const coachRect = coach.getBoundingClientRect();
+    const candidates = [
+      {
+        left: rect.left + rect.width / 2 - handSize / 2,
+        top: rect.top - handSize - gap,
+        symbol: "👇"
+      },
+      {
+        left: rect.right + gap,
+        top: rect.top + rect.height / 2 - handSize / 2,
+        symbol: "👈"
+      },
+      {
+        left: rect.left - handSize - gap,
+        top: rect.top + rect.height / 2 - handSize / 2,
+        symbol: "👉"
+      },
+      {
+        left: rect.left + rect.width / 2 - handSize / 2,
+        top: rect.bottom + gap,
+        symbol: "👆"
+      }
+    ];
+
+    const chosen = candidates.find((candidate) => {
+      const candidateRect = {
+        left: candidate.left,
+        top: candidate.top,
+        right: candidate.left + handSize,
+        bottom: candidate.top + handSize
+      };
+
+      const insideViewport =
+        candidateRect.left >= 6 &&
+        candidateRect.top >= 6 &&
+        candidateRect.right <= viewportWidth - 6 &&
+        candidateRect.bottom <= viewportHeight - 6;
+
+      return insideViewport && !rectanglesOverlap(candidateRect, coachRect, 4);
+    }) || {
+      left: Math.max(6, Math.min(viewportWidth - handSize - 6, rect.right + 4)),
+      top: Math.max(6, Math.min(viewportHeight - handSize - 6, rect.top - handSize - 4)),
+      symbol: "👇"
+    };
+
+    hand.textContent = chosen.symbol;
+    hand.style.left = `${chosen.left}px`;
+    hand.style.top = `${chosen.top}px`;
     hand.classList.add("is-visible");
   }
 

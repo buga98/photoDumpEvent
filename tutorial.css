@@ -64,26 +64,29 @@
 .pde-tutorial-secondary,
 .pde-tutorial-next,
 .pde-tutorial-exit {
-  min-height: 50px;
-  border: 0;
-  border-radius: 18px;
-  font: inherit;
-  font-weight: 700;
+  min-height: 50px !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  font: inherit !important;
+  font-weight: 700 !important;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .pde-tutorial-primary,
 .pde-tutorial-next {
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent, #d86b8c), var(--accent-2, #f5a5bd));
-  box-shadow: 0 12px 26px var(--accent-glow, rgba(216, 107, 140, .30));
+  color: #fff !important;
+  background: linear-gradient(135deg, var(--accent, #d86b8c), var(--accent-2, #f5a5bd)) !important;
+  box-shadow: 0 12px 26px var(--accent-glow, rgba(216, 107, 140, .30)) !important;
 }
 
 .pde-tutorial-secondary,
 .pde-tutorial-exit {
-  color: #6d5f67;
-  background: #f3eef1;
+  color: #6d5f67 !important;
+  background: #f3eef1 !important;
+  box-shadow: none !important;
 }
 
 .pde-tutorial-layer {
@@ -116,10 +119,10 @@
   position: fixed;
   z-index: 2;
   display: none;
-  border: 4px solid rgba(255, 255, 255, .98);
+  border: 3px solid rgba(255, 255, 255, .98);
   border-radius: 24px;
   box-shadow:
-    0 0 0 4px var(--accent, #d86b8c),
+    0 0 0 3px var(--accent, #d86b8c),
     0 12px 36px rgba(0, 0, 0, .24),
     inset 0 0 0 1px rgba(255, 255, 255, .45);
   pointer-events: none;
@@ -137,22 +140,19 @@
 
 .pde-tutorial-hand {
   position: fixed;
-  z-index: 7;
-  width: 58px;
-  height: 58px;
+  z-index: 4;
+  width: 38px;
+  height: 38px;
   display: none;
   place-items: center;
-  border: 3px solid rgba(255, 255, 255, .98);
-  border-radius: 50%;
-  background: var(--accent, #d86b8c);
-  font-size: 38px;
+  border: 0;
+  background: transparent;
+  font-size: 32px;
   line-height: 1;
-  box-shadow:
-    0 0 0 3px rgba(216, 107, 140, .30),
-    0 10px 26px rgba(0, 0, 0, .34);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .34));
   transform-origin: 50% 50%;
   pointer-events: none;
-  animation: pdeTutorialHandTap 1s ease-in-out infinite;
+  animation: pdeTutorialHandTap 1.05s ease-in-out infinite;
 }
 
 .pde-tutorial-hand.is-visible {
@@ -242,7 +242,7 @@
   font-weight: 800;
 }
 
-.pde-tutorial-coach.requires-tap .pde-tutorial-tap-hint {
+.pde-tutorial-coach.has-hint .pde-tutorial-tap-hint {
   display: block;
 }
 
@@ -260,7 +260,6 @@
   font-size: 14px;
 }
 
-.pde-tutorial-coach.requires-tap .pde-tutorial-next,
 .pde-tutorial-coach.is-waiting .pde-tutorial-actions {
   display: none;
 }
@@ -289,8 +288,8 @@
 }
 
 @keyframes pdeTutorialHandTap {
-  0%, 100% { transform: translateX(0) scale(1); }
-  45% { transform: translateX(-5px) scale(1.08); }
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(4px) scale(1.06); }
 }
 
 @keyframes pdeTutorialCardIn {

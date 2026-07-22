@@ -1,0 +1,11 @@
+PhotoDumpEvent tutorijal V4 — uravnoteženi flow
+
+- Gumb "Dalje" ponovno je dostupan na svakom koraku.
+- Korisnik nije prisiljen odabrati ili učitati fotografiju.
+- Dodir označenog navigacijskog gumba i dalje automatski pokreće smisleni sljedeći korak.
+- Korak "Tvoje fotografije" sada je informativan: označava zaglavlje profila i ne traži besmislen klik na već aktivan profil.
+- Nakon stvarnog uploada tutorijal automatski prelazi na profil.
+- Posljednji korak dopušta dodir na Home ili završetak gumbom "Gotovo".
+- Pokazivač više nema krug, ne prekriva označeni element i bira položaj koji se ne sudara s tekstualnom karticom.
+- Verzija localStorage ključa: v4.
+- PWA cache: photodump-v32-guided-tutorial-balanced-flow.
