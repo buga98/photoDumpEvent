@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v30-guided-tutorial-polished";
+const CACHE_NAME = "photodump-v31-guided-tutorial-action-flow";
 
 const APP_SHELL = [
   "/",

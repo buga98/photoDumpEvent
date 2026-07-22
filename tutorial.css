@@ -137,15 +137,20 @@
 
 .pde-tutorial-hand {
   position: fixed;
-  z-index: 3;
-  width: 48px;
-  height: 48px;
+  z-index: 7;
+  width: 58px;
+  height: 58px;
   display: none;
   place-items: center;
-  font-size: 37px;
+  border: 3px solid rgba(255, 255, 255, .98);
+  border-radius: 50%;
+  background: var(--accent, #d86b8c);
+  font-size: 38px;
   line-height: 1;
-  filter: drop-shadow(0 8px 9px rgba(0, 0, 0, .32));
-  transform-origin: 50% 65%;
+  box-shadow:
+    0 0 0 3px rgba(216, 107, 140, .30),
+    0 10px 26px rgba(0, 0, 0, .34);
+  transform-origin: 50% 50%;
   pointer-events: none;
   animation: pdeTutorialHandTap 1s ease-in-out infinite;
 }
@@ -284,8 +289,8 @@
 }
 
 @keyframes pdeTutorialHandTap {
-  0%, 100% { transform: translateY(0) rotate(-7deg) scale(1); }
-  45% { transform: translateY(-9px) rotate(2deg) scale(1.08); }
+  0%, 100% { transform: translateX(0) scale(1); }
+  45% { transform: translateX(-5px) scale(1.08); }
 }
 
 @keyframes pdeTutorialCardIn {
