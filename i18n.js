@@ -302,6 +302,12 @@
 
       <div class="pde-app-language-submenu" role="listbox" aria-label="Jezik"></div>
 
+      ${type === "app" ? `
+      <button type="button" class="pde-app-menu-action" data-pde-tutorial-open>
+        <span class="pde-app-menu-icon" aria-hidden="true">?</span>
+        <span>Kako radi</span>
+      </button>` : ""}
+
       <button type="button" class="pde-app-menu-action" data-install-open>
         <span class="pde-app-menu-icon" aria-hidden="true">⇩</span>
         <span>Instaliraj aplikaciju</span>
@@ -356,6 +362,13 @@
       close();
       if (type === "event") window.openAdminModal?.();
       else document.getElementById("secretAdminBtn")?.click();
+    });
+
+    panel.querySelector("[data-pde-tutorial-open]")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      close();
+      window.startPhotoDumpTutorial?.({ force: true });
     });
 
     panel.querySelector("[data-install-open]")?.addEventListener("click", (event) => {

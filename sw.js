@@ -1,4 +1,4 @@
-const CACHE_NAME = "photodump-v28-sprint-a-security";
+const CACHE_NAME = "photodump-v29-guided-tutorial";
 
 const APP_SHELL = [
   "/",
@@ -10,6 +10,8 @@ const APP_SHELL = [
   "/index.css",
   "/install-help.css",
   "/install-help.js",
+  "/tutorial.css",
+  "/tutorial.js",
   "/i18n.css",
   "/i18n.js",
   "/assets/lang/hr.png",

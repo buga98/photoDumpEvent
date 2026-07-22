@@ -1,0 +1,275 @@
+/* PhotoDumpEvent guided tutorial */
+.pde-tutorial-offer {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(14, 12, 20, .62);
+  backdrop-filter: blur(8px);
+}
+
+.pde-tutorial-offer.is-open {
+  display: flex;
+}
+
+.pde-tutorial-offer-card {
+  width: min(100%, 390px);
+  padding: 26px 22px 22px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .98);
+  color: #29242b;
+  text-align: center;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, .28);
+  animation: pdeTutorialCardIn .28s ease both;
+}
+
+.pde-tutorial-offer-icon {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 14px;
+  border-radius: 24px;
+  font-size: 34px;
+  background: linear-gradient(135deg, var(--accent-soft, #ffe5ee), rgba(255,255,255,.94));
+  box-shadow: 0 14px 28px var(--accent-glow, rgba(216,107,140,.20));
+}
+
+.pde-tutorial-offer-card h2 {
+  margin: 0 0 10px;
+  color: var(--title, #3e2530);
+  font-size: clamp(23px, 6vw, 29px);
+  line-height: 1.2;
+}
+
+.pde-tutorial-offer-card p {
+  margin: 0;
+  color: #5f5660;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.pde-tutorial-offer-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.pde-tutorial-primary,
+.pde-tutorial-secondary,
+.pde-tutorial-next,
+.pde-tutorial-exit {
+  min-height: 50px;
+  border: 0;
+  border-radius: 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pde-tutorial-primary,
+.pde-tutorial-next {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent, #d86b8c), var(--accent-2, #f5a5bd));
+  box-shadow: 0 12px 26px var(--accent-glow, rgba(216,107,140,.30));
+}
+
+.pde-tutorial-secondary,
+.pde-tutorial-exit {
+  color: #6d5f67;
+  background: #f3eef1;
+}
+
+.pde-tutorial-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 11990;
+  display: none;
+  pointer-events: none;
+}
+
+.pde-tutorial-layer.is-open {
+  display: block;
+}
+
+body.pde-tutorial-active {
+  overflow: hidden;
+}
+
+body.pde-tutorial-active .app,
+body.pde-tutorial-active .topbar-wrap,
+body.pde-tutorial-active .navbar {
+  pointer-events: none;
+}
+
+.pde-tutorial-highlight {
+  position: relative !important;
+  z-index: 11995 !important;
+  pointer-events: auto !important;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 5px rgba(255,255,255,.96),
+    0 0 0 10px var(--accent, #d86b8c),
+    0 0 0 9999px rgba(13, 10, 18, .70) !important;
+  animation: pdeTutorialPulse 1.25s ease-in-out infinite !important;
+}
+
+.nav-item.pde-tutorial-highlight {
+  padding: 10px 14px;
+  margin: -10px -14px;
+  border-radius: 18px;
+}
+
+.pde-tutorial-hand {
+  position: fixed;
+  z-index: 12002;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 7px 8px rgba(0,0,0,.28));
+  transform-origin: 50% 65%;
+  animation: pdeTutorialHandTap 1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.pde-tutorial-coach {
+  position: fixed;
+  z-index: 12005;
+  width: min(360px, calc(100vw - 24px));
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.98);
+  color: #2d2730;
+  box-shadow: 0 22px 60px rgba(0,0,0,.30);
+  pointer-events: auto;
+  animation: pdeTutorialCardIn .24s ease both;
+}
+
+.pde-tutorial-step {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 10px;
+  margin-bottom: 9px;
+  border-radius: 999px;
+  color: var(--accent, #d86b8c);
+  background: var(--accent-soft, rgba(216,107,140,.12));
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.pde-tutorial-coach h3 {
+  margin: 0 0 7px;
+  color: var(--title, #3e2530);
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.pde-tutorial-coach p {
+  margin: 0;
+  color: #5d545d;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.pde-tutorial-tap-hint {
+  display: none;
+  margin-top: 12px;
+  color: var(--accent, #d86b8c);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pde-tutorial-coach.requires-tap .pde-tutorial-tap-hint {
+  display: block;
+}
+
+.pde-tutorial-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.pde-tutorial-next,
+.pde-tutorial-exit {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+.pde-tutorial-coach.requires-tap .pde-tutorial-next {
+  display: none;
+}
+
+.pde-tutorial-done {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  z-index: 12010;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(35, 30, 37, .94);
+  box-shadow: 0 14px 34px rgba(0,0,0,.25);
+  font-size: 14px;
+  font-weight: 700;
+  animation: pdeTutorialDone 2.6s ease both;
+}
+
+@keyframes pdeTutorialPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes pdeTutorialHandTap {
+  0%, 100% { transform: translateY(0) rotate(-7deg) scale(1); }
+  45% { transform: translateY(-9px) rotate(2deg) scale(1.08); }
+}
+
+@keyframes pdeTutorialCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pdeTutorialDone {
+  0% { opacity: 0; transform: translate(-50%, 14px); }
+  12%, 82% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -8px); }
+}
+
+@media (max-width: 420px) {
+  .pde-tutorial-offer-card {
+    padding: 23px 18px 19px;
+    border-radius: 24px;
+  }
+
+  .pde-tutorial-coach {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .pde-tutorial-coach h3 {
+    font-size: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pde-tutorial-highlight,
+  .pde-tutorial-hand,
+  .pde-tutorial-offer-card,
+  .pde-tutorial-coach,
+  .pde-tutorial-done {
+    animation: none !important;
+  }
+}
