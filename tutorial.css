@@ -1,14 +1,15 @@
-/* PhotoDumpEvent guided tutorial */
+/* PhotoDumpEvent guided tutorial — polished mobile onboarding */
 .pde-tutorial-offer {
   position: fixed;
   inset: 0;
-  z-index: 12000;
+  z-index: 900010;
   display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(14, 12, 20, .62);
-  backdrop-filter: blur(8px);
+  background: rgba(14, 12, 20, .66);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
 }
 
 .pde-tutorial-offer.is-open {
@@ -18,11 +19,12 @@
 .pde-tutorial-offer-card {
   width: min(100%, 390px);
   padding: 26px 22px 22px;
+  border: 1px solid rgba(255, 255, 255, .76);
   border-radius: 28px;
-  background: rgba(255, 255, 255, .98);
+  background: rgba(255, 255, 255, .985);
   color: #29242b;
   text-align: center;
-  box-shadow: 0 26px 80px rgba(0, 0, 0, .28);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .34);
   animation: pdeTutorialCardIn .28s ease both;
 }
 
@@ -34,8 +36,8 @@
   margin: 0 auto 14px;
   border-radius: 24px;
   font-size: 34px;
-  background: linear-gradient(135deg, var(--accent-soft, #ffe5ee), rgba(255,255,255,.94));
-  box-shadow: 0 14px 28px var(--accent-glow, rgba(216,107,140,.20));
+  background: linear-gradient(135deg, var(--accent-soft, #ffe5ee), rgba(255, 255, 255, .96));
+  box-shadow: 0 14px 28px var(--accent-glow, rgba(216, 107, 140, .20));
 }
 
 .pde-tutorial-offer-card h2 {
@@ -68,13 +70,14 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pde-tutorial-primary,
 .pde-tutorial-next {
   color: #fff;
   background: linear-gradient(135deg, var(--accent, #d86b8c), var(--accent-2, #f5a5bd));
-  box-shadow: 0 12px 26px var(--accent-glow, rgba(216,107,140,.30));
+  box-shadow: 0 12px 26px var(--accent-glow, rgba(216, 107, 140, .30));
 }
 
 .pde-tutorial-secondary,
@@ -86,69 +89,99 @@
 .pde-tutorial-layer {
   position: fixed;
   inset: 0;
-  z-index: 11990;
+  z-index: 900000;
   display: none;
   pointer-events: none;
+  isolation: isolate;
 }
 
 .pde-tutorial-layer.is-open {
   display: block;
 }
 
-body.pde-tutorial-active {
-  overflow: hidden;
+.pde-tutorial-shade {
+  position: fixed;
+  z-index: 1;
+  display: none;
+  background: rgba(14, 11, 18, .68);
+  pointer-events: auto;
+  touch-action: none;
 }
 
-body.pde-tutorial-active .app,
-body.pde-tutorial-active .topbar-wrap,
-body.pde-tutorial-active .navbar {
+.pde-tutorial-shade.is-visible {
+  display: block;
+}
+
+.pde-tutorial-ring {
+  position: fixed;
+  z-index: 2;
+  display: none;
+  border: 4px solid rgba(255, 255, 255, .98);
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 4px var(--accent, #d86b8c),
+    0 12px 36px rgba(0, 0, 0, .24),
+    inset 0 0 0 1px rgba(255, 255, 255, .45);
   pointer-events: none;
+  animation: pdeTutorialRingPulse 1.35s ease-in-out infinite;
+}
+
+.pde-tutorial-ring.is-visible {
+  display: block;
 }
 
 .pde-tutorial-highlight {
-  position: relative !important;
-  z-index: 11995 !important;
   pointer-events: auto !important;
-  border-radius: 20px;
-  box-shadow:
-    0 0 0 5px rgba(255,255,255,.96),
-    0 0 0 10px var(--accent, #d86b8c),
-    0 0 0 9999px rgba(13, 10, 18, .70) !important;
-  animation: pdeTutorialPulse 1.25s ease-in-out infinite !important;
-}
-
-.nav-item.pde-tutorial-highlight {
-  padding: 10px 14px;
-  margin: -10px -14px;
-  border-radius: 18px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pde-tutorial-hand {
   position: fixed;
-  z-index: 12002;
-  width: 46px;
-  height: 46px;
-  display: grid;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  display: none;
   place-items: center;
-  font-size: 36px;
+  font-size: 37px;
   line-height: 1;
-  filter: drop-shadow(0 7px 8px rgba(0,0,0,.28));
+  filter: drop-shadow(0 8px 9px rgba(0, 0, 0, .32));
   transform-origin: 50% 65%;
-  animation: pdeTutorialHandTap 1s ease-in-out infinite;
   pointer-events: none;
+  animation: pdeTutorialHandTap 1s ease-in-out infinite;
+}
+
+.pde-tutorial-hand.is-visible {
+  display: grid;
 }
 
 .pde-tutorial-coach {
   position: fixed;
-  z-index: 12005;
-  width: min(360px, calc(100vw - 24px));
+  z-index: 5;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  width: min(390px, calc(100vw - 24px));
+  max-height: min(46vh, 390px);
   padding: 18px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.98);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, .90);
+  border-radius: 24px;
+  background: #fff;
   color: #2d2730;
-  box-shadow: 0 22px 60px rgba(0,0,0,.30);
+  box-shadow:
+    0 26px 74px rgba(0, 0, 0, .38),
+    0 0 0 1px rgba(62, 37, 48, .04);
+  transform: translateX(-50%);
   pointer-events: auto;
-  animation: pdeTutorialCardIn .24s ease both;
+  animation: pdeTutorialCoachIn .24s ease both;
+  overscroll-behavior: contain;
+}
+
+.pde-tutorial-coach-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
 }
 
 .pde-tutorial-step {
@@ -156,13 +189,30 @@ body.pde-tutorial-active .navbar {
   align-items: center;
   min-height: 26px;
   padding: 5px 10px;
-  margin-bottom: 9px;
   border-radius: 999px;
   color: var(--accent, #d86b8c);
-  background: var(--accent-soft, rgba(216,107,140,.12));
+  background: var(--accent-soft, rgba(216, 107, 140, .12));
   font-size: 12px;
   font-weight: 800;
   letter-spacing: .02em;
+}
+
+.pde-tutorial-status {
+  display: none;
+  width: 19px;
+  height: 19px;
+  border: 3px solid var(--accent-soft, rgba(216, 107, 140, .22));
+  border-top-color: var(--accent, #d86b8c);
+  border-radius: 50%;
+  animation: pdeTutorialSpin .75s linear infinite;
+}
+
+.pde-tutorial-coach.is-waiting .pde-tutorial-status {
+  display: block;
+}
+
+.pde-tutorial-coach.is-error {
+  border-color: rgba(190, 67, 67, .22);
 }
 
 .pde-tutorial-coach h3 {
@@ -200,36 +250,37 @@ body.pde-tutorial-active .navbar {
 .pde-tutorial-next,
 .pde-tutorial-exit {
   flex: 1;
-  min-height: 44px;
+  min-height: 46px;
   border-radius: 15px;
   font-size: 14px;
 }
 
-.pde-tutorial-coach.requires-tap .pde-tutorial-next {
+.pde-tutorial-coach.requires-tap .pde-tutorial-next,
+.pde-tutorial-coach.is-waiting .pde-tutorial-actions {
   display: none;
 }
 
 .pde-tutorial-done {
   position: fixed;
   left: 50%;
-  bottom: 92px;
-  z-index: 12010;
+  bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  z-index: 900020;
   transform: translateX(-50%);
   width: max-content;
   max-width: calc(100vw - 32px);
   padding: 12px 18px;
   border-radius: 999px;
   color: #fff;
-  background: rgba(35, 30, 37, .94);
-  box-shadow: 0 14px 34px rgba(0,0,0,.25);
+  background: rgba(35, 30, 37, .96);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .28);
   font-size: 14px;
   font-weight: 700;
   animation: pdeTutorialDone 2.6s ease both;
 }
 
-@keyframes pdeTutorialPulse {
+@keyframes pdeTutorialRingPulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.045); }
+  50% { transform: scale(1.025); }
 }
 
 @keyframes pdeTutorialHandTap {
@@ -240,6 +291,15 @@ body.pde-tutorial-active .navbar {
 @keyframes pdeTutorialCardIn {
   from { opacity: 0; transform: translateY(12px) scale(.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pdeTutorialCoachIn {
+  from { opacity: 0; transform: translate(-50%, 12px) scale(.98); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes pdeTutorialSpin {
+  to { transform: rotate(360deg); }
 }
 
 @keyframes pdeTutorialDone {
@@ -255,20 +315,38 @@ body.pde-tutorial-active .navbar {
   }
 
   .pde-tutorial-coach {
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px));
     padding: 16px;
-    border-radius: 20px;
+    border-radius: 21px;
   }
 
   .pde-tutorial-coach h3 {
     font-size: 19px;
   }
+
+  .pde-tutorial-coach p {
+    font-size: 14px;
+  }
+}
+
+@media (max-height: 650px) {
+  .pde-tutorial-coach {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    max-height: 48vh;
+    padding: 14px;
+  }
+
+  .pde-tutorial-actions {
+    margin-top: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pde-tutorial-highlight,
+  .pde-tutorial-ring,
   .pde-tutorial-hand,
   .pde-tutorial-offer-card,
   .pde-tutorial-coach,
+  .pde-tutorial-status,
   .pde-tutorial-done {
     animation: none !important;
   }

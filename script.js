@@ -1642,6 +1642,12 @@ window.uploadFile = async function (files) {
 
   const MAX_PARALLEL_UPLOADS = 2;
 
+  window.dispatchEvent(new CustomEvent("pde:photo-upload-start", {
+    detail: {
+      count: fileList.length
+    }
+  }));
+
   showUploadOverlay(
     `Pripremam ${fileList.length} fotografija...`,
     3
@@ -1780,6 +1786,14 @@ window.uploadFile = async function (files) {
     switchScreen("profile");
     loadMyImages();
 
+    window.dispatchEvent(new CustomEvent("pde:photo-upload-complete", {
+      detail: {
+        done,
+        failed,
+        total: fileList.length
+      }
+    }));
+
     showToast(
       failed
         ? `Upload završen — ${done} uspješno, ${failed} nije uspjelo`
@@ -1881,6 +1895,10 @@ window.switchScreen = function (screen) {
     document.querySelectorAll(".nav-item")[2].classList.add("active");
     loadMyImages();
   }
+
+  window.dispatchEvent(new CustomEvent("pde:screenchange", {
+    detail: { screen }
+  }));
 };
 
 window.saveDedication = async function () {
